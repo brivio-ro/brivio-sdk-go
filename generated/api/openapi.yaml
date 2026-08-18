@@ -1,0 +1,5469 @@
+openapi: 3.1.0
+info:
+  description: "Public REST API for Brivio — invoicing, contacts, articles, locations\
+    \ and module entitlements. Authenticate with a Bearer API key (brivio_sk_live_…\
+    \ / brivio_sk_test_…)."
+  title: Brivio API
+  version: 1.0.0
+servers:
+- url: https://api.brivio.ro/v1
+security:
+- bearerAuth: []
+paths:
+  /me:
+    get:
+      operationId: listMe
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Identify the authenticated organization
+      tags:
+      - me
+  /contacts:
+    get:
+      operationId: listContacts
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listContacts_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: List contacts
+      tags:
+      - contacts
+    post:
+      operationId: createContact
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactCreate"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createContact_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Create a contact
+      tags:
+      - contacts
+  /contacts/{id}:
+    delete:
+      operationId: deleteContact
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Delete a contact
+      tags:
+      - contacts
+    get:
+      operationId: getContact
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createContact_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Get a contact
+      tags:
+      - contacts
+    patch:
+      operationId: updateContact
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createContact_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Update a contact
+      tags:
+      - contacts
+  /companies/search:
+    get:
+      description: "Prospectare: filter ~2M Romanian companies. Same query-string\
+        \ codec as the /prospecting web UI (e.g. ?jud=CLUJ&sect=62&fin=employees:latest:10-).\
+        \ Scope: companies:read."
+      operationId: listCompanySearch
+      parameters:
+      - description: Free text (name/CUI)
+        explode: true
+        in: query
+        name: q
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "CAEN codes, comma-separated"
+        explode: true
+        in: query
+        name: caen
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "CAEN divisions, comma-separated"
+        explode: true
+        in: query
+        name: sect
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Counties, comma-separated"
+        explode: true
+        in: query
+        name: jud
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Financial ranges, e.g. revenue:latest:1000000-"
+        explode: true
+        in: query
+        name: fin
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Trend filters, e.g. profitableYears:3"
+        explode: true
+        in: query
+        name: trend
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Administrator/associate name
+        explode: true
+        in: query
+        name: adm
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: sort
+        required: false
+        schema:
+          enum:
+          - relevance
+          - name
+          - nameDesc
+          - revenue
+          - revenueAsc
+          - employees
+          - employeesAsc
+          - foundedNewest
+          - foundedOldest
+          type: string
+        style: form
+      - description: Page
+        explode: true
+        in: query
+        name: p
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Page size (max 200)
+        explode: true
+        in: query
+        name: "n"
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Include aggregate stats
+        explode: true
+        in: query
+        name: stats
+        required: false
+        schema:
+          type: boolean
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Search the public company registry (compact URL filters)
+      tags:
+      - companies
+    post:
+      description: "Body: { groups: FilterGroup[], sort?, page?, pageSize?, stats?\
+        \ }. AND between groups, OR within a group; groups support exclude:true (NOT).\
+        \ Scope: companies:read."
+      operationId: createCompanySearch
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createCompanySearch_request"
+        required: true
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Search the public company registry (full filter model)
+      tags:
+      - companies
+  /companies/{cui}/similar:
+    get:
+      operationId: listCompanySimilar
+      parameters:
+      - explode: false
+        in: path
+        name: cui
+        required: true
+        schema:
+          type: string
+        style: simple
+      - explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          maximum: 25
+          type: integer
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Find similar companies (same CAEN, county, size band)"
+      tags:
+      - companies
+  /articles:
+    get:
+      operationId: listArticles
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listArticles_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: List articles
+      tags:
+      - articles
+    post:
+      operationId: createArticle
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ArticleCreate"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createArticle_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Create an article
+      tags:
+      - articles
+  /articles/{id}:
+    delete:
+      operationId: deleteArticle
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Delete a article
+      tags:
+      - articles
+    get:
+      operationId: getArticle
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createArticle_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Get a article
+      tags:
+      - articles
+    patch:
+      operationId: updateArticle
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createArticle_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Update a article
+      tags:
+      - articles
+  /invoices:
+    get:
+      operationId: listInvoices
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listInvoices_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: List invoices
+      tags:
+      - invoices
+    post:
+      operationId: createInvoice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvoiceCreate"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createInvoice_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Create an invoice
+      tags:
+      - invoices
+  /compat/oblio/docs/invoice:
+    post:
+      operationId: createOblioCompatInvoice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Compat shim: create an invoice with an Oblio-shaped payload (Oblio\
+        \ POST /api/docs/invoice)"
+      tags:
+      - compat
+  /compat/oblio/docs/invoice/cancel:
+    put:
+      operationId: cancelOblioCompatInvoice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Compat shim: cancel an invoice by seriesName + number (Oblio-shaped)"
+      tags:
+      - compat
+  /compat/smartbill/invoice:
+    post:
+      operationId: createSmartBillCompatInvoice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Compat shim: create an invoice with a SmartBill-shaped payload (SmartBill\
+        \ POST /SBORO/api/invoice)"
+      tags:
+      - compat
+  /compat/smartbill/invoice/cancel:
+    delete:
+      operationId: cancelSmartBillCompatInvoice
+      parameters:
+      - explode: true
+        in: query
+        name: seriesname
+        required: true
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: number
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Compat shim: cancel an invoice by seriesname + number query params\
+        \ (SmartBill-shaped)"
+      tags:
+      - compat
+  /invoices/{id}:
+    delete:
+      operationId: deleteInvoice
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Delete a invoice
+      tags:
+      - invoices
+    get:
+      operationId: getInvoice
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createInvoice_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Get a invoice
+      tags:
+      - invoices
+    patch:
+      operationId: updateInvoice
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createInvoice_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Update a invoice
+      tags:
+      - invoices
+  /invoices/{id}/items:
+    get:
+      operationId: listInvoiceItems
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: List line items of an invoice
+      tags:
+      - invoices
+  /invoices/{id}/payments:
+    get:
+      operationId: listInvoicePayments
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: List payments recorded against an invoice
+      tags:
+      - invoices
+    post:
+      operationId: createInvoicePayment
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvoicePaymentCreate"
+        required: true
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Record a payment against an invoice (updates status)
+      tags:
+      - invoices
+  /invoices/{id}/send:
+    post:
+      operationId: sendInvoice
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Mark an invoice as sent (DRAFT → SENT; idempotent)
+      tags:
+      - invoices
+  /invoices/{id}/efactura-status:
+    get:
+      operationId: listInvoiceEfacturaStatus
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: e-Factura transmission status of an invoice
+      tags:
+      - invoices
+  /invoices/{id}/submit-efactura:
+    post:
+      operationId: submitEfacturaInvoice
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Submit an invoice to ANAF e-Factura
+      tags:
+      - invoices
+  /projects:
+    get:
+      operationId: listProjects
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listProjects_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: List projects
+      tags:
+      - projects
+    post:
+      operationId: createProject
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectCreate"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createProject_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Create a project
+      tags:
+      - projects
+  /quotes:
+    get:
+      operationId: listQuotes
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listQuotes_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: List quotes (read-only)
+      tags:
+      - quotes
+  /quotes/{id}:
+    delete:
+      operationId: deleteQuote
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Delete a quote
+      tags:
+      - quotes
+    get:
+      operationId: getQuote
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getQuote_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Get a quote
+      tags:
+      - quotes
+    patch:
+      operationId: updateQuote
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getQuote_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Update a quote
+      tags:
+      - quotes
+  /time-entries:
+    get:
+      operationId: listTimeEntries
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listTimeEntries_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: List time entries (read-only)
+      tags:
+      - time-entries
+  /time-entries/{id}:
+    delete:
+      operationId: deleteTimeEntry
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Delete a time entry
+      tags:
+      - time-entries
+    get:
+      operationId: getTimeEntry
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getTimeEntry_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Get a time entry
+      tags:
+      - time-entries
+    patch:
+      operationId: updateTimeEntry
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getTimeEntry_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Update a time entry
+      tags:
+      - time-entries
+  /expenses:
+    get:
+      operationId: listExpenses
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listExpenses_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: List expenses
+      tags:
+      - expenses
+    post:
+      operationId: createExpense
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExpenseCreate"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createExpense_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Create an expense
+      tags:
+      - expenses
+  /contracts:
+    get:
+      operationId: listContracts
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listContracts_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: List contracts
+      tags:
+      - contracts
+    post:
+      operationId: createContract
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContractCreate"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createContract_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Create a contract
+      tags:
+      - contracts
+  /documents:
+    get:
+      operationId: listDocuments
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listDocuments_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: List documents
+      tags:
+      - documents
+    post:
+      operationId: createDocument
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DocumentCreate"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createDocument_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Create a document
+      tags:
+      - documents
+  /documents/{id}:
+    delete:
+      operationId: deleteDocument
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Delete a document
+      tags:
+      - documents
+    get:
+      operationId: getDocument
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createDocument_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Get a document
+      tags:
+      - documents
+    patch:
+      operationId: updateDocument
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createDocument_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Update a document
+      tags:
+      - documents
+  /locations:
+    get:
+      operationId: listLocations
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listLocations_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: List locations
+      tags:
+      - locations
+    post:
+      operationId: createLocation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LocationCreate"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createLocation_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Create a location
+      tags:
+      - locations
+  /locations/{id}:
+    get:
+      operationId: getLocation
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createLocation_201_response"
+          description: OK
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Get a location
+      tags:
+      - locations
+  /modules:
+    get:
+      operationId: listModules
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listModules_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: List module entitlements
+      tags:
+      - modules
+  /realtime/stream:
+    get:
+      operationId: listRealtimeStream
+      responses:
+        "200":
+          description: SSE stream; events follow the outbound webhook event catalog
+      summary: Server-Sent Events stream of realtime org events (text/event-stream)
+      tags:
+      - realtime
+  /webhooks:
+    get:
+      operationId: listWebhooks
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: List webhook subscriptions
+      tags:
+      - webhooks
+    post:
+      operationId: createWebhook
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Create a webhook subscription
+      tags:
+      - webhooks
+  /affiliates:
+    get:
+      operationId: listAffiliates
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List affiliates in your program (scope: affiliates:read)"
+      tags:
+      - affiliates
+    post:
+      operationId: createAffiliate
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Enroll an affiliate by email (scope: affiliates:write)"
+      tags:
+      - affiliates
+  /affiliates/{id}:
+    get:
+      operationId: getAffiliate
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Get an affiliate
+      tags:
+      - affiliates
+  /affiliates/{id}/referrals:
+    get:
+      operationId: listAffiliateReferrals
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: List referrals for an affiliate
+      tags:
+      - affiliates
+  /affiliates/{id}/commissions:
+    get:
+      operationId: listAffiliateCommissions
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: List commission ledger entries for an affiliate
+      tags:
+      - affiliates
+  /affiliates/{id}/codes:
+    post:
+      operationId: createAffiliateCode
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Create a referral code for an affiliate (scope: affiliates:write)"
+      tags:
+      - affiliates
+  /affiliate-events/click:
+    post:
+      operationId: createAffiliateEventClick
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Record a referral click from an external storefront (scope: affiliates:write)"
+      tags:
+      - affiliate-events
+  /webhooks/events:
+    get:
+      operationId: listWebhookEvents
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: List available webhook event types
+      tags:
+      - webhooks
+  /webhooks/{id}:
+    delete:
+      operationId: deleteWebhook
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Delete a webhook subscription
+      tags:
+      - webhooks
+    get:
+      operationId: getWebhook
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Get a webhook subscription
+      tags:
+      - webhooks
+    patch:
+      operationId: updateWebhook
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Update a webhook subscription (set rotate_secret to rotate the signing
+        secret)
+      tags:
+      - webhooks
+  /webhooks/{id}/deliveries:
+    get:
+      operationId: listWebhookDeliveries
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          enum:
+          - pending
+          - success
+          - failed
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: List delivery attempts for a webhook
+      tags:
+      - webhooks
+  /orders/{id}/status:
+    post:
+      operationId: statusOrder
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Transition an order status: pending|paid|fulfilled|cancelled|refunded\
+        \ (scope: orders:write)"
+      tags:
+      - orders
+  /webhooks/{id}/deliveries/{deliveryId}/redeliver:
+    post:
+      operationId: redeliverWebhookDelivery
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: deliveryId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Redeliver a failed/dead delivery — resets the attempt budget and schedules\
+        \ it due-now; pass {\"force\":true} to redeliver an already-succeeded delivery\
+        \ (scope: webhooks:write)"
+      tags:
+      - webhooks
+  /inventory/stock:
+    get:
+      operationId: listInventoryStock
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: per_page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Opaque keyset cursor (from meta.nextCursor); takes precedence
+          over page
+        explode: true
+        in: query
+        name: cursor
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Current stock levels for stock-tracked articles
+      tags:
+      - inventory
+  /inventory/stock-by-location:
+    get:
+      operationId: listInventoryStockByLocation
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: per_page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: article_id
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: location_id
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Per-location (gestiune) stock balances
+      tags:
+      - inventory
+  /series:
+    get:
+      operationId: listSeries
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: per_page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: document_type
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: active
+        required: false
+        schema:
+          enum:
+          - "true"
+          - "false"
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: List document numbering series (read-only)
+      tags:
+      - series
+  /taxes/vat-rates:
+    get:
+      operationId: listTaxeVatRates
+      parameters:
+      - explode: true
+        in: query
+        name: date
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Romanian VAT rates valid on a date
+      tags:
+      - taxes
+  /inventory/movements:
+    get:
+      operationId: listInventoryMovements
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: per_page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Opaque keyset cursor (from meta.nextCursor); takes precedence
+          over page
+        explode: true
+        in: query
+        name: cursor
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Stock movement history
+      tags:
+      - inventory
+  /inventory/nir:
+    get:
+      operationId: listInventoryNir
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: List goods receipt notes (NIR)
+      tags:
+      - inventory
+  /inventory/nir/{id}:
+    get:
+      operationId: getInventoryNir
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Get a goods receipt note with line items
+      tags:
+      - inventory
+  /hr/employees:
+    get:
+      operationId: listHrEmployees
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: per_page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Opaque keyset cursor (from meta.nextCursor); takes precedence
+          over page
+        explode: true
+        in: query
+        name: cursor
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Employee directory (PII excluded)
+      tags:
+      - hr
+  /orders:
+    get:
+      operationId: listOrders
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List storefront orders (scope: orders:read)"
+      tags:
+      - orders
+  /orders/{id}:
+    get:
+      operationId: getOrder
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Get a storefront order with line items
+      tags:
+      - orders
+  /orders/import:
+    post:
+      operationId: createOrderImport
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createOrderImport_request"
+        required: true
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Import an e-commerce order (Shopify/WooCommerce connectors) — creates\
+        \ a DRAFT invoice + contact, deduped by source+external_id (scope: orders:write)"
+      tags:
+      - orders
+  /bookings:
+    get:
+      operationId: listBookings
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List service appointments (scope: bookings:read)"
+      tags:
+      - bookings
+    post:
+      operationId: createBooking
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Create a service appointment (scope: bookings:write)"
+      tags:
+      - bookings
+  /bookings/{id}:
+    get:
+      operationId: getBooking
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Get a service appointment
+      tags:
+      - bookings
+  /reservations:
+    get:
+      operationId: listReservations
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List hotel reservations (scope: reservations:read)"
+      tags:
+      - reservations
+  /reservations/{id}:
+    get:
+      operationId: getReservation
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Get a hotel reservation
+      tags:
+      - reservations
+  /api-keys:
+    get:
+      operationId: listApiKeys
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List API keys for the calling environment (scope: api_keys:read)"
+      tags:
+      - api-keys
+    post:
+      operationId: createApiKey
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Create an API key — raw key shown once (scope: api_keys:write)"
+      tags:
+      - api-keys
+  /api-keys/{id}/rotate:
+    post:
+      operationId: rotateApiKey
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Rotate an API key — issues a replacement with the same scopes; old\
+        \ key expires after grace_period_hours (default 24, 0 = immediate). Raw key\
+        \ shown once (scope: api_keys:write)"
+      tags:
+      - api-keys
+  /api-keys/{id}:
+    delete:
+      operationId: deleteApiKey
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Revoke an API key (scope: api_keys:write)"
+      tags:
+      - api-keys
+  /banking/connections:
+    get:
+      operationId: listBankingConnections
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List open-banking connections (scope: banking:read)"
+      tags:
+      - banking
+  /banking/transactions:
+    get:
+      operationId: listBankingTransactions
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: match_status
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: from
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: to
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List imported bank transactions (scope: banking:read)"
+      tags:
+      - banking
+  /catalog:
+    get:
+      operationId: listCatalog
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Sellable product catalog with synced prices (scope: articles:read)"
+      tags:
+      - catalog
+  /customers/{externalId}:
+    get:
+      operationId: getCustomer
+      parameters:
+      - explode: false
+        in: path
+        name: externalId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Consolidated billing view of an external customer (scope: invoices:read)"
+      tags:
+      - customers
+  /fixed-assets:
+    get:
+      operationId: listFixedAssets
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List fixed assets (scope: accounting:read)"
+      tags:
+      - fixed-assets
+    post:
+      operationId: createFixedAsset
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Create a fixed asset with depreciation schedule (scope: accounting:write)"
+      tags:
+      - fixed-assets
+  /marketing/audiences:
+    get:
+      operationId: listMarketingAudiences
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List marketing audiences (scope: marketing:read)"
+      tags:
+      - marketing
+    post:
+      operationId: createMarketingAudience
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Create a static audience (scope: marketing:write)"
+      tags:
+      - marketing
+  /marketing/campaigns:
+    get:
+      operationId: listMarketingCampaigns
+      parameters:
+      - explode: true
+        in: query
+        name: channel
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List marketing campaigns (scope: marketing:read)"
+      tags:
+      - marketing
+    post:
+      operationId: createMarketingCampaign
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Create a draft campaign (scope: marketing:write)"
+      tags:
+      - marketing
+  /payment-methods:
+    get:
+      operationId: listPaymentMethods
+      parameters:
+      - explode: true
+        in: query
+        name: external_customer_id
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List saved payment methods for an external customer (scope: payments:charge)"
+      tags:
+      - payment-methods
+    patch:
+      operationId: updatePaymentMethod
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Set default or detach a payment method (scope: payments:charge)"
+      tags:
+      - payment-methods
+    post:
+      operationId: createPaymentMethod
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Create a SetupIntent to save a card (scope: payments:charge)"
+      tags:
+      - payment-methods
+  /payments/charge:
+    post:
+      operationId: createPaymentCharge
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Create a PaymentIntent on the org provider (scope: payments:charge)"
+      tags:
+      - payments
+  /subscriptions:
+    get:
+      operationId: listSubscriptions
+      parameters:
+      - explode: true
+        in: query
+        name: external_customer_id
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List merchant subscriptions (scope: invoices:read)"
+      tags:
+      - subscriptions
+    post:
+      operationId: createSubscription
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Create a recurring subscription (scope: payments:charge)"
+      tags:
+      - subscriptions
+  /subscriptions/{id}:
+    delete:
+      operationId: deleteSubscription
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Cancel at period end (scope: payments:charge)"
+      tags:
+      - subscriptions
+    get:
+      operationId: getSubscription
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Get a merchant subscription (scope: invoices:read)"
+      tags:
+      - subscriptions
+    patch:
+      operationId: updateSubscription
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Cancel / resume / change price (scope: payments:charge)"
+      tags:
+      - subscriptions
+  /trust/providers:
+    get:
+      operationId: listTrustProviders
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List available trust providers (scope: trust:providers)"
+      tags:
+      - trust
+  /trust/signatures:
+    post:
+      operationId: createTrustSignature
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Create a digital signature or seal (scope: trust:sign)"
+      tags:
+      - trust
+  /trust/signatures/batch:
+    post:
+      operationId: createTrustSignatureBatch
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Batch sign up to 100 documents (scope: trust:sign)"
+      tags:
+      - trust
+  /trust/signatures/{id}:
+    get:
+      operationId: getTrustSignature
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Get a signature by id (scope: trust:sign)"
+      tags:
+      - trust
+  /trust/signatures/{id}/evidence:
+    get:
+      operationId: listTrustSignatureEvidence
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Get evidence bundles for a signature (scope: trust:evidence)"
+      tags:
+      - trust
+  /trust/validations:
+    post:
+      operationId: createTrustValidation
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Validate a signed document (scope: trust:validate)"
+      tags:
+      - trust
+  /trust/validations/{id}:
+    get:
+      operationId: getTrustValidation
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Get a validation result (scope: trust:validate)"
+      tags:
+      - trust
+  /trust/timestamps:
+    post:
+      operationId: createTrustTimestamp
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Timestamp a signed document (scope: trust:timestamp)"
+      tags:
+      - trust
+  /dns/zones:
+    get:
+      operationId: listDnsZones
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listDnsZones_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List DNS zones (scope: dns:read)"
+      tags:
+      - dns
+    post:
+      operationId: createDnsZone
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DnsZoneCreate"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createDnsZone_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Create a DNS zone (scope: dns:write)"
+      tags:
+      - dns
+  /dns/zones/{id}:
+    delete:
+      operationId: deleteDnsZone
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Deleted
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Delete a DNS zone (scope: dns:write)"
+      tags:
+      - dns
+    get:
+      operationId: getDnsZone
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createDnsZone_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Get a DNS zone with its records (scope: dns:read)"
+      tags:
+      - dns
+  /dns/zones/{id}/records:
+    get:
+      operationId: listDnsZoneRecords
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List records in a zone (scope: dns:read)"
+      tags:
+      - dns
+    post:
+      operationId: createDnsZoneRecord
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DnsRecordCreate"
+        required: true
+      responses:
+        "201":
+          description: Created
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Create a DNS record (scope: dns:write)"
+      tags:
+      - dns
+  /dns/zones/{id}/records/{recordId}:
+    delete:
+      operationId: deleteDnsZoneRecord
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: recordId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Deleted
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Delete a DNS record (scope: dns:write)"
+      tags:
+      - dns
+    put:
+      operationId: updateDnsZoneRecord
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: recordId
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DnsRecordCreate"
+        required: true
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Update a DNS record (scope: dns:write)"
+      tags:
+      - dns
+  /dns/zones/{id}/import:
+    post:
+      operationId: importDnsZone
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Import a BIND zone file (scope: dns:write)"
+      tags:
+      - dns
+  /dns/zones/{id}/export:
+    get:
+      operationId: listDnsZoneExport
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Export a zone as a BIND zone file (scope: dns:read)"
+      tags:
+      - dns
+  /dns/templates:
+    get:
+      operationId: listDnsTemplates
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List available DNS templates (scope: dns:read)"
+      tags:
+      - dns
+  /dns/zones/{id}/template:
+    post:
+      operationId: templateDnsZone
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Apply a DNS template to a zone (scope: dns:write)"
+      tags:
+      - dns
+  /dns/zones/{id}/versions:
+    get:
+      operationId: listDnsZoneVersions
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List zone version history (scope: dns:read)"
+      tags:
+      - dns
+  /dns/zones/{id}/rollback:
+    post:
+      operationId: rollbackDnsZone
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Roll a zone back to a previous version (scope: dns:write)"
+      tags:
+      - dns
+  /dns/connections:
+    get:
+      operationId: listDnsConnections
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List external DNS provider connections (scope: dns:read)"
+      tags:
+      - dns
+  /dns/connections/{id}/zones:
+    get:
+      operationId: listDnsConnectionZones
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List zones at an external DNS provider (scope: dns:read)"
+      tags:
+      - dns
+  /domains:
+    get:
+      operationId: listDomains
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listDomains_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List registered domains (scope: domains:read)"
+      tags:
+      - domains
+  /domains/{id}/lock:
+    post:
+      operationId: lockDomain
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Lock a domain against transfers (scope: domains:write)"
+      tags:
+      - domains
+  /domains/{id}/unlock:
+    post:
+      operationId: unlockDomain
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Unlock a domain for transfer (scope: domains:write)"
+      tags:
+      - domains
+  /domains/{id}/auth-code:
+    get:
+      operationId: listDomainAuthCode
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Get the domain transfer auth code (scope: domains:write)"
+      tags:
+      - domains
+  /domains/{id}/renew:
+    post:
+      operationId: renewDomain
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Renew a domain registration (scope: domains:write)"
+      tags:
+      - domains
+  /domains/{id}/health:
+    get:
+      operationId: listDomainHealth
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Domain health (expiry, nameservers, DNSSEC) (scope: domains:read)"
+      tags:
+      - domains
+  /sites:
+    get:
+      operationId: listSites
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listSites_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List hosted sites (scope: sites:read)"
+      tags:
+      - sites
+components:
+  schemas:
+    Meta:
+      example:
+        nextCursor: nextCursor
+        total: 1
+        perPage: 6
+        totalPages: 5
+        page: 0
+      properties:
+        page:
+          type: integer
+        perPage:
+          type: integer
+        total:
+          type: integer
+        totalPages:
+          type: integer
+        nextCursor:
+          type: string
+          nullable: true
+    Error:
+      properties:
+        data:
+          nullable: true
+        error:
+          $ref: "#/components/schemas/listMe_401_response_error"
+      required:
+      - data
+      - error
+    Contact:
+      example:
+        is_active: true
+        phone: phone
+        person_type: INDIVIDUAL
+        vat_number: vat_number
+        name: name
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        type: CLIENT
+        email: email
+      properties:
+        id:
+          format: uuid
+          type: string
+        type:
+          enum:
+          - CLIENT
+          - SUPPLIER
+          - BOTH
+          type: string
+        person_type:
+          enum:
+          - INDIVIDUAL
+          - COMPANY
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        vat_number:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+    ContactCreate:
+      example:
+        person_type: INDIVIDUAL
+        vat_number: vat_number
+        name: name
+        type: CLIENT
+        email: email
+      properties:
+        type:
+          enum:
+          - CLIENT
+          - SUPPLIER
+          - BOTH
+          type: string
+        person_type:
+          enum:
+          - INDIVIDUAL
+          - COMPANY
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        vat_number:
+          type: string
+      required:
+      - name
+    Article:
+      example:
+        unit: unit
+        default_price: default_price
+        name: name
+        currency: currency
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        type: PRODUCT
+        vat_rate: vat_rate
+      properties:
+        id:
+          format: uuid
+          type: string
+        type:
+          enum:
+          - PRODUCT
+          - SERVICE
+          type: string
+        name:
+          type: string
+        default_price:
+          type: string
+          nullable: true
+        currency:
+          type: string
+        unit:
+          type: string
+        vat_rate:
+          type: string
+    ArticleCreate:
+      example:
+        default_price: 0.8008281904610115
+        name: name
+        type: PRODUCT
+        vat_rate: 6.027456183070403
+      properties:
+        type:
+          enum:
+          - PRODUCT
+          - SERVICE
+          type: string
+        name:
+          type: string
+        default_price:
+          type: number
+        vat_rate:
+          type: number
+      required:
+      - name
+    Invoice:
+      example:
+        number: 0
+        total: total
+        subtotal: subtotal
+        currency: currency
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        type: type
+        contact_id: contact_id
+        vat_total: vat_total
+        direction: direction
+        status: status
+      properties:
+        id:
+          format: uuid
+          type: string
+        type:
+          type: string
+        direction:
+          type: string
+        number:
+          type: integer
+        status:
+          type: string
+        contact_id:
+          type: string
+        currency:
+          type: string
+        subtotal:
+          type: string
+        vat_total:
+          type: string
+        total:
+          type: string
+    InvoiceCreate:
+      example:
+        issue_date: 2000-01-23
+        due_date: 2000-01-23
+        currency: currency
+        type: INVOICE
+        contact_id: contact_id
+        items:
+        - quantity: 0.8008281904610115
+          description: description
+          unit_price: 6.027456183070403
+          vat_rate: 1.4658129805029452
+        - quantity: 0.8008281904610115
+          description: description
+          unit_price: 6.027456183070403
+          vat_rate: 1.4658129805029452
+      properties:
+        type:
+          enum:
+          - INVOICE
+          - PROFORMA
+          - QUOTE
+          - RECEIPT
+          - CREDIT_NOTE
+          type: string
+        contact_id:
+          type: string
+        issue_date:
+          format: date
+          type: string
+        due_date:
+          format: date
+          type: string
+        currency:
+          type: string
+        items:
+          items:
+            $ref: "#/components/schemas/InvoiceCreate_items_inner"
+          type: array
+      required:
+      - contact_id
+      - due_date
+      - issue_date
+      - items
+    InvoicePaymentCreate:
+      example:
+        reference: reference
+        amount: 0.8008281904610115
+        notes: notes
+        method: CASH
+        currency: currency
+        payment_date: 2000-01-23
+      properties:
+        amount:
+          type: number
+        currency:
+          type: string
+        payment_date:
+          format: date
+          type: string
+        method:
+          enum:
+          - CASH
+          - BANK_TRANSFER
+          - CARD
+          - PAYPAL
+          - STRIPE
+          - OTHER
+          type: string
+        reference:
+          type: string
+        notes:
+          type: string
+      required:
+      - amount
+      - payment_date
+    Location:
+      example:
+        code: code
+        is_primary: true
+        name: name
+        vertical_type: retail
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        code:
+          type: string
+          nullable: true
+        vertical_type:
+          enum:
+          - retail
+          - restaurant
+          - hotel
+          - services
+          - warehouse
+          - professional
+          - generic
+          type: string
+        is_primary:
+          type: boolean
+    LocationCreate:
+      example:
+        code: code
+        city: city
+        name: name
+        vertical_type: vertical_type
+      properties:
+        name:
+          type: string
+        code:
+          type: string
+        vertical_type:
+          type: string
+        city:
+          type: string
+      required:
+      - name
+    Module:
+      example:
+        reason: reason
+        available: true
+        key: key
+        enabled: true
+      properties:
+        key:
+          type: string
+        enabled:
+          type: boolean
+        available:
+          type: boolean
+        reason:
+          type: string
+          nullable: true
+    TimeEntry:
+      example:
+        date: 2000-01-23
+        approval_status: approval_status
+        end_time: end_time
+        description: description
+        created_at: 2000-01-23T04:56:07.000+00:00
+        billable: true
+        start_time: start_time
+        billed: true
+        duration_minutes: 0
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        user_id: user_id
+        project_id: project_id
+        hourly_rate: hourly_rate
+        invoice_id: invoice_id
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        id:
+          format: uuid
+          type: string
+        user_id:
+          type: string
+        project_id:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        date:
+          format: date
+          type: string
+        start_time:
+          type: string
+          nullable: true
+        end_time:
+          type: string
+          nullable: true
+        duration_minutes:
+          type: integer
+        billable:
+          type: boolean
+        hourly_rate:
+          type: string
+          nullable: true
+        billed:
+          type: boolean
+        invoice_id:
+          type: string
+          nullable: true
+        approval_status:
+          type: string
+        created_at:
+          format: date-time
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+    Quote:
+      example:
+        rejected_at: 2000-01-23T04:56:07.000+00:00
+        created_at: 2000-01-23T04:56:07.000+00:00
+        contact_id: contact_id
+        version: 0
+        accepted_at: 2000-01-23T04:56:07.000+00:00
+        sent_at: 2000-01-23T04:56:07.000+00:00
+        number: number
+        total: total
+        valid_until: 2000-01-23T04:56:07.000+00:00
+        issue_date: 2000-01-23T04:56:07.000+00:00
+        vat_amount: vat_amount
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        series: series
+        subtotal: subtotal
+        currency: currency
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        client_name: client_name
+        status: status
+      properties:
+        id:
+          format: uuid
+          type: string
+        series:
+          type: string
+          nullable: true
+        number:
+          type: string
+          nullable: true
+        contact_id:
+          type: string
+          nullable: true
+        client_name:
+          type: string
+          nullable: true
+        status:
+          type: string
+        version:
+          type: integer
+        issue_date:
+          format: date-time
+          type: string
+        valid_until:
+          format: date-time
+          type: string
+          nullable: true
+        currency:
+          type: string
+        subtotal:
+          type: string
+        vat_amount:
+          type: string
+        total:
+          type: string
+        accepted_at:
+          format: date-time
+          type: string
+          nullable: true
+        rejected_at:
+          format: date-time
+          type: string
+          nullable: true
+        sent_at:
+          format: date-time
+          type: string
+          nullable: true
+        created_at:
+          format: date-time
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+    Project:
+      example:
+        name: name
+        currency: currency
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        slug: slug
+        client_id: client_id
+        status: status
+        budget: budget
+      properties:
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+        status:
+          type: string
+        client_id:
+          type: string
+          nullable: true
+        budget:
+          type: string
+          nullable: true
+        currency:
+          type: string
+    ProjectCreate:
+      example:
+        name: name
+        description: description
+        currency: currency
+        deadline: 2000-01-23
+        client_id: client_id
+        status: PLANNING
+        start_date: 2000-01-23
+        budget: 0.8008281904610115
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          enum:
+          - PLANNING
+          - ACTIVE
+          - ON_HOLD
+          - COMPLETED
+          - ARCHIVED
+          type: string
+        client_id:
+          type: string
+        start_date:
+          format: date
+          type: string
+        deadline:
+          format: date
+          type: string
+        budget:
+          type: number
+        currency:
+          type: string
+      required:
+      - name
+    Expense:
+      example:
+        amount: amount
+        description: description
+        expense_date: 2000-01-23
+        currency: currency
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        category: category
+        status: status
+      properties:
+        id:
+          format: uuid
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        status:
+          type: string
+        amount:
+          type: string
+        currency:
+          type: string
+        expense_date:
+          format: date
+          type: string
+          nullable: true
+    ExpenseCreate:
+      example:
+        amount: 0.8008281904610115
+        vat_amount: 6.027456183070403
+        project_id: project_id
+        description: description
+        expense_date: 2000-01-23
+        currency: currency
+        category: category
+        contact_id: contact_id
+        vat_rate: 1.4658129805029452
+      properties:
+        description:
+          type: string
+        category:
+          type: string
+        amount:
+          type: number
+        vat_amount:
+          type: number
+        vat_rate:
+          type: number
+        currency:
+          type: string
+        expense_date:
+          format: date
+          type: string
+        contact_id:
+          type: string
+        project_id:
+          type: string
+      required:
+      - amount
+      - description
+      - expense_date
+    Contract:
+      example:
+        number: number
+        name: name
+        currency: currency
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        signature_required: true
+        value: value
+        status: status
+      properties:
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        number:
+          type: string
+          nullable: true
+        status:
+          type: string
+        value:
+          type: string
+          nullable: true
+        currency:
+          type: string
+        signature_required:
+          type: boolean
+    ContractCreate:
+      example:
+        number: number
+        project_id: project_id
+        name: name
+        currency: currency
+        signature_required: true
+        contact_id: contact_id
+        value: 0.8008281904610115
+        content: content
+      properties:
+        name:
+          type: string
+        content:
+          type: string
+        number:
+          type: string
+        contact_id:
+          type: string
+        project_id:
+          type: string
+        value:
+          type: number
+        currency:
+          type: string
+        signature_required:
+          type: boolean
+      required:
+      - name
+    Document:
+      example:
+        file_key: file_key
+        is_archived: true
+        mime_type: mime_type
+        file_name: file_name
+        name: name
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        type: type
+        file_size: 0
+      properties:
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        file_key:
+          type: string
+        file_name:
+          type: string
+        mime_type:
+          type: string
+        file_size:
+          type: integer
+        is_archived:
+          type: boolean
+    DocumentCreate:
+      example:
+        file_key: file_key
+        mime_type: mime_type
+        project_id: project_id
+        file_name: file_name
+        name: name
+        type: CONTRACT
+        folder_id: folder_id
+        file_size: 0
+        tags:
+        - tags
+        - tags
+      properties:
+        name:
+          type: string
+        type:
+          enum:
+          - CONTRACT
+          - INVOICE
+          - RECEIPT
+          - IDENTITY
+          - CERTIFICATE
+          - IMAGE
+          - OTHER
+          type: string
+        file_key:
+          type: string
+        file_name:
+          type: string
+        mime_type:
+          type: string
+        file_size:
+          type: integer
+        folder_id:
+          type: string
+        project_id:
+          type: string
+        tags:
+          items:
+            type: string
+          type: array
+      required:
+      - file_key
+      - file_name
+      - file_size
+      - mime_type
+      - name
+    DnsZone:
+      example:
+        dnssec_enabled: true
+        name: name
+        id: id
+        status: status
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+        dnssec_enabled:
+          type: boolean
+    DnsZoneCreate:
+      example:
+        template: template
+        name: name
+      properties:
+        name:
+          type: string
+        template:
+          type: string
+      required:
+      - name
+    DnsRecordCreate:
+      example:
+        name: name
+        type: type
+        priority: 6
+        ttl: 0
+        content: content
+      properties:
+        type:
+          type: string
+        name:
+          type: string
+        content:
+          type: string
+        ttl:
+          type: integer
+        priority:
+          type: integer
+      required:
+      - content
+      - name
+      - type
+    Domain:
+      example:
+        expires_at: 2000-01-23T04:56:07.000+00:00
+        name: name
+        id: id
+        locked: true
+        status: status
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+        expires_at:
+          format: date-time
+          type: string
+        locked:
+          type: boolean
+    Site:
+      example:
+        domain: domain
+        id: id
+        plan: plan
+        status: status
+      properties:
+        id:
+          type: string
+        domain:
+          type: string
+        status:
+          type: string
+        plan:
+          type: string
+    listMe_401_response_error:
+      example:
+        code: code
+        details:
+          key:
+          - details
+          - details
+        message: message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          additionalProperties:
+            items:
+              type: string
+          nullable: true
+      required:
+      - code
+      - message
+    listMe_401_response:
+      example:
+        data: ""
+        error:
+          code: code
+          details:
+            key:
+            - details
+            - details
+          message: message
+      properties:
+        data:
+          nullable: true
+        error:
+          $ref: "#/components/schemas/listMe_401_response_error"
+      required:
+      - data
+      - error
+    listContacts_200_response:
+      example:
+        data:
+        - is_active: true
+          phone: phone
+          person_type: INDIVIDUAL
+          vat_number: vat_number
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: CLIENT
+          email: email
+        - is_active: true
+          phone: phone
+          person_type: INDIVIDUAL
+          vat_number: vat_number
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: CLIENT
+          email: email
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/Contact"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    createContact_201_response:
+      example:
+        data:
+          is_active: true
+          phone: phone
+          person_type: INDIVIDUAL
+          vat_number: vat_number
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: CLIENT
+          email: email
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/Contact"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    createCompanySearch_request:
+      properties:
+        groups:
+          items:
+            type: object
+          type: array
+        sort:
+          type: string
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        stats:
+          type: boolean
+      required:
+      - groups
+    listArticles_200_response:
+      example:
+        data:
+        - unit: unit
+          default_price: default_price
+          name: name
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: PRODUCT
+          vat_rate: vat_rate
+        - unit: unit
+          default_price: default_price
+          name: name
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: PRODUCT
+          vat_rate: vat_rate
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/Article"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    createArticle_201_response:
+      example:
+        data:
+          unit: unit
+          default_price: default_price
+          name: name
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: PRODUCT
+          vat_rate: vat_rate
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/Article"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    listInvoices_200_response:
+      example:
+        data:
+        - number: 0
+          total: total
+          subtotal: subtotal
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: type
+          contact_id: contact_id
+          vat_total: vat_total
+          direction: direction
+          status: status
+        - number: 0
+          total: total
+          subtotal: subtotal
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: type
+          contact_id: contact_id
+          vat_total: vat_total
+          direction: direction
+          status: status
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/Invoice"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    createInvoice_201_response:
+      example:
+        data:
+          number: 0
+          total: total
+          subtotal: subtotal
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: type
+          contact_id: contact_id
+          vat_total: vat_total
+          direction: direction
+          status: status
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/Invoice"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    listProjects_200_response:
+      example:
+        data:
+        - name: name
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          slug: slug
+          client_id: client_id
+          status: status
+          budget: budget
+        - name: name
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          slug: slug
+          client_id: client_id
+          status: status
+          budget: budget
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/Project"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    createProject_201_response:
+      example:
+        data:
+          name: name
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          slug: slug
+          client_id: client_id
+          status: status
+          budget: budget
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/Project"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    listQuotes_200_response:
+      example:
+        data:
+        - rejected_at: 2000-01-23T04:56:07.000+00:00
+          created_at: 2000-01-23T04:56:07.000+00:00
+          contact_id: contact_id
+          version: 0
+          accepted_at: 2000-01-23T04:56:07.000+00:00
+          sent_at: 2000-01-23T04:56:07.000+00:00
+          number: number
+          total: total
+          valid_until: 2000-01-23T04:56:07.000+00:00
+          issue_date: 2000-01-23T04:56:07.000+00:00
+          vat_amount: vat_amount
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          series: series
+          subtotal: subtotal
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          client_name: client_name
+          status: status
+        - rejected_at: 2000-01-23T04:56:07.000+00:00
+          created_at: 2000-01-23T04:56:07.000+00:00
+          contact_id: contact_id
+          version: 0
+          accepted_at: 2000-01-23T04:56:07.000+00:00
+          sent_at: 2000-01-23T04:56:07.000+00:00
+          number: number
+          total: total
+          valid_until: 2000-01-23T04:56:07.000+00:00
+          issue_date: 2000-01-23T04:56:07.000+00:00
+          vat_amount: vat_amount
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          series: series
+          subtotal: subtotal
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          client_name: client_name
+          status: status
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/Quote"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    getQuote_200_response:
+      example:
+        data:
+          rejected_at: 2000-01-23T04:56:07.000+00:00
+          created_at: 2000-01-23T04:56:07.000+00:00
+          contact_id: contact_id
+          version: 0
+          accepted_at: 2000-01-23T04:56:07.000+00:00
+          sent_at: 2000-01-23T04:56:07.000+00:00
+          number: number
+          total: total
+          valid_until: 2000-01-23T04:56:07.000+00:00
+          issue_date: 2000-01-23T04:56:07.000+00:00
+          vat_amount: vat_amount
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          series: series
+          subtotal: subtotal
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          client_name: client_name
+          status: status
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/Quote"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    listTimeEntries_200_response:
+      example:
+        data:
+        - date: 2000-01-23
+          approval_status: approval_status
+          end_time: end_time
+          description: description
+          created_at: 2000-01-23T04:56:07.000+00:00
+          billable: true
+          start_time: start_time
+          billed: true
+          duration_minutes: 0
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          user_id: user_id
+          project_id: project_id
+          hourly_rate: hourly_rate
+          invoice_id: invoice_id
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        - date: 2000-01-23
+          approval_status: approval_status
+          end_time: end_time
+          description: description
+          created_at: 2000-01-23T04:56:07.000+00:00
+          billable: true
+          start_time: start_time
+          billed: true
+          duration_minutes: 0
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          user_id: user_id
+          project_id: project_id
+          hourly_rate: hourly_rate
+          invoice_id: invoice_id
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/TimeEntry"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    getTimeEntry_200_response:
+      example:
+        data:
+          date: 2000-01-23
+          approval_status: approval_status
+          end_time: end_time
+          description: description
+          created_at: 2000-01-23T04:56:07.000+00:00
+          billable: true
+          start_time: start_time
+          billed: true
+          duration_minutes: 0
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          user_id: user_id
+          project_id: project_id
+          hourly_rate: hourly_rate
+          invoice_id: invoice_id
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/TimeEntry"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    listExpenses_200_response:
+      example:
+        data:
+        - amount: amount
+          description: description
+          expense_date: 2000-01-23
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          category: category
+          status: status
+        - amount: amount
+          description: description
+          expense_date: 2000-01-23
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          category: category
+          status: status
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/Expense"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    createExpense_201_response:
+      example:
+        data:
+          amount: amount
+          description: description
+          expense_date: 2000-01-23
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          category: category
+          status: status
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/Expense"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    listContracts_200_response:
+      example:
+        data:
+        - number: number
+          name: name
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          signature_required: true
+          value: value
+          status: status
+        - number: number
+          name: name
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          signature_required: true
+          value: value
+          status: status
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/Contract"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    createContract_201_response:
+      example:
+        data:
+          number: number
+          name: name
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          signature_required: true
+          value: value
+          status: status
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/Contract"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    listDocuments_200_response:
+      example:
+        data:
+        - file_key: file_key
+          is_archived: true
+          mime_type: mime_type
+          file_name: file_name
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: type
+          file_size: 0
+        - file_key: file_key
+          is_archived: true
+          mime_type: mime_type
+          file_name: file_name
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: type
+          file_size: 0
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/Document"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    createDocument_201_response:
+      example:
+        data:
+          file_key: file_key
+          is_archived: true
+          mime_type: mime_type
+          file_name: file_name
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: type
+          file_size: 0
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/Document"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    listLocations_200_response:
+      example:
+        data:
+        - code: code
+          is_primary: true
+          name: name
+          vertical_type: retail
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        - code: code
+          is_primary: true
+          name: name
+          vertical_type: retail
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/Location"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    createLocation_201_response:
+      example:
+        data:
+          code: code
+          is_primary: true
+          name: name
+          vertical_type: retail
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/Location"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    listModules_200_response:
+      example:
+        data:
+        - reason: reason
+          available: true
+          key: key
+          enabled: true
+        - reason: reason
+          available: true
+          key: key
+          enabled: true
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/Module"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    createOrderImport_request_customer_address:
+      properties:
+        line1:
+          type: string
+        city:
+          type: string
+        countryCode:
+          type: string
+        postalCode:
+          type: string
+    createOrderImport_request_customer:
+      properties:
+        name:
+          maxLength: 255
+          type: string
+        email:
+          format: email
+          type: string
+        address:
+          $ref: "#/components/schemas/createOrderImport_request_customer_address"
+      required:
+      - name
+    createOrderImport_request_lines_inner:
+      properties:
+        description:
+          maxLength: 500
+          type: string
+        quantity:
+          type: number
+        unitPrice:
+          description: "Decimal string, e.g. \"129.90\""
+          type: string
+        sku:
+          maxLength: 64
+          type: string
+      required:
+      - description
+      - quantity
+      - unitPrice
+    createOrderImport_request:
+      properties:
+        source:
+          default: other
+          enum:
+          - shopify
+          - woocommerce
+          - other
+          type: string
+        external_id:
+          description: Order id in the source system (required; snake_case or camelCase
+            accepted)
+          maxLength: 255
+          type: string
+        external_number:
+          description: Human-facing order number in the source system
+          maxLength: 64
+          type: string
+        issuedAt:
+          description: Order date (ISO 8601); defaults to today (Europe/Bucharest)
+          type: string
+        currency:
+          default: RON
+          maxLength: 3
+          minLength: 3
+          type: string
+        customer:
+          $ref: "#/components/schemas/createOrderImport_request_customer"
+        lines:
+          items:
+            $ref: "#/components/schemas/createOrderImport_request_lines_inner"
+          minItems: 1
+          type: array
+        total:
+          description: Decimal string order total
+          type: string
+        paid:
+          default: false
+          type: boolean
+      required:
+      - customer
+      - lines
+      - total
+    listDnsZones_200_response:
+      example:
+        data:
+        - dnssec_enabled: true
+          name: name
+          id: id
+          status: status
+        - dnssec_enabled: true
+          name: name
+          id: id
+          status: status
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/DnsZone"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    createDnsZone_201_response:
+      example:
+        data:
+          dnssec_enabled: true
+          name: name
+          id: id
+          status: status
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/DnsZone"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    listDomains_200_response:
+      example:
+        data:
+        - expires_at: 2000-01-23T04:56:07.000+00:00
+          name: name
+          id: id
+          locked: true
+          status: status
+        - expires_at: 2000-01-23T04:56:07.000+00:00
+          name: name
+          id: id
+          locked: true
+          status: status
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/Domain"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    listSites_200_response:
+      example:
+        data:
+        - domain: domain
+          id: id
+          plan: plan
+          status: status
+        - domain: domain
+          id: id
+          plan: plan
+          status: status
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/Site"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    InvoiceCreate_items_inner:
+      example:
+        quantity: 0.8008281904610115
+        description: description
+        unit_price: 6.027456183070403
+        vat_rate: 1.4658129805029452
+      properties:
+        description:
+          type: string
+        quantity:
+          type: number
+        unit_price:
+          type: number
+        vat_rate:
+          type: number
+      required:
+      - description
+      - quantity
+      - unit_price
+  securitySchemes:
+    bearerAuth:
+      description: API key as Bearer token
+      scheme: bearer
+      type: http
