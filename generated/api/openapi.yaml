@@ -2024,9 +2024,10 @@ paths:
         schema:
           type: integer
         style: form
-      - explode: true
+      - description: Page size (max 100). `per_page` is accepted as a legacy alias.
+        explode: true
         in: query
-        name: per_page
+        name: perPage
         required: false
         schema:
           type: integer
@@ -2063,9 +2064,10 @@ paths:
         schema:
           type: integer
         style: form
-      - explode: true
+      - description: Page size (max 100). `per_page` is accepted as a legacy alias.
+        explode: true
         in: query
-        name: per_page
+        name: perPage
         required: false
         schema:
           type: integer
@@ -2107,9 +2109,10 @@ paths:
         schema:
           type: integer
         style: form
-      - explode: true
+      - description: Page size (max 100). `per_page` is accepted as a legacy alias.
+        explode: true
         in: query
-        name: per_page
+        name: perPage
         required: false
         schema:
           type: integer
@@ -2178,9 +2181,10 @@ paths:
         schema:
           type: integer
         style: form
-      - explode: true
+      - description: Page size (max 100). `per_page` is accepted as a legacy alias.
+        explode: true
         in: query
-        name: per_page
+        name: perPage
         required: false
         schema:
           type: integer
@@ -2255,9 +2259,10 @@ paths:
         schema:
           type: integer
         style: form
-      - explode: true
+      - description: Page size (max 100). `per_page` is accepted as a legacy alias.
+        explode: true
         in: query
-        name: per_page
+        name: perPage
         required: false
         schema:
           type: integer

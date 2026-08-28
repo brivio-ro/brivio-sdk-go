@@ -35,6 +35,7 @@ func (r ApiListHrEmployeesRequest) Page(page int32) ApiListHrEmployeesRequest {
 	return r
 }
 
+// Page size (max 100). &#x60;per_page&#x60; is accepted as a legacy alias.
 func (r ApiListHrEmployeesRequest) PerPage(perPage int32) ApiListHrEmployeesRequest {
 	r.perPage = &perPage
 	return r
@@ -86,7 +87,7 @@ func (a *HrAPIService) ListHrEmployeesExecute(r ApiListHrEmployeesRequest) (*htt
 		parameterAddToHeaderOrQuery(localVarQueryParams, "page", r.page, "form", "")
 	}
 	if r.perPage != nil {
-		parameterAddToHeaderOrQuery(localVarQueryParams, "per_page", r.perPage, "form", "")
+		parameterAddToHeaderOrQuery(localVarQueryParams, "perPage", r.perPage, "form", "")
 	}
 	if r.cursor != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "cursor", r.cursor, "form", "")

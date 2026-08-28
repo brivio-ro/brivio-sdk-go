@@ -136,6 +136,7 @@ func (r ApiListInventoryMovementsRequest) Page(page int32) ApiListInventoryMovem
 	return r
 }
 
+// Page size (max 100). &#x60;per_page&#x60; is accepted as a legacy alias.
 func (r ApiListInventoryMovementsRequest) PerPage(perPage int32) ApiListInventoryMovementsRequest {
 	r.perPage = &perPage
 	return r
@@ -187,7 +188,7 @@ func (a *InventoryAPIService) ListInventoryMovementsExecute(r ApiListInventoryMo
 		parameterAddToHeaderOrQuery(localVarQueryParams, "page", r.page, "form", "")
 	}
 	if r.perPage != nil {
-		parameterAddToHeaderOrQuery(localVarQueryParams, "per_page", r.perPage, "form", "")
+		parameterAddToHeaderOrQuery(localVarQueryParams, "perPage", r.perPage, "form", "")
 	}
 	if r.cursor != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "cursor", r.cursor, "form", "")
@@ -356,6 +357,7 @@ func (r ApiListInventoryStockRequest) Page(page int32) ApiListInventoryStockRequ
 	return r
 }
 
+// Page size (max 100). &#x60;per_page&#x60; is accepted as a legacy alias.
 func (r ApiListInventoryStockRequest) PerPage(perPage int32) ApiListInventoryStockRequest {
 	r.perPage = &perPage
 	return r
@@ -407,7 +409,7 @@ func (a *InventoryAPIService) ListInventoryStockExecute(r ApiListInventoryStockR
 		parameterAddToHeaderOrQuery(localVarQueryParams, "page", r.page, "form", "")
 	}
 	if r.perPage != nil {
-		parameterAddToHeaderOrQuery(localVarQueryParams, "per_page", r.perPage, "form", "")
+		parameterAddToHeaderOrQuery(localVarQueryParams, "perPage", r.perPage, "form", "")
 	}
 	if r.cursor != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "cursor", r.cursor, "form", "")
@@ -481,6 +483,7 @@ func (r ApiListInventoryStockByLocationRequest) Page(page int32) ApiListInventor
 	return r
 }
 
+// Page size (max 100). &#x60;per_page&#x60; is accepted as a legacy alias.
 func (r ApiListInventoryStockByLocationRequest) PerPage(perPage int32) ApiListInventoryStockByLocationRequest {
 	r.perPage = &perPage
 	return r
@@ -536,7 +539,7 @@ func (a *InventoryAPIService) ListInventoryStockByLocationExecute(r ApiListInven
 		parameterAddToHeaderOrQuery(localVarQueryParams, "page", r.page, "form", "")
 	}
 	if r.perPage != nil {
-		parameterAddToHeaderOrQuery(localVarQueryParams, "per_page", r.perPage, "form", "")
+		parameterAddToHeaderOrQuery(localVarQueryParams, "perPage", r.perPage, "form", "")
 	}
 	if r.articleId != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "article_id", r.articleId, "form", "")

@@ -36,6 +36,7 @@ func (r ApiListSeriesRequest) Page(page int32) ApiListSeriesRequest {
 	return r
 }
 
+// Page size (max 100). &#x60;per_page&#x60; is accepted as a legacy alias.
 func (r ApiListSeriesRequest) PerPage(perPage int32) ApiListSeriesRequest {
 	r.perPage = &perPage
 	return r
@@ -91,7 +92,7 @@ func (a *SeriesAPIService) ListSeriesExecute(r ApiListSeriesRequest) (*http.Resp
 		parameterAddToHeaderOrQuery(localVarQueryParams, "page", r.page, "form", "")
 	}
 	if r.perPage != nil {
-		parameterAddToHeaderOrQuery(localVarQueryParams, "per_page", r.perPage, "form", "")
+		parameterAddToHeaderOrQuery(localVarQueryParams, "perPage", r.perPage, "form", "")
 	}
 	if r.documentType != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "document_type", r.documentType, "form", "")
