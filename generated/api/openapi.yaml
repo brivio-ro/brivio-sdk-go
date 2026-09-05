@@ -189,6 +189,40 @@ paths:
       summary: Update a contact
       tags:
       - contacts
+  /companies/lookup:
+    get:
+      description: "Auto-fill Persoană Juridică billing details from a CUI. Returns\
+        \ an empty result list rather than 404 when nothing matches. Scope: contacts:read."
+      operationId: listCompanyLookup
+      parameters:
+      - description: The CUI to look up
+        explode: true
+        in: query
+        name: cui
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Alias for cui
+        explode: true
+        in: query
+        name: q
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Look up a company by CUI (scope: contacts:read)"
+      tags:
+      - companies
   /companies/search:
     get:
       description: "Prospectare: filter ~2M Romanian companies. Same query-string\
@@ -997,6 +1031,99 @@ paths:
       summary: Create a project
       tags:
       - projects
+  /projects/{id}:
+    delete:
+      operationId: deleteProject
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Delete a project
+      tags:
+      - projects
+    get:
+      operationId: getProject
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createProject_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Get a project
+      tags:
+      - projects
+    patch:
+      operationId: updateProject
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createProject_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Update a project
+      tags:
+      - projects
   /quotes:
     get:
       operationId: listQuotes
@@ -1336,6 +1463,99 @@ paths:
       summary: Create an expense
       tags:
       - expenses
+  /expenses/{id}:
+    delete:
+      operationId: deleteExpense
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Delete a expense
+      tags:
+      - expenses
+    get:
+      operationId: getExpense
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createExpense_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Get a expense
+      tags:
+      - expenses
+    patch:
+      operationId: updateExpense
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createExpense_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Update a expense
+      tags:
+      - expenses
   /contracts:
     get:
       operationId: listContracts
@@ -1405,6 +1625,99 @@ paths:
                 $ref: "#/components/schemas/listMe_401_response"
           description: Error
       summary: Create a contract
+      tags:
+      - contracts
+  /contracts/{id}:
+    delete:
+      operationId: deleteContract
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Delete a contract
+      tags:
+      - contracts
+    get:
+      operationId: getContract
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createContract_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Get a contract
+      tags:
+      - contracts
+    patch:
+      operationId: updateContract
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createContract_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: Update a contract
       tags:
       - contracts
   /documents:
@@ -2504,6 +2817,68 @@ paths:
       summary: Get a hotel reservation
       tags:
       - reservations
+  /construction/work-certificates:
+    get:
+      operationId: listConstructionWorkCertificates
+      parameters:
+      - explode: true
+        in: query
+        name: project_id
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: per_page
+        required: false
+        schema:
+          type: integer
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List work-progress certificates (situații de lucrări). Filter by project_id.\
+        \ (scope: projects:read)"
+      tags:
+      - construction
+  /construction/projects/{id}/schedule:
+    get:
+      operationId: listConstructionProjectSchedule
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List the schedule activities of a construction project, in order (scope:\
+        \ projects:read)"
+      tags:
+      - construction
   /api-keys:
     get:
       operationId: listApiKeys

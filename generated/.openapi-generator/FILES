@@ -12,6 +12,7 @@ api_bookings.go
 api_catalog.go
 api_companies.go
 api_compat.go
+api_construction.go
 api_contacts.go
 api_contracts.go
 api_customers.go

@@ -101,19 +101,25 @@ Class | Method | HTTP request | Description
 *BookingsAPI* | [**ListBookings**](docs/BookingsAPI.md#listbookings) | **Get** /bookings | List service appointments (scope: bookings:read)
 *CatalogAPI* | [**ListCatalog**](docs/CatalogAPI.md#listcatalog) | **Get** /catalog | Sellable product catalog with synced prices (scope: articles:read)
 *CompaniesAPI* | [**CreateCompanySearch**](docs/CompaniesAPI.md#createcompanysearch) | **Post** /companies/search | Search the public company registry (full filter model)
+*CompaniesAPI* | [**ListCompanyLookup**](docs/CompaniesAPI.md#listcompanylookup) | **Get** /companies/lookup | Look up a company by CUI (scope: contacts:read)
 *CompaniesAPI* | [**ListCompanySearch**](docs/CompaniesAPI.md#listcompanysearch) | **Get** /companies/search | Search the public company registry (compact URL filters)
 *CompaniesAPI* | [**ListCompanySimilar**](docs/CompaniesAPI.md#listcompanysimilar) | **Get** /companies/{cui}/similar | Find similar companies (same CAEN, county, size band)
 *CompatAPI* | [**CancelOblioCompatInvoice**](docs/CompatAPI.md#cancelobliocompatinvoice) | **Put** /compat/oblio/docs/invoice/cancel | Compat shim: cancel an invoice by seriesName + number (Oblio-shaped)
 *CompatAPI* | [**CancelSmartBillCompatInvoice**](docs/CompatAPI.md#cancelsmartbillcompatinvoice) | **Delete** /compat/smartbill/invoice/cancel | Compat shim: cancel an invoice by seriesname + number query params (SmartBill-shaped)
 *CompatAPI* | [**CreateOblioCompatInvoice**](docs/CompatAPI.md#createobliocompatinvoice) | **Post** /compat/oblio/docs/invoice | Compat shim: create an invoice with an Oblio-shaped payload (Oblio POST /api/docs/invoice)
 *CompatAPI* | [**CreateSmartBillCompatInvoice**](docs/CompatAPI.md#createsmartbillcompatinvoice) | **Post** /compat/smartbill/invoice | Compat shim: create an invoice with a SmartBill-shaped payload (SmartBill POST /SBORO/api/invoice)
+*ConstructionAPI* | [**ListConstructionProjectSchedule**](docs/ConstructionAPI.md#listconstructionprojectschedule) | **Get** /construction/projects/{id}/schedule | List the schedule activities of a construction project, in order (scope: projects:read)
+*ConstructionAPI* | [**ListConstructionWorkCertificates**](docs/ConstructionAPI.md#listconstructionworkcertificates) | **Get** /construction/work-certificates | List work-progress certificates (situații de lucrări). Filter by project_id. (scope: projects:read)
 *ContactsAPI* | [**CreateContact**](docs/ContactsAPI.md#createcontact) | **Post** /contacts | Create a contact
 *ContactsAPI* | [**DeleteContact**](docs/ContactsAPI.md#deletecontact) | **Delete** /contacts/{id} | Delete a contact
 *ContactsAPI* | [**GetContact**](docs/ContactsAPI.md#getcontact) | **Get** /contacts/{id} | Get a contact
 *ContactsAPI* | [**ListContacts**](docs/ContactsAPI.md#listcontacts) | **Get** /contacts | List contacts
 *ContactsAPI* | [**UpdateContact**](docs/ContactsAPI.md#updatecontact) | **Patch** /contacts/{id} | Update a contact
 *ContractsAPI* | [**CreateContract**](docs/ContractsAPI.md#createcontract) | **Post** /contracts | Create a contract
+*ContractsAPI* | [**DeleteContract**](docs/ContractsAPI.md#deletecontract) | **Delete** /contracts/{id} | Delete a contract
+*ContractsAPI* | [**GetContract**](docs/ContractsAPI.md#getcontract) | **Get** /contracts/{id} | Get a contract
 *ContractsAPI* | [**ListContracts**](docs/ContractsAPI.md#listcontracts) | **Get** /contracts | List contracts
+*ContractsAPI* | [**UpdateContract**](docs/ContractsAPI.md#updatecontract) | **Patch** /contracts/{id} | Update a contract
 *CustomersAPI* | [**GetCustomer**](docs/CustomersAPI.md#getcustomer) | **Get** /customers/{externalId} | Consolidated billing view of an external customer (scope: invoices:read)
 *DnsAPI* | [**CreateDnsZone**](docs/DnsAPI.md#creatednszone) | **Post** /dns/zones | Create a DNS zone (scope: dns:write)
 *DnsAPI* | [**CreateDnsZoneRecord**](docs/DnsAPI.md#creatednszonerecord) | **Post** /dns/zones/{id}/records | Create a DNS record (scope: dns:write)
@@ -143,7 +149,10 @@ Class | Method | HTTP request | Description
 *DomainsAPI* | [**RenewDomain**](docs/DomainsAPI.md#renewdomain) | **Post** /domains/{id}/renew | Renew a domain registration (scope: domains:write)
 *DomainsAPI* | [**UnlockDomain**](docs/DomainsAPI.md#unlockdomain) | **Post** /domains/{id}/unlock | Unlock a domain for transfer (scope: domains:write)
 *ExpensesAPI* | [**CreateExpense**](docs/ExpensesAPI.md#createexpense) | **Post** /expenses | Create an expense
+*ExpensesAPI* | [**DeleteExpense**](docs/ExpensesAPI.md#deleteexpense) | **Delete** /expenses/{id} | Delete a expense
+*ExpensesAPI* | [**GetExpense**](docs/ExpensesAPI.md#getexpense) | **Get** /expenses/{id} | Get a expense
 *ExpensesAPI* | [**ListExpenses**](docs/ExpensesAPI.md#listexpenses) | **Get** /expenses | List expenses
+*ExpensesAPI* | [**UpdateExpense**](docs/ExpensesAPI.md#updateexpense) | **Patch** /expenses/{id} | Update a expense
 *FixedAssetsAPI* | [**CreateFixedAsset**](docs/FixedAssetsAPI.md#createfixedasset) | **Post** /fixed-assets | Create a fixed asset with depreciation schedule (scope: accounting:write)
 *FixedAssetsAPI* | [**ListFixedAssets**](docs/FixedAssetsAPI.md#listfixedassets) | **Get** /fixed-assets | List fixed assets (scope: accounting:read)
 *HrAPI* | [**ListHrEmployees**](docs/HrAPI.md#listhremployees) | **Get** /hr/employees | Employee directory (PII excluded)
@@ -181,7 +190,10 @@ Class | Method | HTTP request | Description
 *PaymentMethodsAPI* | [**UpdatePaymentMethod**](docs/PaymentMethodsAPI.md#updatepaymentmethod) | **Patch** /payment-methods | Set default or detach a payment method (scope: payments:charge)
 *PaymentsAPI* | [**CreatePaymentCharge**](docs/PaymentsAPI.md#createpaymentcharge) | **Post** /payments/charge | Create a PaymentIntent on the org provider (scope: payments:charge)
 *ProjectsAPI* | [**CreateProject**](docs/ProjectsAPI.md#createproject) | **Post** /projects | Create a project
+*ProjectsAPI* | [**DeleteProject**](docs/ProjectsAPI.md#deleteproject) | **Delete** /projects/{id} | Delete a project
+*ProjectsAPI* | [**GetProject**](docs/ProjectsAPI.md#getproject) | **Get** /projects/{id} | Get a project
 *ProjectsAPI* | [**ListProjects**](docs/ProjectsAPI.md#listprojects) | **Get** /projects | List projects
+*ProjectsAPI* | [**UpdateProject**](docs/ProjectsAPI.md#updateproject) | **Patch** /projects/{id} | Update a project
 *QuotesAPI* | [**DeleteQuote**](docs/QuotesAPI.md#deletequote) | **Delete** /quotes/{id} | Delete a quote
 *QuotesAPI* | [**GetQuote**](docs/QuotesAPI.md#getquote) | **Get** /quotes/{id} | Get a quote
 *QuotesAPI* | [**ListQuotes**](docs/QuotesAPI.md#listquotes) | **Get** /quotes | List quotes (read-only)

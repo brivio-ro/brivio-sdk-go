@@ -67,6 +67,8 @@ type APIClient struct {
 
 	CompatAPI *CompatAPIService
 
+	ConstructionAPI *ConstructionAPIService
+
 	ContactsAPI *ContactsAPIService
 
 	ContractsAPI *ContractsAPIService
@@ -151,6 +153,7 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.CatalogAPI = (*CatalogAPIService)(&c.common)
 	c.CompaniesAPI = (*CompaniesAPIService)(&c.common)
 	c.CompatAPI = (*CompatAPIService)(&c.common)
+	c.ConstructionAPI = (*ConstructionAPIService)(&c.common)
 	c.ContactsAPI = (*ContactsAPIService)(&c.common)
 	c.ContractsAPI = (*ContractsAPIService)(&c.common)
 	c.CustomersAPI = (*CustomersAPIService)(&c.common)
