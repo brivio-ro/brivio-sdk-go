@@ -2875,8 +2875,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/listMe_401_response"
           description: Error
-      summary: "List the schedule activities of a construction project, in order (scope:\
-        \ projects:read)"
+      summary: "List the schedule activities (grafic de eșalonare) of a construction\
+        \ project, in order (scope: projects:read)"
       tags:
       - construction
   /api-keys:

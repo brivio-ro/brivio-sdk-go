@@ -34,7 +34,7 @@ func (r ApiListConstructionProjectScheduleRequest) Execute() (*http.Response, er
 }
 
 /*
-ListConstructionProjectSchedule List the schedule activities of a construction project, in order (scope: projects:read)
+ListConstructionProjectSchedule List the schedule activities (grafic de eșalonare) of a construction project, in order (scope: projects:read)
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @param id

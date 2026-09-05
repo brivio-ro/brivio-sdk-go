@@ -108,7 +108,7 @@ Class | Method | HTTP request | Description
 *CompatAPI* | [**CancelSmartBillCompatInvoice**](docs/CompatAPI.md#cancelsmartbillcompatinvoice) | **Delete** /compat/smartbill/invoice/cancel | Compat shim: cancel an invoice by seriesname + number query params (SmartBill-shaped)
 *CompatAPI* | [**CreateOblioCompatInvoice**](docs/CompatAPI.md#createobliocompatinvoice) | **Post** /compat/oblio/docs/invoice | Compat shim: create an invoice with an Oblio-shaped payload (Oblio POST /api/docs/invoice)
 *CompatAPI* | [**CreateSmartBillCompatInvoice**](docs/CompatAPI.md#createsmartbillcompatinvoice) | **Post** /compat/smartbill/invoice | Compat shim: create an invoice with a SmartBill-shaped payload (SmartBill POST /SBORO/api/invoice)
-*ConstructionAPI* | [**ListConstructionProjectSchedule**](docs/ConstructionAPI.md#listconstructionprojectschedule) | **Get** /construction/projects/{id}/schedule | List the schedule activities of a construction project, in order (scope: projects:read)
+*ConstructionAPI* | [**ListConstructionProjectSchedule**](docs/ConstructionAPI.md#listconstructionprojectschedule) | **Get** /construction/projects/{id}/schedule | List the schedule activities (grafic de eșalonare) of a construction project, in order (scope: projects:read)
 *ConstructionAPI* | [**ListConstructionWorkCertificates**](docs/ConstructionAPI.md#listconstructionworkcertificates) | **Get** /construction/work-certificates | List work-progress certificates (situații de lucrări). Filter by project_id. (scope: projects:read)
 *ContactsAPI* | [**CreateContact**](docs/ContactsAPI.md#createcontact) | **Post** /contacts | Create a contact
 *ContactsAPI* | [**DeleteContact**](docs/ContactsAPI.md#deletecontact) | **Delete** /contacts/{id} | Delete a contact
