@@ -10,8 +10,10 @@ api_articles.go
 api_banking.go
 api_bookings.go
 api_catalog.go
+api_comms.go
 api_companies.go
 api_compat.go
+api_connect.go
 api_construction.go
 api_contacts.go
 api_contracts.go
@@ -28,6 +30,7 @@ api_locations.go
 api_marketing.go
 api_me.go
 api_modules.go
+api_network.go
 api_orders.go
 api_payment_methods.go
 api_payments.go
@@ -47,11 +50,13 @@ configuration.go
 git_push.sh
 model_article.go
 model_article_create.go
+model_bank_rule_input.go
 model_contact.go
 model_contact_create.go
 model_contract.go
 model_contract_create.go
 model_create_article_201_response.go
+model_create_banking_statement_import_request.go
 model_create_company_search_request.go
 model_create_contact_201_response.go
 model_create_contract_201_response.go
@@ -98,6 +103,7 @@ model_list_sites_200_response.go
 model_list_time_entries_200_response.go
 model_location.go
 model_location_create.go
+model_match_banking_transaction_request.go
 model_meta.go
 model_module.go
 model_project.go
@@ -105,5 +111,6 @@ model_project_create.go
 model_quote.go
 model_site.go
 model_time_entry.go
+model_unmatch_banking_transaction_request.go
 response.go
 utils.go

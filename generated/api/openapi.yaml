@@ -2168,6 +2168,461 @@ paths:
       summary: List available webhook event types
       tags:
       - webhooks
+  /comms/conversations:
+    get:
+      operationId: listCommConversations
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: scope
+        required: false
+        schema:
+          enum:
+          - internal
+          - external
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List conversations your organization participates in (scope: comms:read)"
+      tags:
+      - comms
+  /comms/conversations/{id}:
+    get:
+      operationId: getCommConversation
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Get one conversation (scope: comms:read)"
+      tags:
+      - comms
+  /comms/conversations/{id}/messages:
+    get:
+      operationId: listCommConversationMessages
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List messages in a conversation; encrypted bodies are masked (scope:\
+        \ comms:read)"
+      tags:
+      - comms
+    post:
+      operationId: createCommConversationMessage
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Send a message as your organization; refused on end-to-end encrypted\
+        \ conversations (scope: comms:write)"
+      tags:
+      - comms
+  /connect/outreach:
+    get:
+      operationId: listConnectOutreach
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          enum:
+          - draft
+          - pending_approval
+          - sent
+          - accepted
+          - declined
+          - expired
+          - blocked
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List Connect outreach initiated by your organization (scope: connect:read)"
+      tags:
+      - connect
+  /connect/outreach/{id}:
+    get:
+      operationId: getConnectOutreach
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Get the status of one outreach attempt (scope: connect:read)"
+      tags:
+      - connect
+  /network/partners:
+    get:
+      operationId: listNetworkPartners
+      parameters:
+      - explode: true
+        in: query
+        name: category
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: county
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: city
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Substring of the display name
+        explode: true
+        in: query
+        name: q
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          maximum: 50
+          type: integer
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Ranked search of verified providers in the Brivio business network;\
+        \ notaries are never listed and lawyers are unranked/unrated by professional\
+        \ rules (scope: network:read)"
+      tags:
+      - network
+  /network/requests:
+    get:
+      operationId: listNetworkRequests
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: role
+        required: false
+        schema:
+          enum:
+          - requester
+          - provider
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List service requests: role=requester (raised by your organization)\
+        \ or role=provider (your inbox, requester redacted to a label) (scope: network:read)"
+      tags:
+      - network
+    post:
+      operationId: createNetworkRequest
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Create a service request (RFQ) to at most 3 verified listings chosen\
+        \ from /network/partners; no payment is involved (scope: network:write)"
+      tags:
+      - network
+  /network/requests/{id}:
+    get:
+      operationId: getNetworkRequest
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Get one request: full view with every quote for the requester; redacted\
+        \ view with only your own quote for a targeted provider (scope: network:read)"
+      tags:
+      - network
+  /network/requests/{id}/quotes:
+    post:
+      operationId: createNetworkRequestQuote
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Submit a quote on a request your organization was asked to quote;\
+        \ a new quote supersedes your live one (scope: network:write)"
+      tags:
+      - network
+  /network/requests/{id}/withdraw:
+    post:
+      operationId: withdrawNetworkRequest
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Withdraw an open request you raised; live quotes are declined (scope:\
+        \ network:write)"
+      tags:
+      - network
+  /network/quotes/{id}/accept:
+    post:
+      operationId: acceptNetworkQuote
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Accept a quote on your request: closes the request, declines the others\
+        \ and creates a platform-originated relationship. Money never transits Brivio\
+        \ (ADR-0147) (scope: network:write)"
+      tags:
+      - network
+  /network/quotes/{id}/decline:
+    post:
+      operationId: declineNetworkQuote
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Decline one quote on your request (scope: network:write)"
+      tags:
+      - network
+  /network/relationships:
+    get:
+      operationId: listNetworkRelationships
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List business relationships where your organization is the provider\
+        \ or the client, with origin and service kind; never the counterpart's contact\
+        \ details (scope: network:read)"
+      tags:
+      - network
   /webhooks/{id}:
     delete:
       operationId: deleteWebhook
@@ -3037,6 +3492,402 @@ paths:
                 $ref: "#/components/schemas/listMe_401_response"
           description: Error
       summary: "List imported bank transactions (scope: banking:read)"
+      tags:
+      - banking
+  /banking/transactions/{id}:
+    get:
+      operationId: getBankingTransaction
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Get a bank transaction with its invoice allocations and allocated/unapplied\
+        \ amounts (scope: banking:read)"
+      tags:
+      - banking
+  /banking/transactions/{id}/suggestions:
+    get:
+      operationId: listBankingTransactionSuggestions
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Top-5 scored open-invoice candidates for a bank line, ranked by the\
+        \ reconciliation matcher (scope: banking:read)"
+      tags:
+      - banking
+  /banking/transactions/{id}/match:
+    post:
+      operationId: matchBankingTransaction
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/matchBankingTransaction_request"
+        required: true
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Allocate a bank line to an invoice and post it to the ledger. Body\
+        \ { invoice_id, amount? }; amount caps the allocation in the transaction currency,\
+        \ omitted = full outstanding. Cross-currency is refused. (scope: banking:write)"
+      tags:
+      - banking
+  /banking/transactions/{id}/unmatch:
+    post:
+      operationId: unmatchBankingTransaction
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/unmatchBankingTransaction_request"
+        required: false
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Unmatch a bank line. A line already posted to the ledger is immutable\
+        \ and needs { storno: true } to be reversed (409 otherwise). (scope: banking:write)"
+      tags:
+      - banking
+  /banking/statements:
+    get:
+      operationId: listBankingStatements
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: from
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: to
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List imported bank statements — account IBAN masked to last4, balances,\
+        \ period, transaction counts (scope: banking:read)"
+      tags:
+      - banking
+  /banking/statements/import:
+    post:
+      operationId: createBankingStatementImport
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createBankingStatementImport_request"
+        required: true
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Import a bank statement file (csv, mt940, mt942, camt052/053/054,\
+        \ ofx). Parses, de-duplicates against previously imported lines, auto-matches\
+        \ open invoices and applies bank rules. Re-importing the same file is a safe\
+        \ no-op. Honours Idempotency-Key. (scope: banking:write)"
+      tags:
+      - banking
+  /banking/statements/{id}:
+    get:
+      operationId: getBankingStatement
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Get a bank statement with its transactions (paginated) (scope: banking:read)"
+      tags:
+      - banking
+  /banking/rules:
+    get:
+      operationId: listBankingRules
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List bank reconciliation rules in priority order (scope: banking:read)"
+      tags:
+      - banking
+    post:
+      operationId: createBankingRule
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BankRuleInput"
+        required: true
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Create a bank rule. At least one condition and one action are required;\
+        \ a new rule goes last in priority. (scope: banking:write)"
+      tags:
+      - banking
+  /banking/rules/{id}:
+    delete:
+      operationId: deleteBankingRule
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Delete a bank rule (scope: banking:write)"
+      tags:
+      - banking
+    get:
+      operationId: getBankingRule
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Get a bank rule (scope: banking:read)"
+      tags:
+      - banking
+    patch:
+      operationId: updateBankingRule
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BankRuleInput"
+        required: true
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Update a bank rule. Partial body; the merged rule is re-validated\
+        \ in full. (scope: banking:write)"
+      tags:
+      - banking
+  /banking/payment-batches:
+    get:
+      operationId: listBankingPaymentBatches
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: kind
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List payment batches (pain.001 / salary runs), read-only; debtor IBAN\
+        \ masked (scope: banking:read)"
+      tags:
+      - banking
+  /banking/payment-batches/{id}:
+    get:
+      operationId: getBankingPaymentBatche
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Get a payment batch with its lines; creditor IBANs masked (scope:\
+        \ banking:read)"
       tags:
       - banking
   /catalog:
@@ -4176,6 +5027,110 @@ components:
       required:
       - data
       - error
+    BankRuleInput:
+      description: "A bank reconciliation rule. At least one condition (matchCounterpartyName,\
+        \ matchCounterpartyIban, matchDescription/Regex, amountMin/Max, direction\
+        \ != any) and one action (assignContactId, assignAccountId, assignCostCenterId,\
+        \ assignVatRate, descriptionTemplate, markIgnored, memo) are required."
+      example:
+        stagingMode: recognized
+        amountMax: amountMax
+        assignAccountId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        descriptionTemplate: descriptionTemplate
+        matchDescriptionRegex: matchDescriptionRegex
+        matchDescription: matchDescription
+        assignVatRate: 8
+        memo: memo
+        isActive: true
+        assignContactId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        matchDescriptionOp: contains
+        markIgnored: false
+        amountMin: amountMin
+        matchCounterpartyIban: matchCounterpartyIban
+        name: name
+        assignCostCenterId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        matchCounterpartyName: matchCounterpartyName
+        direction: any
+      properties:
+        name:
+          maxLength: 200
+          type: string
+        isActive:
+          default: true
+          type: boolean
+        stagingMode:
+          default: recognized
+          enum:
+          - recognized
+          - categorized
+          type: string
+        matchCounterpartyName:
+          maxLength: 255
+          type: string
+          nullable: true
+        matchCounterpartyIban:
+          maxLength: 40
+          type: string
+          nullable: true
+        matchDescriptionRegex:
+          maxLength: 500
+          type: string
+          nullable: true
+        matchDescription:
+          maxLength: 500
+          type: string
+          nullable: true
+        matchDescriptionOp:
+          default: contains
+          enum:
+          - contains
+          - starts_with
+          - equals
+          - regex
+          type: string
+        amountMin:
+          description: "Decimal, up to 2 dp"
+          type: string
+          nullable: true
+        amountMax:
+          description: "Decimal, up to 2 dp"
+          type: string
+          nullable: true
+        direction:
+          default: any
+          enum:
+          - any
+          - inflow
+          - outflow
+          type: string
+        assignContactId:
+          format: uuid
+          type: string
+          nullable: true
+        assignAccountId:
+          format: uuid
+          type: string
+          nullable: true
+        assignCostCenterId:
+          format: uuid
+          type: string
+          nullable: true
+        assignVatRate:
+          maximum: 100
+          minimum: 0
+          type: integer
+          nullable: true
+        descriptionTemplate:
+          maxLength: 500
+          type: string
+          nullable: true
+        markIgnored:
+          default: false
+          type: boolean
+        memo:
+          maxLength: 2000
+          type: string
+          nullable: true
     Contact:
       example:
         is_active: true
@@ -5715,6 +6670,40 @@ components:
       - customer
       - lines
       - total
+    matchBankingTransaction_request:
+      properties:
+        invoice_id:
+          format: uuid
+          type: string
+        amount:
+          type: number
+      required:
+      - invoice_id
+    unmatchBankingTransaction_request:
+      properties:
+        storno:
+          type: boolean
+    createBankingStatementImport_request:
+      properties:
+        format:
+          enum:
+          - csv
+          - mt940
+          - mt942
+          - camt053
+          - camt052
+          - camt054
+          - ofx
+          type: string
+        content:
+          description: Raw file contents (max 5 MB)
+          type: string
+        sourceFilename:
+          maxLength: 255
+          type: string
+      required:
+      - content
+      - format
     listDnsZones_200_response:
       example:
         data:

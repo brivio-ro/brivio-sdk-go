@@ -94,12 +94,30 @@ Class | Method | HTTP request | Description
 *ArticlesAPI* | [**GetArticle**](docs/ArticlesAPI.md#getarticle) | **Get** /articles/{id} | Get a article
 *ArticlesAPI* | [**ListArticles**](docs/ArticlesAPI.md#listarticles) | **Get** /articles | List articles
 *ArticlesAPI* | [**UpdateArticle**](docs/ArticlesAPI.md#updatearticle) | **Patch** /articles/{id} | Update a article
+*BankingAPI* | [**CreateBankingRule**](docs/BankingAPI.md#createbankingrule) | **Post** /banking/rules | Create a bank rule. At least one condition and one action are required; a new rule goes last in priority. (scope: banking:write)
+*BankingAPI* | [**CreateBankingStatementImport**](docs/BankingAPI.md#createbankingstatementimport) | **Post** /banking/statements/import | Import a bank statement file (csv, mt940, mt942, camt052/053/054, ofx). Parses, de-duplicates against previously imported lines, auto-matches open invoices and applies bank rules. Re-importing the same file is a safe no-op. Honours Idempotency-Key. (scope: banking:write)
+*BankingAPI* | [**DeleteBankingRule**](docs/BankingAPI.md#deletebankingrule) | **Delete** /banking/rules/{id} | Delete a bank rule (scope: banking:write)
+*BankingAPI* | [**GetBankingPaymentBatche**](docs/BankingAPI.md#getbankingpaymentbatche) | **Get** /banking/payment-batches/{id} | Get a payment batch with its lines; creditor IBANs masked (scope: banking:read)
+*BankingAPI* | [**GetBankingRule**](docs/BankingAPI.md#getbankingrule) | **Get** /banking/rules/{id} | Get a bank rule (scope: banking:read)
+*BankingAPI* | [**GetBankingStatement**](docs/BankingAPI.md#getbankingstatement) | **Get** /banking/statements/{id} | Get a bank statement with its transactions (paginated) (scope: banking:read)
+*BankingAPI* | [**GetBankingTransaction**](docs/BankingAPI.md#getbankingtransaction) | **Get** /banking/transactions/{id} | Get a bank transaction with its invoice allocations and allocated/unapplied amounts (scope: banking:read)
 *BankingAPI* | [**ListBankingConnections**](docs/BankingAPI.md#listbankingconnections) | **Get** /banking/connections | List open-banking connections (scope: banking:read)
+*BankingAPI* | [**ListBankingPaymentBatches**](docs/BankingAPI.md#listbankingpaymentbatches) | **Get** /banking/payment-batches | List payment batches (pain.001 / salary runs), read-only; debtor IBAN masked (scope: banking:read)
+*BankingAPI* | [**ListBankingRules**](docs/BankingAPI.md#listbankingrules) | **Get** /banking/rules | List bank reconciliation rules in priority order (scope: banking:read)
+*BankingAPI* | [**ListBankingStatements**](docs/BankingAPI.md#listbankingstatements) | **Get** /banking/statements | List imported bank statements — account IBAN masked to last4, balances, period, transaction counts (scope: banking:read)
+*BankingAPI* | [**ListBankingTransactionSuggestions**](docs/BankingAPI.md#listbankingtransactionsuggestions) | **Get** /banking/transactions/{id}/suggestions | Top-5 scored open-invoice candidates for a bank line, ranked by the reconciliation matcher (scope: banking:read)
 *BankingAPI* | [**ListBankingTransactions**](docs/BankingAPI.md#listbankingtransactions) | **Get** /banking/transactions | List imported bank transactions (scope: banking:read)
+*BankingAPI* | [**MatchBankingTransaction**](docs/BankingAPI.md#matchbankingtransaction) | **Post** /banking/transactions/{id}/match | Allocate a bank line to an invoice and post it to the ledger. Body { invoice_id, amount? }; amount caps the allocation in the transaction currency, omitted &#x3D; full outstanding. Cross-currency is refused. (scope: banking:write)
+*BankingAPI* | [**UnmatchBankingTransaction**](docs/BankingAPI.md#unmatchbankingtransaction) | **Post** /banking/transactions/{id}/unmatch | Unmatch a bank line. A line already posted to the ledger is immutable and needs { storno: true } to be reversed (409 otherwise). (scope: banking:write)
+*BankingAPI* | [**UpdateBankingRule**](docs/BankingAPI.md#updatebankingrule) | **Patch** /banking/rules/{id} | Update a bank rule. Partial body; the merged rule is re-validated in full. (scope: banking:write)
 *BookingsAPI* | [**CreateBooking**](docs/BookingsAPI.md#createbooking) | **Post** /bookings | Create a service appointment (scope: bookings:write)
 *BookingsAPI* | [**GetBooking**](docs/BookingsAPI.md#getbooking) | **Get** /bookings/{id} | Get a service appointment
 *BookingsAPI* | [**ListBookings**](docs/BookingsAPI.md#listbookings) | **Get** /bookings | List service appointments (scope: bookings:read)
 *CatalogAPI* | [**ListCatalog**](docs/CatalogAPI.md#listcatalog) | **Get** /catalog | Sellable product catalog with synced prices (scope: articles:read)
+*CommsAPI* | [**CreateCommConversationMessage**](docs/CommsAPI.md#createcommconversationmessage) | **Post** /comms/conversations/{id}/messages | Send a message as your organization; refused on end-to-end encrypted conversations (scope: comms:write)
+*CommsAPI* | [**GetCommConversation**](docs/CommsAPI.md#getcommconversation) | **Get** /comms/conversations/{id} | Get one conversation (scope: comms:read)
+*CommsAPI* | [**ListCommConversationMessages**](docs/CommsAPI.md#listcommconversationmessages) | **Get** /comms/conversations/{id}/messages | List messages in a conversation; encrypted bodies are masked (scope: comms:read)
+*CommsAPI* | [**ListCommConversations**](docs/CommsAPI.md#listcommconversations) | **Get** /comms/conversations | List conversations your organization participates in (scope: comms:read)
 *CompaniesAPI* | [**CreateCompanySearch**](docs/CompaniesAPI.md#createcompanysearch) | **Post** /companies/search | Search the public company registry (full filter model)
 *CompaniesAPI* | [**ListCompanyLookup**](docs/CompaniesAPI.md#listcompanylookup) | **Get** /companies/lookup | Look up a company by CUI (scope: contacts:read)
 *CompaniesAPI* | [**ListCompanySearch**](docs/CompaniesAPI.md#listcompanysearch) | **Get** /companies/search | Search the public company registry (compact URL filters)
@@ -108,6 +126,8 @@ Class | Method | HTTP request | Description
 *CompatAPI* | [**CancelSmartBillCompatInvoice**](docs/CompatAPI.md#cancelsmartbillcompatinvoice) | **Delete** /compat/smartbill/invoice/cancel | Compat shim: cancel an invoice by seriesname + number query params (SmartBill-shaped)
 *CompatAPI* | [**CreateOblioCompatInvoice**](docs/CompatAPI.md#createobliocompatinvoice) | **Post** /compat/oblio/docs/invoice | Compat shim: create an invoice with an Oblio-shaped payload (Oblio POST /api/docs/invoice)
 *CompatAPI* | [**CreateSmartBillCompatInvoice**](docs/CompatAPI.md#createsmartbillcompatinvoice) | **Post** /compat/smartbill/invoice | Compat shim: create an invoice with a SmartBill-shaped payload (SmartBill POST /SBORO/api/invoice)
+*ConnectAPI* | [**GetConnectOutreach**](docs/ConnectAPI.md#getconnectoutreach) | **Get** /connect/outreach/{id} | Get the status of one outreach attempt (scope: connect:read)
+*ConnectAPI* | [**ListConnectOutreach**](docs/ConnectAPI.md#listconnectoutreach) | **Get** /connect/outreach | List Connect outreach initiated by your organization (scope: connect:read)
 *ConstructionAPI* | [**ListConstructionProjectSchedule**](docs/ConstructionAPI.md#listconstructionprojectschedule) | **Get** /construction/projects/{id}/schedule | List the schedule activities (grafic de eșalonare) of a construction project, in order (scope: projects:read)
 *ConstructionAPI* | [**ListConstructionWorkCertificates**](docs/ConstructionAPI.md#listconstructionworkcertificates) | **Get** /construction/work-certificates | List work-progress certificates (situații de lucrări). Filter by project_id. (scope: projects:read)
 *ContactsAPI* | [**CreateContact**](docs/ContactsAPI.md#createcontact) | **Post** /contacts | Create a contact
@@ -181,6 +201,15 @@ Class | Method | HTTP request | Description
 *MarketingAPI* | [**ListMarketingCampaigns**](docs/MarketingAPI.md#listmarketingcampaigns) | **Get** /marketing/campaigns | List marketing campaigns (scope: marketing:read)
 *MeAPI* | [**ListMe**](docs/MeAPI.md#listme) | **Get** /me | Identify the authenticated organization
 *ModulesAPI* | [**ListModules**](docs/ModulesAPI.md#listmodules) | **Get** /modules | List module entitlements
+*NetworkAPI* | [**AcceptNetworkQuote**](docs/NetworkAPI.md#acceptnetworkquote) | **Post** /network/quotes/{id}/accept | Accept a quote on your request: closes the request, declines the others and creates a platform-originated relationship. Money never transits Brivio (ADR-0147) (scope: network:write)
+*NetworkAPI* | [**CreateNetworkRequest**](docs/NetworkAPI.md#createnetworkrequest) | **Post** /network/requests | Create a service request (RFQ) to at most 3 verified listings chosen from /network/partners; no payment is involved (scope: network:write)
+*NetworkAPI* | [**CreateNetworkRequestQuote**](docs/NetworkAPI.md#createnetworkrequestquote) | **Post** /network/requests/{id}/quotes | Submit a quote on a request your organization was asked to quote; a new quote supersedes your live one (scope: network:write)
+*NetworkAPI* | [**DeclineNetworkQuote**](docs/NetworkAPI.md#declinenetworkquote) | **Post** /network/quotes/{id}/decline | Decline one quote on your request (scope: network:write)
+*NetworkAPI* | [**GetNetworkRequest**](docs/NetworkAPI.md#getnetworkrequest) | **Get** /network/requests/{id} | Get one request: full view with every quote for the requester; redacted view with only your own quote for a targeted provider (scope: network:read)
+*NetworkAPI* | [**ListNetworkPartners**](docs/NetworkAPI.md#listnetworkpartners) | **Get** /network/partners | Ranked search of verified providers in the Brivio business network; notaries are never listed and lawyers are unranked/unrated by professional rules (scope: network:read)
+*NetworkAPI* | [**ListNetworkRelationships**](docs/NetworkAPI.md#listnetworkrelationships) | **Get** /network/relationships | List business relationships where your organization is the provider or the client, with origin and service kind; never the counterpart&#39;s contact details (scope: network:read)
+*NetworkAPI* | [**ListNetworkRequests**](docs/NetworkAPI.md#listnetworkrequests) | **Get** /network/requests | List service requests: role&#x3D;requester (raised by your organization) or role&#x3D;provider (your inbox, requester redacted to a label) (scope: network:read)
+*NetworkAPI* | [**WithdrawNetworkRequest**](docs/NetworkAPI.md#withdrawnetworkrequest) | **Post** /network/requests/{id}/withdraw | Withdraw an open request you raised; live quotes are declined (scope: network:write)
 *OrdersAPI* | [**CreateOrderImport**](docs/OrdersAPI.md#createorderimport) | **Post** /orders/import | Import an e-commerce order (Shopify/WooCommerce connectors) — creates a DRAFT invoice + contact, deduped by source+external_id (scope: orders:write)
 *OrdersAPI* | [**GetOrder**](docs/OrdersAPI.md#getorder) | **Get** /orders/{id} | Get a storefront order with line items
 *OrdersAPI* | [**ListOrders**](docs/OrdersAPI.md#listorders) | **Get** /orders | List storefront orders (scope: orders:read)
@@ -235,11 +264,13 @@ Class | Method | HTTP request | Description
 
  - [Article](docs/Article.md)
  - [ArticleCreate](docs/ArticleCreate.md)
+ - [BankRuleInput](docs/BankRuleInput.md)
  - [Contact](docs/Contact.md)
  - [ContactCreate](docs/ContactCreate.md)
  - [Contract](docs/Contract.md)
  - [ContractCreate](docs/ContractCreate.md)
  - [CreateArticle201Response](docs/CreateArticle201Response.md)
+ - [CreateBankingStatementImportRequest](docs/CreateBankingStatementImportRequest.md)
  - [CreateCompanySearchRequest](docs/CreateCompanySearchRequest.md)
  - [CreateContact201Response](docs/CreateContact201Response.md)
  - [CreateContract201Response](docs/CreateContract201Response.md)
@@ -286,6 +317,7 @@ Class | Method | HTTP request | Description
  - [ListTimeEntries200Response](docs/ListTimeEntries200Response.md)
  - [Location](docs/Location.md)
  - [LocationCreate](docs/LocationCreate.md)
+ - [MatchBankingTransactionRequest](docs/MatchBankingTransactionRequest.md)
  - [Meta](docs/Meta.md)
  - [Module](docs/Module.md)
  - [Project](docs/Project.md)
@@ -293,6 +325,7 @@ Class | Method | HTTP request | Description
  - [Quote](docs/Quote.md)
  - [Site](docs/Site.md)
  - [TimeEntry](docs/TimeEntry.md)
+ - [UnmatchBankingTransactionRequest](docs/UnmatchBankingTransactionRequest.md)
 
 
 ## Documentation For Authorization

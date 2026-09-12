@@ -63,9 +63,13 @@ type APIClient struct {
 
 	CatalogAPI *CatalogAPIService
 
+	CommsAPI *CommsAPIService
+
 	CompaniesAPI *CompaniesAPIService
 
 	CompatAPI *CompatAPIService
+
+	ConnectAPI *ConnectAPIService
 
 	ConstructionAPI *ConstructionAPIService
 
@@ -98,6 +102,8 @@ type APIClient struct {
 	MeAPI *MeAPIService
 
 	ModulesAPI *ModulesAPIService
+
+	NetworkAPI *NetworkAPIService
 
 	OrdersAPI *OrdersAPIService
 
@@ -151,8 +157,10 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.BankingAPI = (*BankingAPIService)(&c.common)
 	c.BookingsAPI = (*BookingsAPIService)(&c.common)
 	c.CatalogAPI = (*CatalogAPIService)(&c.common)
+	c.CommsAPI = (*CommsAPIService)(&c.common)
 	c.CompaniesAPI = (*CompaniesAPIService)(&c.common)
 	c.CompatAPI = (*CompatAPIService)(&c.common)
+	c.ConnectAPI = (*ConnectAPIService)(&c.common)
 	c.ConstructionAPI = (*ConstructionAPIService)(&c.common)
 	c.ContactsAPI = (*ContactsAPIService)(&c.common)
 	c.ContractsAPI = (*ContractsAPIService)(&c.common)
@@ -169,6 +177,7 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.MarketingAPI = (*MarketingAPIService)(&c.common)
 	c.MeAPI = (*MeAPIService)(&c.common)
 	c.ModulesAPI = (*ModulesAPIService)(&c.common)
+	c.NetworkAPI = (*NetworkAPIService)(&c.common)
 	c.OrdersAPI = (*OrdersAPIService)(&c.common)
 	c.PaymentMethodsAPI = (*PaymentMethodsAPIService)(&c.common)
 	c.PaymentsAPI = (*PaymentsAPIService)(&c.common)
