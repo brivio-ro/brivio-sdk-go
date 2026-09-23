@@ -21,8 +21,10 @@ var _ MappedNullable = &InvoiceCreateItemsInner{}
 
 // InvoiceCreateItemsInner struct for InvoiceCreateItemsInner
 type InvoiceCreateItemsInner struct {
+	ArticleId *string `json:"article_id,omitempty"`
 	Description string `json:"description"`
 	Quantity float32 `json:"quantity"`
+	Unit *string `json:"unit,omitempty"`
 	UnitPrice float32 `json:"unit_price"`
 	VatRate *float32 `json:"vat_rate,omitempty"`
 }
@@ -37,6 +39,8 @@ func NewInvoiceCreateItemsInner(description string, quantity float32, unitPrice 
 	this := InvoiceCreateItemsInner{}
 	this.Description = description
 	this.Quantity = quantity
+	var unit string = "buc"
+	this.Unit = &unit
 	this.UnitPrice = unitPrice
 	return &this
 }
@@ -46,7 +50,41 @@ func NewInvoiceCreateItemsInner(description string, quantity float32, unitPrice 
 // but it doesn't guarantee that properties required by API are set
 func NewInvoiceCreateItemsInnerWithDefaults() *InvoiceCreateItemsInner {
 	this := InvoiceCreateItemsInner{}
+	var unit string = "buc"
+	this.Unit = &unit
 	return &this
+}
+
+// GetArticleId returns the ArticleId field value if set, zero value otherwise.
+func (o *InvoiceCreateItemsInner) GetArticleId() string {
+	if o == nil || IsNil(o.ArticleId) {
+		var ret string
+		return ret
+	}
+	return *o.ArticleId
+}
+
+// GetArticleIdOk returns a tuple with the ArticleId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *InvoiceCreateItemsInner) GetArticleIdOk() (*string, bool) {
+	if o == nil || IsNil(o.ArticleId) {
+		return nil, false
+	}
+	return o.ArticleId, true
+}
+
+// HasArticleId returns a boolean if a field has been set.
+func (o *InvoiceCreateItemsInner) HasArticleId() bool {
+	if o != nil && !IsNil(o.ArticleId) {
+		return true
+	}
+
+	return false
+}
+
+// SetArticleId gets a reference to the given string and assigns it to the ArticleId field.
+func (o *InvoiceCreateItemsInner) SetArticleId(v string) {
+	o.ArticleId = &v
 }
 
 // GetDescription returns the Description field value
@@ -95,6 +133,38 @@ func (o *InvoiceCreateItemsInner) GetQuantityOk() (*float32, bool) {
 // SetQuantity sets field value
 func (o *InvoiceCreateItemsInner) SetQuantity(v float32) {
 	o.Quantity = v
+}
+
+// GetUnit returns the Unit field value if set, zero value otherwise.
+func (o *InvoiceCreateItemsInner) GetUnit() string {
+	if o == nil || IsNil(o.Unit) {
+		var ret string
+		return ret
+	}
+	return *o.Unit
+}
+
+// GetUnitOk returns a tuple with the Unit field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *InvoiceCreateItemsInner) GetUnitOk() (*string, bool) {
+	if o == nil || IsNil(o.Unit) {
+		return nil, false
+	}
+	return o.Unit, true
+}
+
+// HasUnit returns a boolean if a field has been set.
+func (o *InvoiceCreateItemsInner) HasUnit() bool {
+	if o != nil && !IsNil(o.Unit) {
+		return true
+	}
+
+	return false
+}
+
+// SetUnit gets a reference to the given string and assigns it to the Unit field.
+func (o *InvoiceCreateItemsInner) SetUnit(v string) {
+	o.Unit = &v
 }
 
 // GetUnitPrice returns the UnitPrice field value
@@ -163,8 +233,14 @@ func (o InvoiceCreateItemsInner) MarshalJSON() ([]byte, error) {
 
 func (o InvoiceCreateItemsInner) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	if !IsNil(o.ArticleId) {
+		toSerialize["article_id"] = o.ArticleId
+	}
 	toSerialize["description"] = o.Description
 	toSerialize["quantity"] = o.Quantity
+	if !IsNil(o.Unit) {
+		toSerialize["unit"] = o.Unit
+	}
 	toSerialize["unit_price"] = o.UnitPrice
 	if !IsNil(o.VatRate) {
 		toSerialize["vat_rate"] = o.VatRate

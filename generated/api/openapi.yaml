@@ -3603,6 +3603,24 @@ paths:
         \ and needs { storno: true } to be reversed (409 otherwise). (scope: banking:write)"
       tags:
       - banking
+  /banking/coverage:
+    get:
+      operationId: listBankingCoverage
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Reconciliation coverage per own bank account — matched / partially\
+        \ matched / ignored over total lines, bank-rule hit-rate, lines auto-settled\
+        \ by rules, plus org totals and active-rule counts. Own IBAN masked to last4.\
+        \ (scope: banking:read)"
+      tags:
+      - banking
   /banking/statements:
     get:
       operationId: listBankingStatements
@@ -3890,6 +3908,25 @@ paths:
         \ banking:read)"
       tags:
       - banking
+  /cabinet/spv-status:
+    get:
+      operationId: listCabinetSpvStatus
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "SPV / e-Factura status of every client the key’s organisation manages\
+        \ (accounting practice) — per client: last sync, unread (critical flagged),\
+        \ rejected uploads, invoices within 2 working days of the legal window, invoices\
+        \ past it, and the ANAF connection state and expiry. Read-only; the client\
+        \ set is the cabinet’s active managed companies. (scope: efactura:read)"
+      tags:
+      - cabinet
   /catalog:
     get:
       operationId: listCatalog
@@ -4997,6 +5034,350 @@ paths:
       summary: "List hosted sites (scope: sites:read)"
       tags:
       - sites
+  /emails/send:
+    post:
+      description: "Accepted with 202 once the message is durably recorded; delivery\
+        \ is asynchronous. Honours `Idempotency-Key` (same key → same `id`). Rate\
+        \ limit 600/h per organisation. Suppressed recipients (bounces, complaints,\
+        \ org opt-outs) are reported per recipient and never handed to the MTA; if\
+        \ every `to` is suppressed the message is recorded with `status: suppressed`.\
+        \ `category: marketing` → 422 (use campaigns). `from` on an unverified domain\
+        \ → 422. Attachments over 2 MB decoded → 413. Webhooks: `email.sent`, `email.delivered`,\
+        \ `email.bounced`, `email.complained`, `email.suppressed`."
+      operationId: createEmailSend
+      parameters:
+      - explode: false
+        in: header
+        name: Idempotency-Key
+        required: false
+        schema:
+          maxLength: 255
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            example:
+              to:
+              - email: ana@client.ro
+                name: Ana Popescu
+              subject: Factura 2026-0042
+              html: "<p>Bună ziua, atașat găsiți factura.</p>"
+              category: transactional
+              tags:
+              - invoice
+              headers:
+                X-Entity-Ref-ID: inv_2026_0042
+            schema:
+              $ref: "#/components/schemas/EmailSendRequest"
+        required: true
+      responses:
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createEmailSend_202_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "413":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Send a transactional or notification email as the organisation (scope:\
+        \ emails:send)"
+      tags:
+      - emails
+  /emails:
+    get:
+      operationId: listEmails
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: since
+        required: false
+        schema:
+          format: date-time
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          enum:
+          - queued
+          - sent
+          - delivered
+          - bounced
+          - complained
+          - suppressed
+          - failed
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listEmails_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List emails sent through the API (scope: emails:read)"
+      tags:
+      - emails
+  /emails/{id}:
+    get:
+      operationId: getEmail
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createEmailSend_202_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Get an email with its delivery timeline (scope: emails:read)"
+      tags:
+      - emails
+  /email-domains:
+    get:
+      operationId: listEmailDomains
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listEmailDomains_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List sending domains (scope: email_domains:read)"
+      tags:
+      - email-domains
+    post:
+      description: "Returns the ownership TXT (`_brivio.<domain>`), SPF, DKIM selector\
+        \ record(s), DMARC and — when hosted — MX. Publish them, then call `/email-domains/{id}/verify`.\
+        \ 409 when the domain is already registered or claimed by another account;\
+        \ 503 when provisioning is not configured."
+      operationId: createEmailDomain
+      requestBody:
+        content:
+          application/json:
+            example:
+              domain: acme.ro
+              from_local_part: facturi
+            schema:
+              $ref: "#/components/schemas/EmailDomainCreate"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createEmailDomain_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Register a sending domain and get the DNS records to publish (scope:\
+        \ email_domains:write)"
+      tags:
+      - email-domains
+  /email-domains/{id}:
+    delete:
+      operationId: deleteEmailDomain
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Deleted
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Remove a sending domain (scope: email_domains:write)"
+      tags:
+      - email-domains
+    get:
+      operationId: getEmailDomain
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createEmailDomain_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Get a sending domain (scope: email_domains:read)"
+      tags:
+      - email-domains
+  /email-domains/{id}/verify:
+    post:
+      operationId: verifyEmailDomain
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/verifyEmailDomain_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Re-check DNS for a sending domain: ownership, SPF, DKIM, DMARC (scope:\
+        \ email_domains:write)"
+      tags:
+      - email-domains
 components:
   schemas:
     Meta:
@@ -5247,14 +5628,19 @@ components:
       - name
     Invoice:
       example:
-        number: 0
-        total: total
-        subtotal: subtotal
-        currency: currency
-        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        company_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        exchange_rate: exchange_rate
+        vat_exemption_reason: vat_exemption_reason
         type: type
         contact_id: contact_id
         vat_total: vat_total
+        number: 0
+        total: total
+        series: series
+        subtotal: subtotal
+        currency: currency
+        vat_type: TAXABLE
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         direction: direction
         status: status
       properties:
@@ -5265,14 +5651,39 @@ components:
           type: string
         direction:
           type: string
+        series:
+          type: string
+          nullable: true
         number:
           type: integer
         status:
           type: string
         contact_id:
           type: string
+        company_id:
+          description: Issuing legal entity the number was allocated under.
+          format: uuid
+          type: string
+          nullable: true
         currency:
           type: string
+        exchange_rate:
+          description: "RON per 1 unit of `currency`, persisted per document (BNR\
+            \ T-1, Cod Fiscal art. 290 / ADR-0029). \"1.000000\" for RON."
+          type: string
+        vat_type:
+          enum:
+          - TAXABLE
+          - REVERSE_CHARGE
+          - INTRA_COMMUNITY
+          - EXPORT
+          - VAT_EXEMPT
+          - NON_TAXABLE
+          - MARGIN
+          type: string
+        vat_exemption_reason:
+          type: string
+          nullable: true
         subtotal:
           type: string
         vat_total:
@@ -5280,21 +5691,41 @@ components:
         total:
           type: string
     InvoiceCreate:
+      description: "Exactly one of `contact_id` or `contact_external_id` is required.\
+        \ Issued documents are numbered by the same gapless per-(company, series,\
+        \ year) allocator the app uses (ADR-0202); the `series` defaults to `BRV`.\
+        \ Non-RON documents carry the BNR T-1 reference rate for `issue_date` unless\
+        \ a positive `exchange_rate` is supplied — when the rate cannot be obtained\
+        \ the request fails with 422 `EXCHANGE_RATE_UNAVAILABLE`, never a silent rate\
+        \ of 1."
       example:
-        issue_date: 2000-01-23
+        contact_external_id: contact_external_id
+        notes: notes
+        company_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        exchange_rate: 0.8008281904610115
         due_date: 2000-01-23
-        currency: currency
+        vat_exemption_reason: vat_exemption_reason
         type: INVOICE
-        contact_id: contact_id
+        contact_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        issue_date: 2000-01-23
+        project_id: project_id
+        series: series
+        currency: RON
+        vat_type: TAXABLE
         items:
-        - quantity: 0.8008281904610115
+        - article_id: article_id
+          unit: buc
+          quantity: 6.027456183070403
           description: description
-          unit_price: 6.027456183070403
-          vat_rate: 1.4658129805029452
-        - quantity: 0.8008281904610115
+          unit_price: 1.4658129805029452
+          vat_rate: 5.962133916683182
+        - article_id: article_id
+          unit: buc
+          quantity: 6.027456183070403
           description: description
-          unit_price: 6.027456183070403
-          vat_rate: 1.4658129805029452
+          unit_price: 1.4658129805029452
+          vat_rate: 5.962133916683182
+        direction: ISSUED
       properties:
         type:
           enum:
@@ -5304,7 +5735,30 @@ components:
           - RECEIPT
           - CREDIT_NOTE
           type: string
+        direction:
+          default: ISSUED
+          enum:
+          - ISSUED
+          - RECEIVED
+          type: string
+        series:
+          description: Numbering series; defaults to `BRV` for issued documents.
+          type: string
         contact_id:
+          format: uuid
+          type: string
+        contact_external_id:
+          description: "Your own identifier for the contact, resolved through the\
+            \ external reference map (source `api`, entity `contact`). Used only when\
+            \ `contact_id` is absent; unknown → 404 `CONTACT_NOT_FOUND`."
+          maxLength: 255
+          type: string
+        company_id:
+          description: Issuing legal entity. Optional when the organization has a
+            single active company; required (422) when it has several.
+          format: uuid
+          type: string
+        project_id:
           type: string
         issue_date:
           format: date
@@ -5313,13 +5767,38 @@ components:
           format: date
           type: string
         currency:
+          default: RON
+          type: string
+        exchange_rate:
+          description: RON per 1 unit of `currency`. Omit to have the BNR T-1 reference
+            rate fetched server-side (recommended). A supplied value is persisted
+            as-is; ignored for RON.
+          type: number
+        vat_type:
+          description: "VAT regime of the document. When omitted it is derived from\
+            \ the contact: RO → TAXABLE; EU (non-RO) with a VAT number → INTRA_COMMUNITY\
+            \ (reverse charge, UBL category AE); EU without VAT number → TAXABLE;\
+            \ non-EU → EXPORT. Only TAXABLE carries line VAT."
+          enum:
+          - TAXABLE
+          - REVERSE_CHARGE
+          - INTRA_COMMUNITY
+          - EXPORT
+          - VAT_EXEMPT
+          - NON_TAXABLE
+          - MARGIN
+          type: string
+        vat_exemption_reason:
+          description: Legal mention printed and emitted for non-TAXABLE regimes.
+          maxLength: 500
+          type: string
+        notes:
           type: string
         items:
           items:
             $ref: "#/components/schemas/InvoiceCreate_items_inner"
           type: array
       required:
-      - contact_id
       - due_date
       - issue_date
       - items
@@ -5887,6 +6366,601 @@ components:
           type: string
         plan:
           type: string
+    EmailAddress:
+      example:
+        name: Ana Popescu
+        email: ana@client.ro
+      properties:
+        email:
+          example: ana@client.ro
+          format: email
+          type: string
+        name:
+          example: Ana Popescu
+          maxLength: 100
+          type: string
+      required:
+      - email
+    EmailAttachment:
+      description: Base64 payload. All attachments together must decode to at most
+        2 MB.
+      example:
+        filename: factura-2026-0042.pdf
+        content_type: application/pdf
+        content_base64: content_base64
+      properties:
+        filename:
+          example: factura-2026-0042.pdf
+          type: string
+        content_base64:
+          format: byte
+          type: string
+        content_type:
+          example: application/pdf
+          type: string
+      required:
+      - content_base64
+      - filename
+    EmailSendRequest:
+      description: "Transactional or notification email sent as the organisation.\
+        \ `from` must be on a VERIFIED sending domain (see /email-domains); omit it\
+        \ to use the default sender. `category: marketing` is refused (422) — use\
+        \ campaigns."
+      example:
+        cc:
+        - name: Ana Popescu
+          email: ana@client.ro
+        - name: Ana Popescu
+          email: ana@client.ro
+        - name: Ana Popescu
+          email: ana@client.ro
+        - name: Ana Popescu
+          email: ana@client.ro
+        - name: Ana Popescu
+          email: ana@client.ro
+        headers:
+          X-Entity-Ref-ID: inv_2026_0042
+        bcc:
+        - name: Ana Popescu
+          email: ana@client.ro
+        - name: Ana Popescu
+          email: ana@client.ro
+        - name: Ana Popescu
+          email: ana@client.ro
+        - name: Ana Popescu
+          email: ana@client.ro
+        - name: Ana Popescu
+          email: ana@client.ro
+        attachments:
+        - filename: factura-2026-0042.pdf
+          content_type: application/pdf
+          content_base64: content_base64
+        - filename: factura-2026-0042.pdf
+          content_type: application/pdf
+          content_base64: content_base64
+        - filename: factura-2026-0042.pdf
+          content_type: application/pdf
+          content_base64: content_base64
+        - filename: factura-2026-0042.pdf
+          content_type: application/pdf
+          content_base64: content_base64
+        - filename: factura-2026-0042.pdf
+          content_type: application/pdf
+          content_base64: content_base64
+        reply_to:
+          name: Ana Popescu
+          email: ana@client.ro
+        subject: Factura 2026-0042
+        html: html
+        from:
+          name: Ana Popescu
+          email: ana@client.ro
+        to:
+        - name: Ana Popescu
+          email: ana@client.ro
+        - name: Ana Popescu
+          email: ana@client.ro
+        - name: Ana Popescu
+          email: ana@client.ro
+        - name: Ana Popescu
+          email: ana@client.ro
+        - name: Ana Popescu
+          email: ana@client.ro
+        text: text
+        category: transactional
+        tags:
+        - invoice
+        - codai
+      properties:
+        to:
+          items:
+            $ref: "#/components/schemas/EmailAddress"
+          maxItems: 50
+          minItems: 1
+          type: array
+        cc:
+          items:
+            $ref: "#/components/schemas/EmailAddress"
+          maxItems: 50
+          type: array
+        bcc:
+          items:
+            $ref: "#/components/schemas/EmailAddress"
+          maxItems: 50
+          type: array
+        subject:
+          example: Factura 2026-0042
+          maxLength: 998
+          type: string
+        html:
+          description: At least one of html / text is required.
+          type: string
+        text:
+          type: string
+        from:
+          $ref: "#/components/schemas/EmailAddress"
+        reply_to:
+          $ref: "#/components/schemas/EmailAddress"
+        headers:
+          additionalProperties:
+            type: string
+          description: "Allow-listed: X-Entity-Ref-ID, List-Unsubscribe."
+          example:
+            X-Entity-Ref-ID: inv_2026_0042
+        category:
+          enum:
+          - transactional
+          - notification
+          example: transactional
+          type: string
+        tags:
+          example:
+          - invoice
+          - codai
+          items:
+            maxLength: 64
+            type: string
+          maxItems: 10
+          type: array
+        attachments:
+          items:
+            $ref: "#/components/schemas/EmailAttachment"
+          maxItems: 20
+          type: array
+      required:
+      - category
+      - subject
+      - to
+    EmailRecipient:
+      example:
+        kind: to
+        name: name
+        email: email
+        status: accepted
+      properties:
+        email:
+          format: email
+          type: string
+        name:
+          type: string
+        kind:
+          enum:
+          - to
+          - cc
+          - bcc
+          type: string
+        status:
+          enum:
+          - accepted
+          - suppressed
+          type: string
+      required:
+      - email
+      - kind
+      - status
+    EmailEvent:
+      example:
+        at: 2000-01-23T04:56:07.000+00:00
+        type: email.queued
+      properties:
+        type:
+          enum:
+          - email.queued
+          - email.sent
+          - email.delivered
+          - email.bounced
+          - email.complained
+          - email.suppressed
+          type: string
+        at:
+          format: date-time
+          type: string
+      required:
+      - at
+      - type
+    Email:
+      example:
+        subject: subject
+        created_at: 2000-01-23T04:56:07.000+00:00
+        suppressed_recipients:
+        - suppressed_recipients
+        - suppressed_recipients
+        message_id: message_id
+        provider_message_id: provider_message_id
+        complained_at: 2000-01-23T04:56:07.000+00:00
+        tags:
+        - tags
+        - tags
+        sent_at: 2000-01-23T04:56:07.000+00:00
+        recipients:
+        - kind: to
+          name: name
+          email: email
+          status: accepted
+        - kind: to
+          name: name
+          email: email
+          status: accepted
+        bounced_at: 2000-01-23T04:56:07.000+00:00
+        idempotency_key: idempotency_key
+        from: Acme SRL <no-reply@acme.ro>
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        last_error: last_error
+        category: transactional
+        delivered_at: 2000-01-23T04:56:07.000+00:00
+        events:
+        - at: 2000-01-23T04:56:07.000+00:00
+          type: email.queued
+        - at: 2000-01-23T04:56:07.000+00:00
+          type: email.queued
+        status: queued
+      properties:
+        id:
+          format: uuid
+          type: string
+        status:
+          description: '`queued` also covers a transport failure parked in the retry
+            outbox.'
+          enum:
+          - queued
+          - sent
+          - delivered
+          - bounced
+          - complained
+          - suppressed
+          - failed
+          type: string
+        category:
+          enum:
+          - transactional
+          - notification
+          type: string
+        from:
+          example: Acme SRL <no-reply@acme.ro>
+          type: string
+        subject:
+          type: string
+        recipients:
+          items:
+            $ref: "#/components/schemas/EmailRecipient"
+          type: array
+        suppressed_recipients:
+          items:
+            type: string
+          type: array
+        tags:
+          items:
+            type: string
+          type: array
+        message_id:
+          description: SMTP Message-ID set on the outbound mail.
+          type: string
+        provider_message_id:
+          type: string
+          nullable: true
+        idempotency_key:
+          type: string
+          nullable: true
+        last_error:
+          type: string
+          nullable: true
+        created_at:
+          format: date-time
+          type: string
+        sent_at:
+          format: date-time
+          type: string
+          nullable: true
+        delivered_at:
+          format: date-time
+          type: string
+          nullable: true
+        bounced_at:
+          format: date-time
+          type: string
+          nullable: true
+        complained_at:
+          format: date-time
+          type: string
+          nullable: true
+        events:
+          items:
+            $ref: "#/components/schemas/EmailEvent"
+          type: array
+      required:
+      - category
+      - created_at
+      - events
+      - from
+      - id
+      - recipients
+      - status
+      - subject
+    EmailDnsRecord:
+      example:
+        name: stw._domainkey.acme.ro
+        type: TXT
+        value: v=DKIM1; k=rsa; p=MIIB...
+        status: pending
+      properties:
+        type:
+          enum:
+          - TXT
+          - MX
+          - CNAME
+          - A
+          - AAAA
+          - SRV
+          example: TXT
+          type: string
+        name:
+          example: stw._domainkey.acme.ro
+          type: string
+        value:
+          example: v=DKIM1; k=rsa; p=MIIB...
+          type: string
+        status:
+          enum:
+          - pending
+          - verified
+          type: string
+      required:
+      - name
+      - status
+      - type
+      - value
+    EmailDomainChecks:
+      description: Per-purpose verdicts. `mx` is null when the domain is not hosted
+        by Brivio Mail.
+      example:
+        ownership: true
+        dkim: true
+        spf: true
+        mx: true
+        dmarc: true
+      properties:
+        ownership:
+          description: The `_brivio.<domain>` TXT (ADR-0185).
+          type: boolean
+        spf:
+          type: boolean
+        dkim:
+          type: boolean
+        dmarc:
+          type: boolean
+        mx:
+          type: boolean
+          nullable: true
+      required:
+      - dkim
+      - dmarc
+      - ownership
+      - spf
+    EmailDomainCreate:
+      example:
+        domain: acme.ro
+        from_local_part: facturi
+      properties:
+        domain:
+          example: acme.ro
+          type: string
+        from_local_part:
+          default: no-reply
+          example: facturi
+          type: string
+      required:
+      - domain
+    EmailDomain:
+      example:
+        checks:
+          ownership: true
+          dkim: true
+          spf: true
+          mx: true
+          dmarc: true
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        dns_records:
+        - name: stw._domainkey.acme.ro
+          type: TXT
+          value: v=DKIM1; k=rsa; p=MIIB...
+          status: pending
+        - name: stw._domainkey.acme.ro
+          type: TXT
+          value: v=DKIM1; k=rsa; p=MIIB...
+          status: pending
+        verified_at: 2000-01-23T04:56:07.000+00:00
+        domain: acme.ro
+        verified: true
+        from_local_part: from_local_part
+        created_at: 2000-01-23T04:56:07.000+00:00
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        last_error: last_error
+        status: pending
+        dkim_selector: dkim_selector
+      properties:
+        id:
+          format: uuid
+          type: string
+        domain:
+          example: acme.ro
+          type: string
+        status:
+          enum:
+          - pending
+          - verified
+          - failed
+          type: string
+        verified:
+          type: boolean
+        from_local_part:
+          type: string
+        dkim_selector:
+          type: string
+          nullable: true
+        dns_records:
+          description: "Everything the organisation must publish: ownership TXT, SPF,\
+            \ DKIM, DMARC, MX when hosted."
+          items:
+            $ref: "#/components/schemas/EmailDnsRecord"
+          type: array
+        checks:
+          $ref: "#/components/schemas/EmailDomainChecks"
+        last_error:
+          type: string
+          nullable: true
+        verified_at:
+          format: date-time
+          type: string
+          nullable: true
+        created_at:
+          format: date-time
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+      required:
+      - checks
+      - dns_records
+      - domain
+      - id
+      - status
+      - verified
+    EmailDomainVerifyResult:
+      example:
+        checks:
+          ownership: true
+          dkim: true
+          spf: true
+          mx: true
+          dmarc: true
+        dns_records:
+        - name: stw._domainkey.acme.ro
+          type: TXT
+          value: v=DKIM1; k=rsa; p=MIIB...
+          status: pending
+        - name: stw._domainkey.acme.ro
+          type: TXT
+          value: v=DKIM1; k=rsa; p=MIIB...
+          status: pending
+        verified: true
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        last_error: last_error
+        status: pending
+      properties:
+        id:
+          format: uuid
+          type: string
+        verified:
+          type: boolean
+        status:
+          enum:
+          - pending
+          - verified
+          - failed
+          type: string
+        checks:
+          $ref: "#/components/schemas/EmailDomainChecks"
+        dns_records:
+          items:
+            $ref: "#/components/schemas/EmailDnsRecord"
+          type: array
+        last_error:
+          type: string
+          nullable: true
+      required:
+      - checks
+      - dns_records
+      - id
+      - status
+      - verified
+    InvoicePaymentWebhookData:
+      properties:
+        invoice_id:
+          format: uuid
+          type: string
+        number:
+          description: "`<series><number>`, e.g. IMS42"
+          type: string
+        currency:
+          type: string
+        total:
+          description: Decimal string
+          type: string
+        paid_amount:
+          description: "Decimal string, after this payment"
+          type: string
+        remaining_amount:
+          description: "Decimal string, 0.00 when settled"
+          type: string
+        status:
+          enum:
+          - PAID
+          - PARTIALLY_PAID
+          type: string
+        payment:
+          $ref: "#/components/schemas/InvoicePaymentWebhookData_payment"
+        paid_at:
+          description: Set only on invoice.paid
+          format: date-time
+          type: string
+          nullable: true
+        contact_id:
+          format: uuid
+          type: string
+          nullable: true
+      required:
+      - currency
+      - invoice_id
+      - number
+      - paid_amount
+      - payment
+      - remaining_amount
+      - status
+      - total
+    WebhookDelivery:
+      properties:
+        id:
+          description: "Stable delivery id (`evt_…`). Dedupe on it: a replayed settlement\
+            \ reuses the same id."
+          type: string
+        type:
+          type: string
+        created:
+          description: Unix seconds
+          type: integer
+        environment:
+          enum:
+          - live
+          - test
+          type: string
+        data:
+          type: object
+      required:
+      - created
+      - data
+      - environment
+      - id
+      - type
     listMe_401_response_error:
       example:
         code: code
@@ -6058,24 +7132,34 @@ components:
     listInvoices_200_response:
       example:
         data:
-        - number: 0
-          total: total
-          subtotal: subtotal
-          currency: currency
-          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        - company_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          exchange_rate: exchange_rate
+          vat_exemption_reason: vat_exemption_reason
           type: type
           contact_id: contact_id
           vat_total: vat_total
+          number: 0
+          total: total
+          series: series
+          subtotal: subtotal
+          currency: currency
+          vat_type: TAXABLE
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           direction: direction
           status: status
-        - number: 0
-          total: total
-          subtotal: subtotal
-          currency: currency
-          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        - company_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          exchange_rate: exchange_rate
+          vat_exemption_reason: vat_exemption_reason
           type: type
           contact_id: contact_id
           vat_total: vat_total
+          number: 0
+          total: total
+          series: series
+          subtotal: subtotal
+          currency: currency
+          vat_type: TAXABLE
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           direction: direction
           status: status
         meta:
@@ -6100,14 +7184,19 @@ components:
     createInvoice_201_response:
       example:
         data:
-          number: 0
-          total: total
-          subtotal: subtotal
-          currency: currency
-          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          company_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          exchange_rate: exchange_rate
+          vat_exemption_reason: vat_exemption_reason
           type: type
           contact_id: contact_id
           vat_total: vat_total
+          number: 0
+          total: total
+          series: series
+          subtotal: subtotal
+          currency: currency
+          vat_type: TAXABLE
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           direction: direction
           status: status
         error: ""
@@ -6812,17 +7901,318 @@ components:
       required:
       - data
       - error
+    createEmailSend_202_response:
+      example:
+        data:
+          subject: subject
+          created_at: 2000-01-23T04:56:07.000+00:00
+          suppressed_recipients:
+          - suppressed_recipients
+          - suppressed_recipients
+          message_id: message_id
+          provider_message_id: provider_message_id
+          complained_at: 2000-01-23T04:56:07.000+00:00
+          tags:
+          - tags
+          - tags
+          sent_at: 2000-01-23T04:56:07.000+00:00
+          recipients:
+          - kind: to
+            name: name
+            email: email
+            status: accepted
+          - kind: to
+            name: name
+            email: email
+            status: accepted
+          bounced_at: 2000-01-23T04:56:07.000+00:00
+          idempotency_key: idempotency_key
+          from: Acme SRL <no-reply@acme.ro>
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          last_error: last_error
+          category: transactional
+          delivered_at: 2000-01-23T04:56:07.000+00:00
+          events:
+          - at: 2000-01-23T04:56:07.000+00:00
+            type: email.queued
+          - at: 2000-01-23T04:56:07.000+00:00
+            type: email.queued
+          status: queued
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/Email"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    listEmails_200_response:
+      example:
+        data:
+        - subject: subject
+          created_at: 2000-01-23T04:56:07.000+00:00
+          suppressed_recipients:
+          - suppressed_recipients
+          - suppressed_recipients
+          message_id: message_id
+          provider_message_id: provider_message_id
+          complained_at: 2000-01-23T04:56:07.000+00:00
+          tags:
+          - tags
+          - tags
+          sent_at: 2000-01-23T04:56:07.000+00:00
+          recipients:
+          - kind: to
+            name: name
+            email: email
+            status: accepted
+          - kind: to
+            name: name
+            email: email
+            status: accepted
+          bounced_at: 2000-01-23T04:56:07.000+00:00
+          idempotency_key: idempotency_key
+          from: Acme SRL <no-reply@acme.ro>
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          last_error: last_error
+          category: transactional
+          delivered_at: 2000-01-23T04:56:07.000+00:00
+          events:
+          - at: 2000-01-23T04:56:07.000+00:00
+            type: email.queued
+          - at: 2000-01-23T04:56:07.000+00:00
+            type: email.queued
+          status: queued
+        - subject: subject
+          created_at: 2000-01-23T04:56:07.000+00:00
+          suppressed_recipients:
+          - suppressed_recipients
+          - suppressed_recipients
+          message_id: message_id
+          provider_message_id: provider_message_id
+          complained_at: 2000-01-23T04:56:07.000+00:00
+          tags:
+          - tags
+          - tags
+          sent_at: 2000-01-23T04:56:07.000+00:00
+          recipients:
+          - kind: to
+            name: name
+            email: email
+            status: accepted
+          - kind: to
+            name: name
+            email: email
+            status: accepted
+          bounced_at: 2000-01-23T04:56:07.000+00:00
+          idempotency_key: idempotency_key
+          from: Acme SRL <no-reply@acme.ro>
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          last_error: last_error
+          category: transactional
+          delivered_at: 2000-01-23T04:56:07.000+00:00
+          events:
+          - at: 2000-01-23T04:56:07.000+00:00
+            type: email.queued
+          - at: 2000-01-23T04:56:07.000+00:00
+            type: email.queued
+          status: queued
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/Email"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    listEmailDomains_200_response:
+      example:
+        data:
+        - checks:
+            ownership: true
+            dkim: true
+            spf: true
+            mx: true
+            dmarc: true
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          dns_records:
+          - name: stw._domainkey.acme.ro
+            type: TXT
+            value: v=DKIM1; k=rsa; p=MIIB...
+            status: pending
+          - name: stw._domainkey.acme.ro
+            type: TXT
+            value: v=DKIM1; k=rsa; p=MIIB...
+            status: pending
+          verified_at: 2000-01-23T04:56:07.000+00:00
+          domain: acme.ro
+          verified: true
+          from_local_part: from_local_part
+          created_at: 2000-01-23T04:56:07.000+00:00
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          last_error: last_error
+          status: pending
+          dkim_selector: dkim_selector
+        - checks:
+            ownership: true
+            dkim: true
+            spf: true
+            mx: true
+            dmarc: true
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          dns_records:
+          - name: stw._domainkey.acme.ro
+            type: TXT
+            value: v=DKIM1; k=rsa; p=MIIB...
+            status: pending
+          - name: stw._domainkey.acme.ro
+            type: TXT
+            value: v=DKIM1; k=rsa; p=MIIB...
+            status: pending
+          verified_at: 2000-01-23T04:56:07.000+00:00
+          domain: acme.ro
+          verified: true
+          from_local_part: from_local_part
+          created_at: 2000-01-23T04:56:07.000+00:00
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          last_error: last_error
+          status: pending
+          dkim_selector: dkim_selector
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/EmailDomain"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    createEmailDomain_201_response:
+      example:
+        data:
+          checks:
+            ownership: true
+            dkim: true
+            spf: true
+            mx: true
+            dmarc: true
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          dns_records:
+          - name: stw._domainkey.acme.ro
+            type: TXT
+            value: v=DKIM1; k=rsa; p=MIIB...
+            status: pending
+          - name: stw._domainkey.acme.ro
+            type: TXT
+            value: v=DKIM1; k=rsa; p=MIIB...
+            status: pending
+          verified_at: 2000-01-23T04:56:07.000+00:00
+          domain: acme.ro
+          verified: true
+          from_local_part: from_local_part
+          created_at: 2000-01-23T04:56:07.000+00:00
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          last_error: last_error
+          status: pending
+          dkim_selector: dkim_selector
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/EmailDomain"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    verifyEmailDomain_200_response:
+      example:
+        data:
+          checks:
+            ownership: true
+            dkim: true
+            spf: true
+            mx: true
+            dmarc: true
+          dns_records:
+          - name: stw._domainkey.acme.ro
+            type: TXT
+            value: v=DKIM1; k=rsa; p=MIIB...
+            status: pending
+          - name: stw._domainkey.acme.ro
+            type: TXT
+            value: v=DKIM1; k=rsa; p=MIIB...
+            status: pending
+          verified: true
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          last_error: last_error
+          status: pending
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/EmailDomainVerifyResult"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    invoice_paid_post_request:
+      allOf:
+      - $ref: "#/components/schemas/WebhookDelivery"
+      - properties:
+          type:
+            enum:
+            - invoice.paid
+          data:
+            $ref: "#/components/schemas/InvoicePaymentWebhookData"
+    invoice_partially_paid_post_request:
+      allOf:
+      - $ref: "#/components/schemas/WebhookDelivery"
+      - properties:
+          type:
+            enum:
+            - invoice.partially_paid
+          data:
+            $ref: "#/components/schemas/InvoicePaymentWebhookData"
     InvoiceCreate_items_inner:
       example:
-        quantity: 0.8008281904610115
+        article_id: article_id
+        unit: buc
+        quantity: 6.027456183070403
         description: description
-        unit_price: 6.027456183070403
-        vat_rate: 1.4658129805029452
+        unit_price: 1.4658129805029452
+        vat_rate: 5.962133916683182
       properties:
+        article_id:
+          type: string
         description:
           type: string
         quantity:
           type: number
+        unit:
+          default: buc
+          type: string
         unit_price:
           type: number
         vat_rate:
@@ -6831,6 +8221,38 @@ components:
       - description
       - quantity
       - unit_price
+    InvoicePaymentWebhookData_payment:
+      properties:
+        id:
+          format: uuid
+          type: string
+        amount:
+          type: string
+        payment_date:
+          format: date
+          type: string
+        method:
+          type: string
+        reference:
+          type: string
+          nullable: true
+        source:
+          enum:
+          - manual
+          - mark_paid
+          - bank_match
+          - provider
+          - instrument
+          - receipt
+          - telegram
+          - api
+          type: string
+      required:
+      - amount
+      - id
+      - method
+      - payment_date
+      - source
   securitySchemes:
     bearerAuth:
       description: API key as Bearer token

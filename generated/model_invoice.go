@@ -22,10 +22,17 @@ type Invoice struct {
 	Id *string `json:"id,omitempty"`
 	Type *string `json:"type,omitempty"`
 	Direction *string `json:"direction,omitempty"`
+	Series *string `json:"series,omitempty"`
 	Number *int32 `json:"number,omitempty"`
 	Status *string `json:"status,omitempty"`
 	ContactId *string `json:"contact_id,omitempty"`
+	// Issuing legal entity the number was allocated under.
+	CompanyId *string `json:"company_id,omitempty"`
 	Currency *string `json:"currency,omitempty"`
+	// RON per 1 unit of `currency`, persisted per document (BNR T-1, Cod Fiscal art. 290 / ADR-0029). \"1.000000\" for RON.
+	ExchangeRate *string `json:"exchange_rate,omitempty"`
+	VatType *string `json:"vat_type,omitempty"`
+	VatExemptionReason *string `json:"vat_exemption_reason,omitempty"`
 	Subtotal *string `json:"subtotal,omitempty"`
 	VatTotal *string `json:"vat_total,omitempty"`
 	Total *string `json:"total,omitempty"`
@@ -144,6 +151,38 @@ func (o *Invoice) SetDirection(v string) {
 	o.Direction = &v
 }
 
+// GetSeries returns the Series field value if set, zero value otherwise.
+func (o *Invoice) GetSeries() string {
+	if o == nil || IsNil(o.Series) {
+		var ret string
+		return ret
+	}
+	return *o.Series
+}
+
+// GetSeriesOk returns a tuple with the Series field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Invoice) GetSeriesOk() (*string, bool) {
+	if o == nil || IsNil(o.Series) {
+		return nil, false
+	}
+	return o.Series, true
+}
+
+// HasSeries returns a boolean if a field has been set.
+func (o *Invoice) HasSeries() bool {
+	if o != nil && !IsNil(o.Series) {
+		return true
+	}
+
+	return false
+}
+
+// SetSeries gets a reference to the given string and assigns it to the Series field.
+func (o *Invoice) SetSeries(v string) {
+	o.Series = &v
+}
+
 // GetNumber returns the Number field value if set, zero value otherwise.
 func (o *Invoice) GetNumber() int32 {
 	if o == nil || IsNil(o.Number) {
@@ -240,6 +279,38 @@ func (o *Invoice) SetContactId(v string) {
 	o.ContactId = &v
 }
 
+// GetCompanyId returns the CompanyId field value if set, zero value otherwise.
+func (o *Invoice) GetCompanyId() string {
+	if o == nil || IsNil(o.CompanyId) {
+		var ret string
+		return ret
+	}
+	return *o.CompanyId
+}
+
+// GetCompanyIdOk returns a tuple with the CompanyId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Invoice) GetCompanyIdOk() (*string, bool) {
+	if o == nil || IsNil(o.CompanyId) {
+		return nil, false
+	}
+	return o.CompanyId, true
+}
+
+// HasCompanyId returns a boolean if a field has been set.
+func (o *Invoice) HasCompanyId() bool {
+	if o != nil && !IsNil(o.CompanyId) {
+		return true
+	}
+
+	return false
+}
+
+// SetCompanyId gets a reference to the given string and assigns it to the CompanyId field.
+func (o *Invoice) SetCompanyId(v string) {
+	o.CompanyId = &v
+}
+
 // GetCurrency returns the Currency field value if set, zero value otherwise.
 func (o *Invoice) GetCurrency() string {
 	if o == nil || IsNil(o.Currency) {
@@ -270,6 +341,102 @@ func (o *Invoice) HasCurrency() bool {
 // SetCurrency gets a reference to the given string and assigns it to the Currency field.
 func (o *Invoice) SetCurrency(v string) {
 	o.Currency = &v
+}
+
+// GetExchangeRate returns the ExchangeRate field value if set, zero value otherwise.
+func (o *Invoice) GetExchangeRate() string {
+	if o == nil || IsNil(o.ExchangeRate) {
+		var ret string
+		return ret
+	}
+	return *o.ExchangeRate
+}
+
+// GetExchangeRateOk returns a tuple with the ExchangeRate field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Invoice) GetExchangeRateOk() (*string, bool) {
+	if o == nil || IsNil(o.ExchangeRate) {
+		return nil, false
+	}
+	return o.ExchangeRate, true
+}
+
+// HasExchangeRate returns a boolean if a field has been set.
+func (o *Invoice) HasExchangeRate() bool {
+	if o != nil && !IsNil(o.ExchangeRate) {
+		return true
+	}
+
+	return false
+}
+
+// SetExchangeRate gets a reference to the given string and assigns it to the ExchangeRate field.
+func (o *Invoice) SetExchangeRate(v string) {
+	o.ExchangeRate = &v
+}
+
+// GetVatType returns the VatType field value if set, zero value otherwise.
+func (o *Invoice) GetVatType() string {
+	if o == nil || IsNil(o.VatType) {
+		var ret string
+		return ret
+	}
+	return *o.VatType
+}
+
+// GetVatTypeOk returns a tuple with the VatType field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Invoice) GetVatTypeOk() (*string, bool) {
+	if o == nil || IsNil(o.VatType) {
+		return nil, false
+	}
+	return o.VatType, true
+}
+
+// HasVatType returns a boolean if a field has been set.
+func (o *Invoice) HasVatType() bool {
+	if o != nil && !IsNil(o.VatType) {
+		return true
+	}
+
+	return false
+}
+
+// SetVatType gets a reference to the given string and assigns it to the VatType field.
+func (o *Invoice) SetVatType(v string) {
+	o.VatType = &v
+}
+
+// GetVatExemptionReason returns the VatExemptionReason field value if set, zero value otherwise.
+func (o *Invoice) GetVatExemptionReason() string {
+	if o == nil || IsNil(o.VatExemptionReason) {
+		var ret string
+		return ret
+	}
+	return *o.VatExemptionReason
+}
+
+// GetVatExemptionReasonOk returns a tuple with the VatExemptionReason field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Invoice) GetVatExemptionReasonOk() (*string, bool) {
+	if o == nil || IsNil(o.VatExemptionReason) {
+		return nil, false
+	}
+	return o.VatExemptionReason, true
+}
+
+// HasVatExemptionReason returns a boolean if a field has been set.
+func (o *Invoice) HasVatExemptionReason() bool {
+	if o != nil && !IsNil(o.VatExemptionReason) {
+		return true
+	}
+
+	return false
+}
+
+// SetVatExemptionReason gets a reference to the given string and assigns it to the VatExemptionReason field.
+func (o *Invoice) SetVatExemptionReason(v string) {
+	o.VatExemptionReason = &v
 }
 
 // GetSubtotal returns the Subtotal field value if set, zero value otherwise.
@@ -387,6 +554,9 @@ func (o Invoice) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.Direction) {
 		toSerialize["direction"] = o.Direction
 	}
+	if !IsNil(o.Series) {
+		toSerialize["series"] = o.Series
+	}
 	if !IsNil(o.Number) {
 		toSerialize["number"] = o.Number
 	}
@@ -396,8 +566,20 @@ func (o Invoice) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.ContactId) {
 		toSerialize["contact_id"] = o.ContactId
 	}
+	if !IsNil(o.CompanyId) {
+		toSerialize["company_id"] = o.CompanyId
+	}
 	if !IsNil(o.Currency) {
 		toSerialize["currency"] = o.Currency
+	}
+	if !IsNil(o.ExchangeRate) {
+		toSerialize["exchange_rate"] = o.ExchangeRate
+	}
+	if !IsNil(o.VatType) {
+		toSerialize["vat_type"] = o.VatType
+	}
+	if !IsNil(o.VatExemptionReason) {
+		toSerialize["vat_exemption_reason"] = o.VatExemptionReason
 	}
 	if !IsNil(o.Subtotal) {
 		toSerialize["subtotal"] = o.Subtotal
