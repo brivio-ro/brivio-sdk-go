@@ -19,7 +19,7 @@ import (
 // checks if the InvoiceCreate type satisfies the MappedNullable interface at compile time
 var _ MappedNullable = &InvoiceCreate{}
 
-// InvoiceCreate Exactly one of `contact_id` or `contact_external_id` is required. Issued documents are numbered by the same gapless per-(company, series, year) allocator the app uses (ADR-0202); the `series` defaults to `BRV`. Non-RON documents carry the BNR T-1 reference rate for `issue_date` unless a positive `exchange_rate` is supplied — when the rate cannot be obtained the request fails with 422 `EXCHANGE_RATE_UNAVAILABLE`, never a silent rate of 1.
+// InvoiceCreate Exactly one of `contact_id` or `contact_external_id` is required. Issued documents are numbered by the same gapless per-(company, series, year) allocator the app uses (ADR-0208); the `series` defaults to `BRV`. Non-RON documents carry the BNR T-1 reference rate for `issue_date` unless a positive `exchange_rate` is supplied — when the rate cannot be obtained the request fails with 422 `EXCHANGE_RATE_UNAVAILABLE`, never a silent rate of 1.
 type InvoiceCreate struct {
 	Type *string `json:"type,omitempty"`
 	Direction *string `json:"direction,omitempty"`
