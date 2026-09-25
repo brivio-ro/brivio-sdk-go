@@ -113,9 +113,13 @@ type APIClient struct {
 
 	OrdersAPI *OrdersAPIService
 
+	PaymentLinksAPI *PaymentLinksAPIService
+
 	PaymentMethodsAPI *PaymentMethodsAPIService
 
 	PaymentsAPI *PaymentsAPIService
+
+	PayoutsAPI *PayoutsAPIService
 
 	ProjectsAPI *ProjectsAPIService
 
@@ -188,8 +192,10 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.ModulesAPI = (*ModulesAPIService)(&c.common)
 	c.NetworkAPI = (*NetworkAPIService)(&c.common)
 	c.OrdersAPI = (*OrdersAPIService)(&c.common)
+	c.PaymentLinksAPI = (*PaymentLinksAPIService)(&c.common)
 	c.PaymentMethodsAPI = (*PaymentMethodsAPIService)(&c.common)
 	c.PaymentsAPI = (*PaymentsAPIService)(&c.common)
+	c.PayoutsAPI = (*PayoutsAPIService)(&c.common)
 	c.ProjectsAPI = (*ProjectsAPIService)(&c.common)
 	c.QuotesAPI = (*QuotesAPIService)(&c.common)
 	c.RealtimeAPI = (*RealtimeAPIService)(&c.common)

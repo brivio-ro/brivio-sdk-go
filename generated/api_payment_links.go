@@ -20,63 +20,58 @@ import (
 )
 
 
-// ContactsAPIService ContactsAPI service
-type ContactsAPIService service
+// PaymentLinksAPIService PaymentLinksAPI service
+type PaymentLinksAPIService service
 
-type ApiCreateContactRequest struct {
+type ApiCancelPaymentLinkRequest struct {
 	ctx context.Context
-	ApiService *ContactsAPIService
-	contactCreate *ContactCreate
+	ApiService *PaymentLinksAPIService
+	id string
 }
 
-func (r ApiCreateContactRequest) ContactCreate(contactCreate ContactCreate) ApiCreateContactRequest {
-	r.contactCreate = &contactCreate
-	return r
-}
-
-func (r ApiCreateContactRequest) Execute() (*CreateContact201Response, *http.Response, error) {
-	return r.ApiService.CreateContactExecute(r)
+func (r ApiCancelPaymentLinkRequest) Execute() (*CancelPaymentLink200Response, *http.Response, error) {
+	return r.ApiService.CancelPaymentLinkExecute(r)
 }
 
 /*
-CreateContact Create a contact
+CancelPaymentLink Cancel an open payment link. 409 when already paid or not cancellable. Honours Idempotency-Key. (scope: payments:write)
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiCreateContactRequest
+ @param id Payment link id
+ @return ApiCancelPaymentLinkRequest
 */
-func (a *ContactsAPIService) CreateContact(ctx context.Context) ApiCreateContactRequest {
-	return ApiCreateContactRequest{
+func (a *PaymentLinksAPIService) CancelPaymentLink(ctx context.Context, id string) ApiCancelPaymentLinkRequest {
+	return ApiCancelPaymentLinkRequest{
 		ApiService: a,
 		ctx: ctx,
+		id: id,
 	}
 }
 
 // Execute executes the request
-//  @return CreateContact201Response
-func (a *ContactsAPIService) CreateContactExecute(r ApiCreateContactRequest) (*CreateContact201Response, *http.Response, error) {
+//  @return CancelPaymentLink200Response
+func (a *PaymentLinksAPIService) CancelPaymentLinkExecute(r ApiCancelPaymentLinkRequest) (*CancelPaymentLink200Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
 		formFiles            []formFile
-		localVarReturnValue  *CreateContact201Response
+		localVarReturnValue  *CancelPaymentLink200Response
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ContactsAPIService.CreateContact")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PaymentLinksAPIService.CancelPaymentLink")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/contacts"
+	localVarPath := localBasePath + "/payment-links/{id}/cancel"
+	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterValueToString(r.id, "id")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
-	if r.contactCreate == nil {
-		return localVarReturnValue, nil, reportError("contactCreate is required and must be specified")
-	}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
+	localVarHTTPContentTypes := []string{}
 
 	// set Content-Type header
 	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
@@ -92,8 +87,6 @@ func (a *ContactsAPIService) CreateContactExecute(r ApiCreateContactRequest) (*C
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	// body params
-	localVarPostBody = r.contactCreate
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -115,6 +108,157 @@ func (a *ContactsAPIService) CreateContactExecute(r ApiCreateContactRequest) (*C
 		newErr := &GenericOpenAPIError{
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v ListMe401Response
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v ListMe401Response
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 409 {
+			var v ListMe401Response
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiCreatePaymentLinkRequest struct {
+	ctx context.Context
+	ApiService *PaymentLinksAPIService
+	paymentLinkCreate *PaymentLinkCreate
+}
+
+func (r ApiCreatePaymentLinkRequest) PaymentLinkCreate(paymentLinkCreate PaymentLinkCreate) ApiCreatePaymentLinkRequest {
+	r.paymentLinkCreate = &paymentLinkCreate
+	return r
+}
+
+func (r ApiCreatePaymentLinkRequest) Execute() (*CreatePaymentLink201Response, *http.Response, error) {
+	return r.ApiService.CreatePaymentLinkExecute(r)
+}
+
+/*
+CreatePaymentLink Create a payment link. The provider is not contacted until the payer opens it, so a link can be minted before a processor is connected (it then offers IBAN + EPC QR). Honours Idempotency-Key. (scope: payments:write)
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiCreatePaymentLinkRequest
+*/
+func (a *PaymentLinksAPIService) CreatePaymentLink(ctx context.Context) ApiCreatePaymentLinkRequest {
+	return ApiCreatePaymentLinkRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+//  @return CreatePaymentLink201Response
+func (a *PaymentLinksAPIService) CreatePaymentLinkExecute(r ApiCreatePaymentLinkRequest) (*CreatePaymentLink201Response, *http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *CreatePaymentLink201Response
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PaymentLinksAPIService.CreatePaymentLink")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/payment-links"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.paymentLinkCreate == nil {
+		return localVarReturnValue, nil, reportError("paymentLinkCreate is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.paymentLinkCreate
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v ListMe401Response
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
 			var v ListMe401Response
@@ -152,25 +296,25 @@ func (a *ContactsAPIService) CreateContactExecute(r ApiCreateContactRequest) (*C
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiDeleteContactRequest struct {
+type ApiGetPaymentLinkRequest struct {
 	ctx context.Context
-	ApiService *ContactsAPIService
+	ApiService *PaymentLinksAPIService
 	id string
 }
 
-func (r ApiDeleteContactRequest) Execute() (*http.Response, error) {
-	return r.ApiService.DeleteContactExecute(r)
+func (r ApiGetPaymentLinkRequest) Execute() (*GetPaymentLink200Response, *http.Response, error) {
+	return r.ApiService.GetPaymentLinkExecute(r)
 }
 
 /*
-DeleteContact Delete a contact
+GetPaymentLink Get a payment link (scope: payments:read)
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param id
- @return ApiDeleteContactRequest
+ @param id Payment link id
+ @return ApiGetPaymentLinkRequest
 */
-func (a *ContactsAPIService) DeleteContact(ctx context.Context, id string) ApiDeleteContactRequest {
-	return ApiDeleteContactRequest{
+func (a *PaymentLinksAPIService) GetPaymentLink(ctx context.Context, id string) ApiGetPaymentLinkRequest {
+	return ApiGetPaymentLinkRequest{
 		ApiService: a,
 		ctx: ctx,
 		id: id,
@@ -178,143 +322,21 @@ func (a *ContactsAPIService) DeleteContact(ctx context.Context, id string) ApiDe
 }
 
 // Execute executes the request
-func (a *ContactsAPIService) DeleteContactExecute(r ApiDeleteContactRequest) (*http.Response, error) {
-	var (
-		localVarHTTPMethod   = http.MethodDelete
-		localVarPostBody     interface{}
-		formFiles            []formFile
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ContactsAPIService.DeleteContact")
-	if err != nil {
-		return nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/contacts/{id}"
-	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterValueToString(r.id, "id")), -1)
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
-	}
-
-	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		if localVarHTTPResponse.StatusCode == 401 {
-			var v ListMe401Response
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarHTTPResponse, newErr
-			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
-			return localVarHTTPResponse, newErr
-		}
-		if localVarHTTPResponse.StatusCode == 404 {
-			var v ListMe401Response
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarHTTPResponse, newErr
-			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
-			return localVarHTTPResponse, newErr
-		}
-		if localVarHTTPResponse.StatusCode == 409 {
-			var v ListMe401Response
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarHTTPResponse, newErr
-			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
-		}
-		return localVarHTTPResponse, newErr
-	}
-
-	return localVarHTTPResponse, nil
-}
-
-type ApiGetContactRequest struct {
-	ctx context.Context
-	ApiService *ContactsAPIService
-	id string
-}
-
-func (r ApiGetContactRequest) Execute() (*CreateContact201Response, *http.Response, error) {
-	return r.ApiService.GetContactExecute(r)
-}
-
-/*
-GetContact Get a contact
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param id
- @return ApiGetContactRequest
-*/
-func (a *ContactsAPIService) GetContact(ctx context.Context, id string) ApiGetContactRequest {
-	return ApiGetContactRequest{
-		ApiService: a,
-		ctx: ctx,
-		id: id,
-	}
-}
-
-// Execute executes the request
-//  @return CreateContact201Response
-func (a *ContactsAPIService) GetContactExecute(r ApiGetContactRequest) (*CreateContact201Response, *http.Response, error) {
+//  @return GetPaymentLink200Response
+func (a *PaymentLinksAPIService) GetPaymentLinkExecute(r ApiGetPaymentLinkRequest) (*GetPaymentLink200Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
 		formFiles            []formFile
-		localVarReturnValue  *CreateContact201Response
+		localVarReturnValue  *GetPaymentLink200Response
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ContactsAPIService.GetContact")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PaymentLinksAPIService.GetPaymentLink")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/contacts/{id}"
+	localVarPath := localBasePath + "/payment-links/{id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterValueToString(r.id, "id")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -396,62 +418,65 @@ func (a *ContactsAPIService) GetContactExecute(r ApiGetContactRequest) (*CreateC
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiListContactsRequest struct {
+type ApiListPaymentLinksRequest struct {
 	ctx context.Context
-	ApiService *ContactsAPIService
+	ApiService *PaymentLinksAPIService
 	page *int32
 	perPage *int32
-	search *string
+	status *string
 }
 
-func (r ApiListContactsRequest) Page(page int32) ApiListContactsRequest {
+// Page number (1-based)
+func (r ApiListPaymentLinksRequest) Page(page int32) ApiListPaymentLinksRequest {
 	r.page = &page
 	return r
 }
 
-func (r ApiListContactsRequest) PerPage(perPage int32) ApiListContactsRequest {
+// Page size (max 100)
+func (r ApiListPaymentLinksRequest) PerPage(perPage int32) ApiListPaymentLinksRequest {
 	r.perPage = &perPage
 	return r
 }
 
-func (r ApiListContactsRequest) Search(search string) ApiListContactsRequest {
-	r.search = &search
+// Filter by spine status
+func (r ApiListPaymentLinksRequest) Status(status string) ApiListPaymentLinksRequest {
+	r.status = &status
 	return r
 }
 
-func (r ApiListContactsRequest) Execute() (*ListContacts200Response, *http.Response, error) {
-	return r.ApiService.ListContactsExecute(r)
+func (r ApiListPaymentLinksRequest) Execute() (*ListPaymentLinks200Response, *http.Response, error) {
+	return r.ApiService.ListPaymentLinksExecute(r)
 }
 
 /*
-ListContacts List contacts
+ListPaymentLinks List ad-hoc payment links, newest first (scope: payments:read)
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiListContactsRequest
+ @return ApiListPaymentLinksRequest
 */
-func (a *ContactsAPIService) ListContacts(ctx context.Context) ApiListContactsRequest {
-	return ApiListContactsRequest{
+func (a *PaymentLinksAPIService) ListPaymentLinks(ctx context.Context) ApiListPaymentLinksRequest {
+	return ApiListPaymentLinksRequest{
 		ApiService: a,
 		ctx: ctx,
 	}
 }
 
 // Execute executes the request
-//  @return ListContacts200Response
-func (a *ContactsAPIService) ListContactsExecute(r ApiListContactsRequest) (*ListContacts200Response, *http.Response, error) {
+//  @return ListPaymentLinks200Response
+func (a *PaymentLinksAPIService) ListPaymentLinksExecute(r ApiListPaymentLinksRequest) (*ListPaymentLinks200Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
 		formFiles            []formFile
-		localVarReturnValue  *ListContacts200Response
+		localVarReturnValue  *ListPaymentLinks200Response
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ContactsAPIService.ListContacts")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PaymentLinksAPIService.ListPaymentLinks")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/contacts"
+	localVarPath := localBasePath + "/payment-links"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -463,8 +488,8 @@ func (a *ContactsAPIService) ListContactsExecute(r ApiListContactsRequest) (*Lis
 	if r.perPage != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "perPage", r.perPage, "form", "")
 	}
-	if r.search != nil {
-		parameterAddToHeaderOrQuery(localVarQueryParams, "search", r.search, "form", "")
+	if r.status != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "status", r.status, "form", "")
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -506,139 +531,6 @@ func (a *ContactsAPIService) ListContactsExecute(r ApiListContactsRequest) (*Lis
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
-			var v ListMe401Response
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-	if err != nil {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: err.Error(),
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
-type ApiUpdateContactRequest struct {
-	ctx context.Context
-	ApiService *ContactsAPIService
-	id string
-}
-
-func (r ApiUpdateContactRequest) Execute() (*CreateContact201Response, *http.Response, error) {
-	return r.ApiService.UpdateContactExecute(r)
-}
-
-/*
-UpdateContact Update a contact
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param id
- @return ApiUpdateContactRequest
-*/
-func (a *ContactsAPIService) UpdateContact(ctx context.Context, id string) ApiUpdateContactRequest {
-	return ApiUpdateContactRequest{
-		ApiService: a,
-		ctx: ctx,
-		id: id,
-	}
-}
-
-// Execute executes the request
-//  @return CreateContact201Response
-func (a *ContactsAPIService) UpdateContactExecute(r ApiUpdateContactRequest) (*CreateContact201Response, *http.Response, error) {
-	var (
-		localVarHTTPMethod   = http.MethodPatch
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *CreateContact201Response
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ContactsAPIService.UpdateContact")
-	if err != nil {
-		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/contacts/{id}"
-	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterValueToString(r.id, "id")), -1)
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return localVarReturnValue, nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		if localVarHTTPResponse.StatusCode == 401 {
-			var v ListMe401Response
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
-		if localVarHTTPResponse.StatusCode == 404 {
-			var v ListMe401Response
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
-		if localVarHTTPResponse.StatusCode == 409 {
 			var v ListMe401Response
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {

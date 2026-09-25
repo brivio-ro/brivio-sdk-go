@@ -215,3 +215,100 @@ func (a *DefaultAPIService) InvoicePartiallyPaidPostExecute(r ApiInvoicePartiall
 
 	return localVarHTTPResponse, nil
 }
+
+type ApiInvoicePaymentReversedPostRequest struct {
+	ctx context.Context
+	ApiService *DefaultAPIService
+	invoicePaymentReversedPostRequest *InvoicePaymentReversedPostRequest
+}
+
+func (r ApiInvoicePaymentReversedPostRequest) InvoicePaymentReversedPostRequest(invoicePaymentReversedPostRequest InvoicePaymentReversedPostRequest) ApiInvoicePaymentReversedPostRequest {
+	r.invoicePaymentReversedPostRequest = &invoicePaymentReversedPostRequest
+	return r
+}
+
+func (r ApiInvoicePaymentReversedPostRequest) Execute() (*http.Response, error) {
+	return r.ApiService.InvoicePaymentReversedPostExecute(r)
+}
+
+/*
+InvoicePaymentReversedPost A recorded payment on an ISSUED invoice was reversed and the balance re-opened. Idempotent per reversal row (evt_rev_<id>); reversal.reverses_payment_id names the payment to undo.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiInvoicePaymentReversedPostRequest
+*/
+func (a *DefaultAPIService) InvoicePaymentReversedPost(ctx context.Context) ApiInvoicePaymentReversedPostRequest {
+	return ApiInvoicePaymentReversedPostRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+func (a *DefaultAPIService) InvoicePaymentReversedPostExecute(r ApiInvoicePaymentReversedPostRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.InvoicePaymentReversedPost")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/invoice.payment_reversed"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.invoicePaymentReversedPostRequest == nil {
+		return nil, reportError("invoicePaymentReversedPostRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.invoicePaymentReversedPostRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}

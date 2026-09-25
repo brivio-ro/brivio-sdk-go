@@ -122,6 +122,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/listMe_401_response"
           description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
       summary: Delete a contact
       tags:
       - contacts
@@ -181,6 +187,18 @@ paths:
                 $ref: "#/components/schemas/listMe_401_response"
           description: Error
         "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
           content:
             application/json:
               schema:
@@ -464,6 +482,28 @@ paths:
       summary: Create an article
       tags:
       - articles
+  /articles/sync:
+    post:
+      operationId: createArticleSync
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Upsert articles by external_id (idempotent bulk sync, ADR-0212; scope:\
+        \ articles:write)"
+      tags:
+      - articles
   /articles/{id}:
     delete:
       operationId: deleteArticle
@@ -485,6 +525,12 @@ paths:
                 $ref: "#/components/schemas/listMe_401_response"
           description: Error
         "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "409":
           content:
             application/json:
               schema:
@@ -554,7 +600,95 @@ paths:
               schema:
                 $ref: "#/components/schemas/listMe_401_response"
           description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
       summary: Update a article
+      tags:
+      - articles
+  /articles/{id}/prices:
+    get:
+      operationId: listArticlePrices
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List an article's prices (scope: articles:read)"
+      tags:
+      - articles
+    post:
+      operationId: createArticlePrice
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Add a price (one_time | month | year | metered) to an article (scope:\
+        \ articles:write)"
+      tags:
+      - articles
+  /articles/{id}/prices/sync:
+    post:
+      operationId: createArticlePriceSync
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Push the article's active prices to the org's Stripe account (metered\
+        \ prices get a Billing Meter; scope: articles:write)"
       tags:
       - articles
   /invoices:
@@ -750,6 +884,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/listMe_401_response"
           description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
       summary: Delete a invoice
       tags:
       - invoices
@@ -809,6 +949,18 @@ paths:
                 $ref: "#/components/schemas/listMe_401_response"
           description: Error
         "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
           content:
             application/json:
               schema:
@@ -889,6 +1041,81 @@ paths:
                 $ref: "#/components/schemas/listMe_401_response"
           description: Error
       summary: Record a payment against an invoice (updates status)
+      tags:
+      - invoices
+  /invoices/{id}/credit-note:
+    post:
+      operationId: creditNoteInvoice
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        required: false
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Issue a credit note (storno) for an issued invoice, full or per line;\
+        \ 422 CREDIT_EXCEEDS_SOURCE when over-crediting (scope: invoices:write)"
+      tags:
+      - invoices
+  /invoices/{id}/pdf:
+    get:
+      operationId: listInvoicePdf
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/pdf:
+              schema:
+                format: binary
+                type: string
+          description: PDF document
+      summary: "Invoice PDF (application/pdf attachment; scope: invoices:read)"
+      tags:
+      - invoices
+  /invoices/{id}/payment-link:
+    post:
+      operationId: paymentLinkInvoice
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Get (minting on first call) the invoice's public pay URL (scope: payments:write)"
       tags:
       - invoices
   /invoices/{id}/send:
@@ -1057,6 +1284,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/listMe_401_response"
           description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
       summary: Delete a project
       tags:
       - projects
@@ -1121,6 +1354,18 @@ paths:
               schema:
                 $ref: "#/components/schemas/listMe_401_response"
           description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
       summary: Update a project
       tags:
       - projects
@@ -1166,34 +1411,6 @@ paths:
       tags:
       - quotes
   /quotes/{id}:
-    delete:
-      operationId: deleteQuote
-      parameters:
-      - explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "200":
-          description: OK
-        "401":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/listMe_401_response"
-          description: Error
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/listMe_401_response"
-          description: Error
-      summary: Delete a quote
-      tags:
-      - quotes
     get:
       operationId: getQuote
       parameters:
@@ -1224,38 +1441,6 @@ paths:
                 $ref: "#/components/schemas/listMe_401_response"
           description: Error
       summary: Get a quote
-      tags:
-      - quotes
-    patch:
-      operationId: updateQuote
-      parameters:
-      - explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/getQuote_200_response"
-          description: OK
-        "401":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/listMe_401_response"
-          description: Error
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/listMe_401_response"
-          description: Error
-      summary: Update a quote
       tags:
       - quotes
   /time-entries:
@@ -1300,34 +1485,6 @@ paths:
       tags:
       - time-entries
   /time-entries/{id}:
-    delete:
-      operationId: deleteTimeEntry
-      parameters:
-      - explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "200":
-          description: OK
-        "401":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/listMe_401_response"
-          description: Error
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/listMe_401_response"
-          description: Error
-      summary: Delete a time entry
-      tags:
-      - time-entries
     get:
       operationId: getTimeEntry
       parameters:
@@ -1358,38 +1515,6 @@ paths:
                 $ref: "#/components/schemas/listMe_401_response"
           description: Error
       summary: Get a time entry
-      tags:
-      - time-entries
-    patch:
-      operationId: updateTimeEntry
-      parameters:
-      - explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/getTimeEntry_200_response"
-          description: OK
-        "401":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/listMe_401_response"
-          description: Error
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/listMe_401_response"
-          description: Error
-      summary: Update a time entry
       tags:
       - time-entries
   /expenses:
@@ -1489,6 +1614,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/listMe_401_response"
           description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
       summary: Delete a expense
       tags:
       - expenses
@@ -1548,6 +1679,18 @@ paths:
                 $ref: "#/components/schemas/listMe_401_response"
           description: Error
         "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
           content:
             application/json:
               schema:
@@ -1653,6 +1796,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/listMe_401_response"
           description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
       summary: Delete a contract
       tags:
       - contracts
@@ -1712,6 +1861,18 @@ paths:
                 $ref: "#/components/schemas/listMe_401_response"
           description: Error
         "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
           content:
             application/json:
               schema:
@@ -1817,6 +1978,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/listMe_401_response"
           description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
       summary: Delete a document
       tags:
       - documents
@@ -1876,6 +2043,18 @@ paths:
                 $ref: "#/components/schemas/listMe_401_response"
           description: Error
         "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
           content:
             application/json:
               schema:
@@ -4155,6 +4334,455 @@ paths:
       summary: "Create a PaymentIntent on the org provider (scope: payments:charge)"
       tags:
       - payments
+  /payments:
+    get:
+      operationId: listPayments
+      parameters:
+      - description: Page number (1-based)
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Page size (max 100)
+        explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Filter by spine status
+        explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          enum:
+          - pending
+          - authorized
+          - paid
+          - failed
+          - cancelled
+          - expired
+          - refunded
+          - partially_refunded
+          type: string
+        style: form
+      - description: What the money was collected for
+        explode: true
+        in: query
+        name: source_kind
+        required: false
+        schema:
+          enum:
+          - invoice
+          - order
+          - booking
+          - event_ticket
+          - portal_topup
+          - link
+          - contract_tranche
+          type: string
+        style: form
+      - description: created_at ≥ (ISO date or date-time)
+        explode: true
+        in: query
+        name: from
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "created_at ≤ (ISO date = through end of day, or date-time)"
+        explode: true
+        in: query
+        name: to
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Exact match on provider_ref (Stripe pi_…, Netopia ntpID…) or\
+          \ pay token"
+        explode: true
+        in: query
+        name: q
+        required: false
+        schema:
+          maxLength: 255
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listPayments_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List payments — every attempt to collect money for the organization,\
+        \ with provider reference and refund state (scope: payments:read)"
+      tags:
+      - payments
+  /payments/{id}:
+    get:
+      operationId: getPayment
+      parameters:
+      - description: Payment id
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getPayment_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Get a payment (scope: payments:read)"
+      tags:
+      - payments
+  /payments/{id}/refund:
+    post:
+      operationId: refundPayment
+      parameters:
+      - description: Payment id
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentRefundInput"
+        required: false
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/refundPayment_200_response"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Refund a paid payment through the account that collected it. Omit\
+        \ amount_minor for the full remaining amount; `pending: true` means the processor\
+        \ accepted but has not settled. Honours Idempotency-Key. (scope: payments:refund)"
+      tags:
+      - payments
+  /payment-links:
+    get:
+      operationId: listPaymentLinks
+      parameters:
+      - description: Page number (1-based)
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Page size (max 100)
+        explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Filter by spine status
+        explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listPaymentLinks_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List ad-hoc payment links, newest first (scope: payments:read)"
+      tags:
+      - payment-links
+    post:
+      operationId: createPaymentLink
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentLinkCreate"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createPaymentLink_201_response"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Create a payment link. The provider is not contacted until the payer\
+        \ opens it, so a link can be minted before a processor is connected (it then\
+        \ offers IBAN + EPC QR). Honours Idempotency-Key. (scope: payments:write)"
+      tags:
+      - payment-links
+  /payment-links/{id}:
+    get:
+      operationId: getPaymentLink
+      parameters:
+      - description: Payment link id
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getPaymentLink_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Get a payment link (scope: payments:read)"
+      tags:
+      - payment-links
+  /payment-links/{id}/cancel:
+    post:
+      operationId: cancelPaymentLink
+      parameters:
+      - description: Payment link id
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/cancelPaymentLink_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Cancel an open payment link. 409 when already paid or not cancellable.\
+        \ Honours Idempotency-Key. (scope: payments:write)"
+      tags:
+      - payment-links
+  /payouts:
+    get:
+      operationId: listPayouts
+      parameters:
+      - description: Page number (1-based)
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Page size (max 100)
+        explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: stripe | netopia | revolut | …
+        explode: true
+        in: query
+        name: provider
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: pending | paid | failed | canceled
+        explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: arrival_date ≥
+        explode: true
+        in: query
+        name: from
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - description: arrival_date ≤
+        explode: true
+        in: query
+        name: to
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - description: Set false to omit the covered charges
+        explode: true
+        in: query
+        name: include_items
+        required: false
+        schema:
+          default: true
+          type: boolean
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listPayouts_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List processor payouts (settlements) with the charges each one covers\
+        \ (scope: payments:read)"
+      tags:
+      - payouts
   /subscriptions:
     get:
       operationId: listSubscriptions
@@ -4257,6 +4885,36 @@ paths:
                 $ref: "#/components/schemas/listMe_401_response"
           description: Error
       summary: "Cancel / resume / change price (scope: payments:charge)"
+      tags:
+      - subscriptions
+  /subscriptions/{id}/usage:
+    post:
+      operationId: usageSubscription
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/usageSubscription_request"
+        required: true
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Report usage for a metered price (Stripe Billing Meter event; identifier\
+        \ makes retries no-ops; scope: payments:charge)"
       tags:
       - subscriptions
   /trust/providers:
@@ -6937,6 +7595,41 @@ components:
       - remaining_amount
       - status
       - total
+    InvoicePaymentReversedWebhookData:
+      properties:
+        invoice_id:
+          format: uuid
+          type: string
+        number:
+          type: string
+        currency:
+          type: string
+        total:
+          description: Decimal string
+          type: string
+        paid_amount:
+          description: "Decimal string, after the reversal"
+          type: string
+        remaining_amount:
+          description: "Decimal string, the re-opened balance"
+          type: string
+        status:
+          type: string
+        reversal:
+          $ref: "#/components/schemas/InvoicePaymentReversedWebhookData_reversal"
+        contact_id:
+          format: uuid
+          type: string
+          nullable: true
+      required:
+      - currency
+      - invoice_id
+      - number
+      - paid_amount
+      - remaining_amount
+      - reversal
+      - status
+      - total
     WebhookDelivery:
       properties:
         id:
@@ -6961,6 +7654,441 @@ components:
       - environment
       - id
       - type
+    Payment:
+      description: "One attempt to collect money for the organization (invoice pay\
+        \ link, storefront order, booking, ad-hoc link). Amounts are integers in minor\
+        \ units (bani/cents)."
+      example:
+        platform_fee_minor: 1
+        source_kind: invoice
+        channel: channel
+        sandbox: true
+        description: description
+        created_at: 2000-01-23T04:56:07.000+00:00
+        refunded_minor: 6
+        provider_ref: provider_ref
+        paid_at: 2000-01-23T04:56:07.000+00:00
+        environment: live
+        expires_at: 2000-01-23T04:56:07.000+00:00
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        provider: provider
+        customer_email: customer_email
+        currency: currency
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        source_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        customer_name: customer_name
+        last_error: last_error
+        amount_minor: 0
+        flow: redirect
+        status: pending
+      properties:
+        id:
+          format: uuid
+          type: string
+        environment:
+          enum:
+          - live
+          - test
+          type: string
+        source_kind:
+          enum:
+          - invoice
+          - order
+          - booking
+          - event_ticket
+          - portal_topup
+          - link
+          - contract_tranche
+          type: string
+        source_id:
+          format: uuid
+          type: string
+          nullable: true
+        channel:
+          type: string
+        amount_minor:
+          type: integer
+        currency:
+          maxLength: 3
+          minLength: 3
+          type: string
+        refunded_minor:
+          type: integer
+        platform_fee_minor:
+          type: integer
+        provider:
+          description: stripe | netopia | payu | euplatesc | revolut | none
+          type: string
+        provider_ref:
+          type: string
+          nullable: true
+        sandbox:
+          type: boolean
+        status:
+          enum:
+          - pending
+          - authorized
+          - paid
+          - failed
+          - cancelled
+          - expired
+          - refunded
+          - partially_refunded
+          type: string
+        flow:
+          enum:
+          - redirect
+          - embedded
+          type: string
+        description:
+          type: string
+          nullable: true
+        customer_email:
+          type: string
+          nullable: true
+        customer_name:
+          type: string
+          nullable: true
+        last_error:
+          type: string
+          nullable: true
+        paid_at:
+          format: date-time
+          type: string
+          nullable: true
+        expires_at:
+          format: date-time
+          type: string
+          nullable: true
+        created_at:
+          format: date-time
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+    PaymentRefundInput:
+      example:
+        reason: reason
+        amount_minor: 1
+      properties:
+        amount_minor:
+          description: Minor units. Omit for the full remaining amount.
+          minimum: 1
+          type: integer
+        reason:
+          maxLength: 200
+          type: string
+    PaymentRefundResult:
+      example:
+        pending: true
+        payment:
+          platform_fee_minor: 1
+          source_kind: invoice
+          channel: channel
+          sandbox: true
+          description: description
+          created_at: 2000-01-23T04:56:07.000+00:00
+          refunded_minor: 6
+          provider_ref: provider_ref
+          paid_at: 2000-01-23T04:56:07.000+00:00
+          environment: live
+          expires_at: 2000-01-23T04:56:07.000+00:00
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          provider: provider
+          customer_email: customer_email
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          source_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          customer_name: customer_name
+          last_error: last_error
+          amount_minor: 0
+          flow: redirect
+          status: pending
+        refunded_minor: 0
+      properties:
+        refunded_minor:
+          type: integer
+        pending:
+          description: "The processor accepted the refund but has not settled it;\
+            \ the payment still shows the claim, not `refunded`."
+          type: boolean
+        payment:
+          $ref: "#/components/schemas/Payment"
+      required:
+      - payment
+      - pending
+      - refunded_minor
+    PaymentLink:
+      description: An ad-hoc payment request the merchant shares as a URL / QR. The
+        payer resolves the payment account when they open it.
+      example:
+        paid_at: 2000-01-23T04:56:07.000+00:00
+        expires_at: 2000-01-23T04:56:07.000+00:00
+        customer_email: customer_email
+        description: description
+        created_at: 2000-01-23T04:56:07.000+00:00
+        currency: currency
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        customer_name: customer_name
+        url: https://openapi-generator.tech
+        amount_minor: 0
+        token: token
+        status: status
+      properties:
+        id:
+          format: uuid
+          type: string
+        token:
+          type: string
+        url:
+          format: uri
+          type: string
+        amount_minor:
+          type: integer
+        currency:
+          maxLength: 3
+          minLength: 3
+          type: string
+        description:
+          type: string
+          nullable: true
+        customer_email:
+          type: string
+          nullable: true
+        customer_name:
+          type: string
+          nullable: true
+        status:
+          type: string
+        created_at:
+          format: date-time
+          type: string
+        expires_at:
+          format: date-time
+          type: string
+          nullable: true
+        paid_at:
+          format: date-time
+          type: string
+          nullable: true
+    PaymentLinkCreate:
+      example:
+        amount: 80082.81904610115
+        expires_in_days: 220
+        customer_email: customer_email
+        description: description
+        currency: currency
+        customer_name: customer_name
+      properties:
+        amount:
+          description: MAJOR units (350.00 = 350 RON).
+          maximum: 1000000
+          type: number
+        currency:
+          maxLength: 3
+          minLength: 3
+          type: string
+        description:
+          maxLength: 200
+          minLength: 1
+          type: string
+        customer_email:
+          format: email
+          type: string
+        customer_name:
+          maxLength: 120
+          type: string
+        expires_in_days:
+          default: 30
+          maximum: 365
+          minimum: 1
+          type: integer
+      required:
+      - amount
+      - currency
+      - description
+    PaymentLinkCreated:
+      example:
+        expires_at: 2000-01-23T04:56:07.000+00:00
+        qr_url: https://openapi-generator.tech
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        url: https://openapi-generator.tech
+        token: token
+      properties:
+        id:
+          format: uuid
+          type: string
+        token:
+          type: string
+        url:
+          format: uri
+          type: string
+        qr_url:
+          format: uri
+          type: string
+          nullable: true
+        expires_at:
+          format: date-time
+          type: string
+      required:
+      - expires_at
+      - id
+      - token
+      - url
+    PaymentLinkCancelResult:
+      example:
+        provider_cancelled: true
+        link:
+          paid_at: 2000-01-23T04:56:07.000+00:00
+          expires_at: 2000-01-23T04:56:07.000+00:00
+          customer_email: customer_email
+          description: description
+          created_at: 2000-01-23T04:56:07.000+00:00
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          customer_name: customer_name
+          url: https://openapi-generator.tech
+          amount_minor: 0
+          token: token
+          status: status
+      properties:
+        provider_cancelled:
+          type: boolean
+        link:
+          $ref: "#/components/schemas/PaymentLink"
+      required:
+      - provider_cancelled
+    PayoutItem:
+      example:
+        gross: gross
+        item_type: item_type
+        fee: fee
+        external_reference: external_reference
+        invoice_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        description: description
+        created_at: 2000-01-23T04:56:07.000+00:00
+        external_id: external_id
+        currency: currency
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        net: net
+      properties:
+        id:
+          format: uuid
+          type: string
+        external_id:
+          type: string
+        item_type:
+          description: charge | refund | adjustment | payment | …
+          type: string
+        gross:
+          description: "Decimal, signed (refunds negative)"
+          type: string
+        fee:
+          description: "Decimal, signed"
+          type: string
+        net:
+          description: "Decimal, gross - fee"
+          type: string
+        currency:
+          type: string
+        invoice_id:
+          format: uuid
+          type: string
+          nullable: true
+        external_reference:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        created_at:
+          format: date-time
+          type: string
+    Payout:
+      description: "One processor settlement to the merchant bank account: gross −\
+        \ fee = net. Decimals are strings with 2 dp."
+      example:
+        payment_provider_config_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        bank_transaction_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        gross: gross
+        fee: fee
+        description: description
+        created_at: 2000-01-23T04:56:07.000+00:00
+        external_id: external_id
+        reconciled_at: 2000-01-23T04:56:07.000+00:00
+        provider: provider
+        currency: currency
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        net: net
+        arrival_date: 2000-01-23
+        items:
+        - gross: gross
+          item_type: item_type
+          fee: fee
+          external_reference: external_reference
+          invoice_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          description: description
+          created_at: 2000-01-23T04:56:07.000+00:00
+          external_id: external_id
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          net: net
+        - gross: gross
+          item_type: item_type
+          fee: fee
+          external_reference: external_reference
+          invoice_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          description: description
+          created_at: 2000-01-23T04:56:07.000+00:00
+          external_id: external_id
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          net: net
+        status: status
+      properties:
+        id:
+          format: uuid
+          type: string
+        provider:
+          type: string
+        external_id:
+          type: string
+        payment_provider_config_id:
+          format: uuid
+          type: string
+          nullable: true
+        arrival_date:
+          format: date
+          type: string
+        currency:
+          type: string
+        gross:
+          type: string
+        fee:
+          type: string
+        net:
+          type: string
+        status:
+          description: pending | paid | failed | canceled
+          type: string
+        bank_transaction_id:
+          format: uuid
+          type: string
+          nullable: true
+        reconciled_at:
+          format: date-time
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        created_at:
+          format: date-time
+          type: string
+        items:
+          items:
+            $ref: "#/components/schemas/PayoutItem"
+          type: array
     listMe_401_response_error:
       example:
         code: code
@@ -7793,6 +8921,365 @@ components:
       required:
       - content
       - format
+    listPayments_200_response:
+      example:
+        data:
+        - platform_fee_minor: 1
+          source_kind: invoice
+          channel: channel
+          sandbox: true
+          description: description
+          created_at: 2000-01-23T04:56:07.000+00:00
+          refunded_minor: 6
+          provider_ref: provider_ref
+          paid_at: 2000-01-23T04:56:07.000+00:00
+          environment: live
+          expires_at: 2000-01-23T04:56:07.000+00:00
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          provider: provider
+          customer_email: customer_email
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          source_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          customer_name: customer_name
+          last_error: last_error
+          amount_minor: 0
+          flow: redirect
+          status: pending
+        - platform_fee_minor: 1
+          source_kind: invoice
+          channel: channel
+          sandbox: true
+          description: description
+          created_at: 2000-01-23T04:56:07.000+00:00
+          refunded_minor: 6
+          provider_ref: provider_ref
+          paid_at: 2000-01-23T04:56:07.000+00:00
+          environment: live
+          expires_at: 2000-01-23T04:56:07.000+00:00
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          provider: provider
+          customer_email: customer_email
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          source_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          customer_name: customer_name
+          last_error: last_error
+          amount_minor: 0
+          flow: redirect
+          status: pending
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/Payment"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    getPayment_200_response:
+      example:
+        data:
+          platform_fee_minor: 1
+          source_kind: invoice
+          channel: channel
+          sandbox: true
+          description: description
+          created_at: 2000-01-23T04:56:07.000+00:00
+          refunded_minor: 6
+          provider_ref: provider_ref
+          paid_at: 2000-01-23T04:56:07.000+00:00
+          environment: live
+          expires_at: 2000-01-23T04:56:07.000+00:00
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          provider: provider
+          customer_email: customer_email
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          source_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          customer_name: customer_name
+          last_error: last_error
+          amount_minor: 0
+          flow: redirect
+          status: pending
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/Payment"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    refundPayment_200_response:
+      example:
+        data:
+          pending: true
+          payment:
+            platform_fee_minor: 1
+            source_kind: invoice
+            channel: channel
+            sandbox: true
+            description: description
+            created_at: 2000-01-23T04:56:07.000+00:00
+            refunded_minor: 6
+            provider_ref: provider_ref
+            paid_at: 2000-01-23T04:56:07.000+00:00
+            environment: live
+            expires_at: 2000-01-23T04:56:07.000+00:00
+            updated_at: 2000-01-23T04:56:07.000+00:00
+            provider: provider
+            customer_email: customer_email
+            currency: currency
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            source_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            customer_name: customer_name
+            last_error: last_error
+            amount_minor: 0
+            flow: redirect
+            status: pending
+          refunded_minor: 0
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/PaymentRefundResult"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    listPaymentLinks_200_response:
+      example:
+        data:
+        - paid_at: 2000-01-23T04:56:07.000+00:00
+          expires_at: 2000-01-23T04:56:07.000+00:00
+          customer_email: customer_email
+          description: description
+          created_at: 2000-01-23T04:56:07.000+00:00
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          customer_name: customer_name
+          url: https://openapi-generator.tech
+          amount_minor: 0
+          token: token
+          status: status
+        - paid_at: 2000-01-23T04:56:07.000+00:00
+          expires_at: 2000-01-23T04:56:07.000+00:00
+          customer_email: customer_email
+          description: description
+          created_at: 2000-01-23T04:56:07.000+00:00
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          customer_name: customer_name
+          url: https://openapi-generator.tech
+          amount_minor: 0
+          token: token
+          status: status
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/PaymentLink"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    createPaymentLink_201_response:
+      example:
+        data:
+          expires_at: 2000-01-23T04:56:07.000+00:00
+          qr_url: https://openapi-generator.tech
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          url: https://openapi-generator.tech
+          token: token
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/PaymentLinkCreated"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    getPaymentLink_200_response:
+      example:
+        data:
+          paid_at: 2000-01-23T04:56:07.000+00:00
+          expires_at: 2000-01-23T04:56:07.000+00:00
+          customer_email: customer_email
+          description: description
+          created_at: 2000-01-23T04:56:07.000+00:00
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          customer_name: customer_name
+          url: https://openapi-generator.tech
+          amount_minor: 0
+          token: token
+          status: status
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/PaymentLink"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    cancelPaymentLink_200_response:
+      example:
+        data:
+          provider_cancelled: true
+          link:
+            paid_at: 2000-01-23T04:56:07.000+00:00
+            expires_at: 2000-01-23T04:56:07.000+00:00
+            customer_email: customer_email
+            description: description
+            created_at: 2000-01-23T04:56:07.000+00:00
+            currency: currency
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            customer_name: customer_name
+            url: https://openapi-generator.tech
+            amount_minor: 0
+            token: token
+            status: status
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/PaymentLinkCancelResult"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    listPayouts_200_response:
+      example:
+        data:
+        - payment_provider_config_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          bank_transaction_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          gross: gross
+          fee: fee
+          description: description
+          created_at: 2000-01-23T04:56:07.000+00:00
+          external_id: external_id
+          reconciled_at: 2000-01-23T04:56:07.000+00:00
+          provider: provider
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          net: net
+          arrival_date: 2000-01-23
+          items:
+          - gross: gross
+            item_type: item_type
+            fee: fee
+            external_reference: external_reference
+            invoice_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            description: description
+            created_at: 2000-01-23T04:56:07.000+00:00
+            external_id: external_id
+            currency: currency
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            net: net
+          - gross: gross
+            item_type: item_type
+            fee: fee
+            external_reference: external_reference
+            invoice_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            description: description
+            created_at: 2000-01-23T04:56:07.000+00:00
+            external_id: external_id
+            currency: currency
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            net: net
+          status: status
+        - payment_provider_config_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          bank_transaction_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          gross: gross
+          fee: fee
+          description: description
+          created_at: 2000-01-23T04:56:07.000+00:00
+          external_id: external_id
+          reconciled_at: 2000-01-23T04:56:07.000+00:00
+          provider: provider
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          net: net
+          arrival_date: 2000-01-23
+          items:
+          - gross: gross
+            item_type: item_type
+            fee: fee
+            external_reference: external_reference
+            invoice_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            description: description
+            created_at: 2000-01-23T04:56:07.000+00:00
+            external_id: external_id
+            currency: currency
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            net: net
+          - gross: gross
+            item_type: item_type
+            fee: fee
+            external_reference: external_reference
+            invoice_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            description: description
+            created_at: 2000-01-23T04:56:07.000+00:00
+            external_id: external_id
+            currency: currency
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            net: net
+          status: status
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/Payout"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    usageSubscription_request:
+      properties:
+        quantity:
+          minimum: 1
+          type: integer
+        timestamp:
+          format: date-time
+          type: string
+        identifier:
+          maxLength: 100
+          type: string
+      required:
+      - quantity
     listDnsZones_200_response:
       example:
         data:
@@ -8195,6 +9682,15 @@ components:
             - invoice.partially_paid
           data:
             $ref: "#/components/schemas/InvoicePaymentWebhookData"
+    invoice_payment_reversed_post_request:
+      allOf:
+      - $ref: "#/components/schemas/WebhookDelivery"
+      - properties:
+          type:
+            enum:
+            - invoice.payment_reversed
+          data:
+            $ref: "#/components/schemas/InvoicePaymentReversedWebhookData"
     InvoiceCreate_items_inner:
       example:
         article_id: article_id
@@ -8253,6 +9749,32 @@ components:
       - method
       - payment_date
       - source
+    InvoicePaymentReversedWebhookData_reversal:
+      properties:
+        id:
+          format: uuid
+          type: string
+        reverses_payment_id:
+          description: The payment.id previously announced by invoice.paid / invoice.partially_paid
+          format: uuid
+          type: string
+        amount:
+          description: Negative decimal string
+          type: string
+        reversal_date:
+          format: date
+          type: string
+        method:
+          type: string
+        reason:
+          type: string
+      required:
+      - amount
+      - id
+      - method
+      - reason
+      - reversal_date
+      - reverses_payment_id
   securitySchemes:
     bearerAuth:
       description: API key as Bearer token

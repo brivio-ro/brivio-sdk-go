@@ -90,8 +90,12 @@ Class | Method | HTTP request | Description
 *ApiKeysAPI* | [**ListApiKeys**](docs/ApiKeysAPI.md#listapikeys) | **Get** /api-keys | List API keys for the calling environment (scope: api_keys:read)
 *ApiKeysAPI* | [**RotateApiKey**](docs/ApiKeysAPI.md#rotateapikey) | **Post** /api-keys/{id}/rotate | Rotate an API key — issues a replacement with the same scopes; old key expires after grace_period_hours (default 24, 0 &#x3D; immediate). Raw key shown once (scope: api_keys:write)
 *ArticlesAPI* | [**CreateArticle**](docs/ArticlesAPI.md#createarticle) | **Post** /articles | Create an article
+*ArticlesAPI* | [**CreateArticlePrice**](docs/ArticlesAPI.md#createarticleprice) | **Post** /articles/{id}/prices | Add a price (one_time | month | year | metered) to an article (scope: articles:write)
+*ArticlesAPI* | [**CreateArticlePriceSync**](docs/ArticlesAPI.md#createarticlepricesync) | **Post** /articles/{id}/prices/sync | Push the article&#39;s active prices to the org&#39;s Stripe account (metered prices get a Billing Meter; scope: articles:write)
+*ArticlesAPI* | [**CreateArticleSync**](docs/ArticlesAPI.md#createarticlesync) | **Post** /articles/sync | Upsert articles by external_id (idempotent bulk sync, ADR-0212; scope: articles:write)
 *ArticlesAPI* | [**DeleteArticle**](docs/ArticlesAPI.md#deletearticle) | **Delete** /articles/{id} | Delete a article
 *ArticlesAPI* | [**GetArticle**](docs/ArticlesAPI.md#getarticle) | **Get** /articles/{id} | Get a article
+*ArticlesAPI* | [**ListArticlePrices**](docs/ArticlesAPI.md#listarticleprices) | **Get** /articles/{id}/prices | List an article&#39;s prices (scope: articles:read)
 *ArticlesAPI* | [**ListArticles**](docs/ArticlesAPI.md#listarticles) | **Get** /articles | List articles
 *ArticlesAPI* | [**UpdateArticle**](docs/ArticlesAPI.md#updatearticle) | **Patch** /articles/{id} | Update a article
 *BankingAPI* | [**CreateBankingRule**](docs/BankingAPI.md#createbankingrule) | **Post** /banking/rules | Create a bank rule. At least one condition and one action are required; a new rule goes last in priority. (scope: banking:write)
@@ -193,12 +197,15 @@ Class | Method | HTTP request | Description
 *InventoryAPI* | [**ListInventoryStockByLocation**](docs/InventoryAPI.md#listinventorystockbylocation) | **Get** /inventory/stock-by-location | Per-location (gestiune) stock balances
 *InvoicesAPI* | [**CreateInvoice**](docs/InvoicesAPI.md#createinvoice) | **Post** /invoices | Create an invoice
 *InvoicesAPI* | [**CreateInvoicePayment**](docs/InvoicesAPI.md#createinvoicepayment) | **Post** /invoices/{id}/payments | Record a payment against an invoice (updates status)
+*InvoicesAPI* | [**CreditNoteInvoice**](docs/InvoicesAPI.md#creditnoteinvoice) | **Post** /invoices/{id}/credit-note | Issue a credit note (storno) for an issued invoice, full or per line; 422 CREDIT_EXCEEDS_SOURCE when over-crediting (scope: invoices:write)
 *InvoicesAPI* | [**DeleteInvoice**](docs/InvoicesAPI.md#deleteinvoice) | **Delete** /invoices/{id} | Delete a invoice
 *InvoicesAPI* | [**GetInvoice**](docs/InvoicesAPI.md#getinvoice) | **Get** /invoices/{id} | Get a invoice
 *InvoicesAPI* | [**ListInvoiceEfacturaStatus**](docs/InvoicesAPI.md#listinvoiceefacturastatus) | **Get** /invoices/{id}/efactura-status | e-Factura transmission status of an invoice
 *InvoicesAPI* | [**ListInvoiceItems**](docs/InvoicesAPI.md#listinvoiceitems) | **Get** /invoices/{id}/items | List line items of an invoice
 *InvoicesAPI* | [**ListInvoicePayments**](docs/InvoicesAPI.md#listinvoicepayments) | **Get** /invoices/{id}/payments | List payments recorded against an invoice
+*InvoicesAPI* | [**ListInvoicePdf**](docs/InvoicesAPI.md#listinvoicepdf) | **Get** /invoices/{id}/pdf | Invoice PDF (application/pdf attachment; scope: invoices:read)
 *InvoicesAPI* | [**ListInvoices**](docs/InvoicesAPI.md#listinvoices) | **Get** /invoices | List invoices
+*InvoicesAPI* | [**PaymentLinkInvoice**](docs/InvoicesAPI.md#paymentlinkinvoice) | **Post** /invoices/{id}/payment-link | Get (minting on first call) the invoice&#39;s public pay URL (scope: payments:write)
 *InvoicesAPI* | [**SendInvoice**](docs/InvoicesAPI.md#sendinvoice) | **Post** /invoices/{id}/send | Mark an invoice as sent (DRAFT → SENT; idempotent)
 *InvoicesAPI* | [**SubmitEfacturaInvoice**](docs/InvoicesAPI.md#submitefacturainvoice) | **Post** /invoices/{id}/submit-efactura | Submit an invoice to ANAF e-Factura
 *InvoicesAPI* | [**UpdateInvoice**](docs/InvoicesAPI.md#updateinvoice) | **Patch** /invoices/{id} | Update a invoice
@@ -224,19 +231,25 @@ Class | Method | HTTP request | Description
 *OrdersAPI* | [**GetOrder**](docs/OrdersAPI.md#getorder) | **Get** /orders/{id} | Get a storefront order with line items
 *OrdersAPI* | [**ListOrders**](docs/OrdersAPI.md#listorders) | **Get** /orders | List storefront orders (scope: orders:read)
 *OrdersAPI* | [**StatusOrder**](docs/OrdersAPI.md#statusorder) | **Post** /orders/{id}/status | Transition an order status: pending|paid|fulfilled|cancelled|refunded (scope: orders:write)
+*PaymentLinksAPI* | [**CancelPaymentLink**](docs/PaymentLinksAPI.md#cancelpaymentlink) | **Post** /payment-links/{id}/cancel | Cancel an open payment link. 409 when already paid or not cancellable. Honours Idempotency-Key. (scope: payments:write)
+*PaymentLinksAPI* | [**CreatePaymentLink**](docs/PaymentLinksAPI.md#createpaymentlink) | **Post** /payment-links | Create a payment link. The provider is not contacted until the payer opens it, so a link can be minted before a processor is connected (it then offers IBAN + EPC QR). Honours Idempotency-Key. (scope: payments:write)
+*PaymentLinksAPI* | [**GetPaymentLink**](docs/PaymentLinksAPI.md#getpaymentlink) | **Get** /payment-links/{id} | Get a payment link (scope: payments:read)
+*PaymentLinksAPI* | [**ListPaymentLinks**](docs/PaymentLinksAPI.md#listpaymentlinks) | **Get** /payment-links | List ad-hoc payment links, newest first (scope: payments:read)
 *PaymentMethodsAPI* | [**CreatePaymentMethod**](docs/PaymentMethodsAPI.md#createpaymentmethod) | **Post** /payment-methods | Create a SetupIntent to save a card (scope: payments:charge)
 *PaymentMethodsAPI* | [**ListPaymentMethods**](docs/PaymentMethodsAPI.md#listpaymentmethods) | **Get** /payment-methods | List saved payment methods for an external customer (scope: payments:charge)
 *PaymentMethodsAPI* | [**UpdatePaymentMethod**](docs/PaymentMethodsAPI.md#updatepaymentmethod) | **Patch** /payment-methods | Set default or detach a payment method (scope: payments:charge)
 *PaymentsAPI* | [**CreatePaymentCharge**](docs/PaymentsAPI.md#createpaymentcharge) | **Post** /payments/charge | Create a PaymentIntent on the org provider (scope: payments:charge)
+*PaymentsAPI* | [**GetPayment**](docs/PaymentsAPI.md#getpayment) | **Get** /payments/{id} | Get a payment (scope: payments:read)
+*PaymentsAPI* | [**ListPayments**](docs/PaymentsAPI.md#listpayments) | **Get** /payments | List payments — every attempt to collect money for the organization, with provider reference and refund state (scope: payments:read)
+*PaymentsAPI* | [**RefundPayment**](docs/PaymentsAPI.md#refundpayment) | **Post** /payments/{id}/refund | Refund a paid payment through the account that collected it. Omit amount_minor for the full remaining amount; &#x60;pending: true&#x60; means the processor accepted but has not settled. Honours Idempotency-Key. (scope: payments:refund)
+*PayoutsAPI* | [**ListPayouts**](docs/PayoutsAPI.md#listpayouts) | **Get** /payouts | List processor payouts (settlements) with the charges each one covers (scope: payments:read)
 *ProjectsAPI* | [**CreateProject**](docs/ProjectsAPI.md#createproject) | **Post** /projects | Create a project
 *ProjectsAPI* | [**DeleteProject**](docs/ProjectsAPI.md#deleteproject) | **Delete** /projects/{id} | Delete a project
 *ProjectsAPI* | [**GetProject**](docs/ProjectsAPI.md#getproject) | **Get** /projects/{id} | Get a project
 *ProjectsAPI* | [**ListProjects**](docs/ProjectsAPI.md#listprojects) | **Get** /projects | List projects
 *ProjectsAPI* | [**UpdateProject**](docs/ProjectsAPI.md#updateproject) | **Patch** /projects/{id} | Update a project
-*QuotesAPI* | [**DeleteQuote**](docs/QuotesAPI.md#deletequote) | **Delete** /quotes/{id} | Delete a quote
 *QuotesAPI* | [**GetQuote**](docs/QuotesAPI.md#getquote) | **Get** /quotes/{id} | Get a quote
 *QuotesAPI* | [**ListQuotes**](docs/QuotesAPI.md#listquotes) | **Get** /quotes | List quotes (read-only)
-*QuotesAPI* | [**UpdateQuote**](docs/QuotesAPI.md#updatequote) | **Patch** /quotes/{id} | Update a quote
 *RealtimeAPI* | [**ListRealtimeStream**](docs/RealtimeAPI.md#listrealtimestream) | **Get** /realtime/stream | Server-Sent Events stream of realtime org events (text/event-stream)
 *ReservationsAPI* | [**GetReservation**](docs/ReservationsAPI.md#getreservation) | **Get** /reservations/{id} | Get a hotel reservation
 *ReservationsAPI* | [**ListReservations**](docs/ReservationsAPI.md#listreservations) | **Get** /reservations | List hotel reservations (scope: reservations:read)
@@ -247,11 +260,10 @@ Class | Method | HTTP request | Description
 *SubscriptionsAPI* | [**GetSubscription**](docs/SubscriptionsAPI.md#getsubscription) | **Get** /subscriptions/{id} | Get a merchant subscription (scope: invoices:read)
 *SubscriptionsAPI* | [**ListSubscriptions**](docs/SubscriptionsAPI.md#listsubscriptions) | **Get** /subscriptions | List merchant subscriptions (scope: invoices:read)
 *SubscriptionsAPI* | [**UpdateSubscription**](docs/SubscriptionsAPI.md#updatesubscription) | **Patch** /subscriptions/{id} | Cancel / resume / change price (scope: payments:charge)
+*SubscriptionsAPI* | [**UsageSubscription**](docs/SubscriptionsAPI.md#usagesubscription) | **Post** /subscriptions/{id}/usage | Report usage for a metered price (Stripe Billing Meter event; identifier makes retries no-ops; scope: payments:charge)
 *TaxesAPI* | [**ListTaxeVatRates**](docs/TaxesAPI.md#listtaxevatrates) | **Get** /taxes/vat-rates | Romanian VAT rates valid on a date
-*TimeEntriesAPI* | [**DeleteTimeEntry**](docs/TimeEntriesAPI.md#deletetimeentry) | **Delete** /time-entries/{id} | Delete a time entry
 *TimeEntriesAPI* | [**GetTimeEntry**](docs/TimeEntriesAPI.md#gettimeentry) | **Get** /time-entries/{id} | Get a time entry
 *TimeEntriesAPI* | [**ListTimeEntries**](docs/TimeEntriesAPI.md#listtimeentries) | **Get** /time-entries | List time entries (read-only)
-*TimeEntriesAPI* | [**UpdateTimeEntry**](docs/TimeEntriesAPI.md#updatetimeentry) | **Patch** /time-entries/{id} | Update a time entry
 *TrustAPI* | [**CreateTrustSignature**](docs/TrustAPI.md#createtrustsignature) | **Post** /trust/signatures | Create a digital signature or seal (scope: trust:sign)
 *TrustAPI* | [**CreateTrustSignatureBatch**](docs/TrustAPI.md#createtrustsignaturebatch) | **Post** /trust/signatures/batch | Batch sign up to 100 documents (scope: trust:sign)
 *TrustAPI* | [**CreateTrustTimestamp**](docs/TrustAPI.md#createtrusttimestamp) | **Post** /trust/timestamps | Timestamp a signed document (scope: trust:timestamp)
@@ -275,6 +287,7 @@ Class | Method | HTTP request | Description
  - [Article](docs/Article.md)
  - [ArticleCreate](docs/ArticleCreate.md)
  - [BankRuleInput](docs/BankRuleInput.md)
+ - [CancelPaymentLink200Response](docs/CancelPaymentLink200Response.md)
  - [Contact](docs/Contact.md)
  - [ContactCreate](docs/ContactCreate.md)
  - [Contract](docs/Contract.md)
@@ -295,6 +308,7 @@ Class | Method | HTTP request | Description
  - [CreateOrderImportRequestCustomer](docs/CreateOrderImportRequestCustomer.md)
  - [CreateOrderImportRequestCustomerAddress](docs/CreateOrderImportRequestCustomerAddress.md)
  - [CreateOrderImportRequestLinesInner](docs/CreateOrderImportRequestLinesInner.md)
+ - [CreatePaymentLink201Response](docs/CreatePaymentLink201Response.md)
  - [CreateProject201Response](docs/CreateProject201Response.md)
  - [DnsRecordCreate](docs/DnsRecordCreate.md)
  - [DnsZone](docs/DnsZone.md)
@@ -316,6 +330,8 @@ Class | Method | HTTP request | Description
  - [Error](docs/Error.md)
  - [Expense](docs/Expense.md)
  - [ExpenseCreate](docs/ExpenseCreate.md)
+ - [GetPayment200Response](docs/GetPayment200Response.md)
+ - [GetPaymentLink200Response](docs/GetPaymentLink200Response.md)
  - [GetQuote200Response](docs/GetQuote200Response.md)
  - [GetTimeEntry200Response](docs/GetTimeEntry200Response.md)
  - [Invoice](docs/Invoice.md)
@@ -324,6 +340,9 @@ Class | Method | HTTP request | Description
  - [InvoicePaidPostRequest](docs/InvoicePaidPostRequest.md)
  - [InvoicePartiallyPaidPostRequest](docs/InvoicePartiallyPaidPostRequest.md)
  - [InvoicePaymentCreate](docs/InvoicePaymentCreate.md)
+ - [InvoicePaymentReversedPostRequest](docs/InvoicePaymentReversedPostRequest.md)
+ - [InvoicePaymentReversedWebhookData](docs/InvoicePaymentReversedWebhookData.md)
+ - [InvoicePaymentReversedWebhookDataReversal](docs/InvoicePaymentReversedWebhookDataReversal.md)
  - [InvoicePaymentWebhookData](docs/InvoicePaymentWebhookData.md)
  - [InvoicePaymentWebhookDataPayment](docs/InvoicePaymentWebhookDataPayment.md)
  - [ListArticles200Response](docs/ListArticles200Response.md)
@@ -340,6 +359,9 @@ Class | Method | HTTP request | Description
  - [ListMe401Response](docs/ListMe401Response.md)
  - [ListMe401ResponseError](docs/ListMe401ResponseError.md)
  - [ListModules200Response](docs/ListModules200Response.md)
+ - [ListPaymentLinks200Response](docs/ListPaymentLinks200Response.md)
+ - [ListPayments200Response](docs/ListPayments200Response.md)
+ - [ListPayouts200Response](docs/ListPayouts200Response.md)
  - [ListProjects200Response](docs/ListProjects200Response.md)
  - [ListQuotes200Response](docs/ListQuotes200Response.md)
  - [ListSites200Response](docs/ListSites200Response.md)
@@ -349,12 +371,23 @@ Class | Method | HTTP request | Description
  - [MatchBankingTransactionRequest](docs/MatchBankingTransactionRequest.md)
  - [Meta](docs/Meta.md)
  - [Module](docs/Module.md)
+ - [Payment](docs/Payment.md)
+ - [PaymentLink](docs/PaymentLink.md)
+ - [PaymentLinkCancelResult](docs/PaymentLinkCancelResult.md)
+ - [PaymentLinkCreate](docs/PaymentLinkCreate.md)
+ - [PaymentLinkCreated](docs/PaymentLinkCreated.md)
+ - [PaymentRefundInput](docs/PaymentRefundInput.md)
+ - [PaymentRefundResult](docs/PaymentRefundResult.md)
+ - [Payout](docs/Payout.md)
+ - [PayoutItem](docs/PayoutItem.md)
  - [Project](docs/Project.md)
  - [ProjectCreate](docs/ProjectCreate.md)
  - [Quote](docs/Quote.md)
+ - [RefundPayment200Response](docs/RefundPayment200Response.md)
  - [Site](docs/Site.md)
  - [TimeEntry](docs/TimeEntry.md)
  - [UnmatchBankingTransactionRequest](docs/UnmatchBankingTransactionRequest.md)
+ - [UsageSubscriptionRequest](docs/UsageSubscriptionRequest.md)
  - [VerifyEmailDomain200Response](docs/VerifyEmailDomain200Response.md)
  - [WebhookDelivery](docs/WebhookDelivery.md)
 
