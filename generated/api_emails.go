@@ -48,7 +48,7 @@ func (r ApiCreateEmailSendRequest) Execute() (*CreateEmailSend202Response, *http
 /*
 CreateEmailSend Send a transactional or notification email as the organisation (scope: emails:send)
 
-Accepted with 202 once the message is durably recorded; delivery is asynchronous. Honours `Idempotency-Key` (same key → same `id`). Rate limit 600/h per organisation. Suppressed recipients (bounces, complaints, org opt-outs) are reported per recipient and never handed to the MTA; if every `to` is suppressed the message is recorded with `status: suppressed`. `category: marketing` → 422 (use campaigns). `from` on an unverified domain → 422. Attachments over 2 MB decoded → 413. Webhooks: `email.sent`, `email.delivered`, `email.bounced`, `email.complained`, `email.suppressed`.
+Accepted with 202 once the message is durably recorded; delivery is asynchronous. Honours `Idempotency-Key` (same key → same `id`). Rate limit 600/h per organisation. Suppressed recipients (bounces, complaints, org opt-outs) are reported per recipient and never handed to the MTA; if every `to` is suppressed the message is recorded with `status: suppressed`. `category: marketing` → 422 (use campaigns). `from` on an unverified domain → 422. A verified `from` domain whose sending identity is not provisioned yet → 422 `sender_identity_missing` (nothing recorded; re-run `/email-domains/{id}/verify`). Attachments over 2 MB decoded → 413. Webhooks: `email.sent`, `email.delivered`, `email.bounced`, `email.complained`, `email.suppressed`.
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiCreateEmailSendRequest

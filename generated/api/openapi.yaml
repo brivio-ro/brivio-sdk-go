@@ -5876,7 +5876,7 @@ paths:
         \ DKIM-Signature, ARC-*, …; no CR/LF). `category` defaults to `transactional`;\
         \ `auth` and `alert` are aliases for `transactional` and `notification`; `marketing`\
         \ → 422. `from` on an unverified domain → 422 `from_domain_not_verified`;\
-        \ omit it for the org default sender. 202 whenever the message is recorded\
+        \ omit it for the org default sender. A verified domain whose sending identity is not provisioned yet → 422 `sender_identity_missing` (nothing recorded). 202 whenever the message is recorded\
         \ — `status` is `sent`, `queued` (including a transport failure parked for\
         \ retry) or `suppressed` (non-error). A transport refusal that could not be\
         \ queued → 502 `send_failed`. `id`, `status` and `suppressed` are mirrored\
