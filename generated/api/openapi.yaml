@@ -5866,6 +5866,138 @@ paths:
       summary: "Get an email with its delivery timeline (scope: emails:read)"
       tags:
       - emails
+  /email/send:
+    post:
+      description: "Same pipeline as `/emails/send` (verified sender domain, fail-closed\
+        \ suppression, Safe Mode, outbox retry, `email.*` webhooks) with a flatter\
+        \ wire shape: addresses are strings (`\"Ana <ana@x.ro>\"`), `tags` is a key→\
+        value map, custom headers are allowed except envelope/MIME/authentication\
+        \ ones (From, To, Cc, Bcc, Subject, Reply-To, Message-ID, Date, Content-Type,\
+        \ DKIM-Signature, ARC-*, …; no CR/LF). `category` defaults to `transactional`;\
+        \ `auth` and `alert` are aliases for `transactional` and `notification`; `marketing`\
+        \ → 422. `from` on an unverified domain → 422 `from_domain_not_verified`;\
+        \ omit it for the org default sender. 202 whenever the message is recorded\
+        \ — `status` is `sent`, `queued` (including a transport failure parked for\
+        \ retry) or `suppressed` (non-error). A transport refusal that could not be\
+        \ queued → 502 `send_failed`. `id`, `status` and `suppressed` are mirrored\
+        \ at the top level of the 202 body for clients that read them there. Honours\
+        \ `Idempotency-Key`. Shares the 600/h per-organisation limit with `/emails/send`."
+      operationId: sendEmailMessage
+      parameters:
+      - explode: false
+        in: header
+        name: Idempotency-Key
+        required: false
+        schema:
+          maxLength: 255
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            example:
+              from: codai <no-reply@mail.codai.ro>
+              to:
+              - ana@client.ro
+              subject: Your sign-in code
+              text: "Code: 481 220"
+              category: transactional
+              tags:
+                kind: auth_email
+              headers:
+                X-Entity-Ref-ID: auth-8f2c
+            schema:
+              $ref: "#/components/schemas/EmailMessageSendRequest"
+        required: true
+      responses:
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailMessageAccepted"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "502":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Send transactional mail from a sibling application, RFC 5322 address\
+        \ strings (scope: emails:send)"
+      tags:
+      - email
+  /email/messages/{id}:
+    get:
+      description: "Org-scoped. Accepts a key holding `emails:read` or `emails:send`,\
+        \ so a sending application can poll what it sent."
+      operationId: getEmailMessage
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createEmailSend_202_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Get a message sent through /email/send, with its delivery timeline\
+        \ (scope: emails:send)"
+      tags:
+      - email
   /email-domains:
     get:
       operationId: listEmailDomains
@@ -7189,6 +7321,137 @@ components:
       - category
       - subject
       - to
+    EmailMessageSendRequest:
+      description: Sibling-application mail (POST /email/send). Addresses are RFC
+        5322 strings. At least one of html / text is required.
+      example:
+        cc:
+        - cc
+        - cc
+        - cc
+        - cc
+        - cc
+        headers:
+          key: headers
+        bcc:
+        - bcc
+        - bcc
+        - bcc
+        - bcc
+        - bcc
+        reply_to: reply_to
+        subject: subject
+        from: codai <no-reply@mail.codai.ro>
+        html: html
+        to:
+        - ana@client.ro
+        text: text
+        category: transactional
+        tags:
+          key: tags
+      properties:
+        from:
+          description: Must be on a VERIFIED sending domain; omit for the org default.
+          example: codai <no-reply@mail.codai.ro>
+          maxLength: 420
+          type: string
+        to:
+          example:
+          - ana@client.ro
+          items:
+            maxLength: 420
+            type: string
+          maxItems: 50
+          minItems: 1
+          type: array
+        cc:
+          items:
+            maxLength: 420
+            type: string
+          maxItems: 50
+          type: array
+        bcc:
+          items:
+            maxLength: 420
+            type: string
+          maxItems: 50
+          type: array
+        reply_to:
+          maxLength: 420
+          type: string
+        subject:
+          maxLength: 998
+          minLength: 1
+          type: string
+        html:
+          type: string
+        text:
+          type: string
+        headers:
+          additionalProperties:
+            maxLength: 2000
+            type: string
+          description: "Custom headers. Envelope, MIME and authentication headers\
+            \ are rejected (422); no CR/LF."
+        tags:
+          additionalProperties:
+            maxLength: 256
+            type: string
+          description: Key→value labels; stored as `key:value` tags (first 10).
+        category:
+          default: transactional
+          description: "`auth` → transactional, `alert` → notification; `marketing`\
+            \ is refused (use campaigns)."
+          enum:
+          - transactional
+          - notification
+          - marketing
+          - auth
+          - alert
+          type: string
+      required:
+      - subject
+      - to
+    EmailMessageAccepted:
+      example:
+        data:
+          message_id: message_id
+          suppressed_recipients:
+          - suppressed_recipients
+          - suppressed_recipients
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          status: queued
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        suppressed:
+        - suppressed
+        - suppressed
+        error: ""
+        status: queued
+      properties:
+        data:
+          $ref: "#/components/schemas/EmailMessageAccepted_data"
+        error:
+          nullable: true
+        id:
+          description: Mirror of data.id.
+          format: uuid
+          type: string
+        status:
+          description: Mirror of data.status.
+          enum:
+          - queued
+          - sent
+          - suppressed
+          type: string
+        suppressed:
+          description: Mirror of data.suppressed_recipients.
+          items:
+            type: string
+          type: array
+      required:
+      - data
+      - id
+      - status
     EmailRecipient:
       example:
         kind: to
@@ -7630,6 +7893,29 @@ components:
       - reversal
       - status
       - total
+    ContactFiscalStatusWebhookData:
+      properties:
+        contact_id:
+          format: uuid
+          type: string
+        cui:
+          description: "Numeric Romanian CUI, without the RO prefix"
+          type: string
+        name:
+          type: string
+        changes:
+          items:
+            $ref: "#/components/schemas/ContactFiscalStatusWebhookData_changes_inner"
+          minItems: 1
+          type: array
+        open_invoices:
+          $ref: "#/components/schemas/ContactFiscalStatusWebhookData_open_invoices"
+      required:
+      - changes
+      - contact_id
+      - cui
+      - name
+      - open_invoices
     WebhookDelivery:
       properties:
         id:
@@ -9691,6 +9977,15 @@ components:
             - invoice.payment_reversed
           data:
             $ref: "#/components/schemas/InvoicePaymentReversedWebhookData"
+    contact_fiscal_status_changed_post_request:
+      allOf:
+      - $ref: "#/components/schemas/WebhookDelivery"
+      - properties:
+          type:
+            enum:
+            - contact.fiscal_status_changed
+          data:
+            $ref: "#/components/schemas/ContactFiscalStatusWebhookData"
     InvoiceCreate_items_inner:
       example:
         article_id: article_id
@@ -9717,6 +10012,35 @@ components:
       - description
       - quantity
       - unit_price
+    EmailMessageAccepted_data:
+      example:
+        message_id: message_id
+        suppressed_recipients:
+        - suppressed_recipients
+        - suppressed_recipients
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        status: queued
+      properties:
+        id:
+          format: uuid
+          type: string
+        message_id:
+          description: SMTP Message-ID set on the outbound mail.
+          type: string
+        status:
+          enum:
+          - queued
+          - sent
+          - suppressed
+          type: string
+        suppressed_recipients:
+          items:
+            type: string
+          type: array
+      required:
+      - id
+      - message_id
+      - status
     InvoicePaymentWebhookData_payment:
       properties:
         id:
@@ -9775,6 +10099,49 @@ components:
       - reason
       - reversal_date
       - reverses_payment_id
+    ContactFiscalStatusWebhookData_changes_inner:
+      properties:
+        kind:
+          enum:
+          - became_inactive
+          - reactivated
+          - struck_off
+          - insolvency
+          - vat_registered
+          - vat_deregistered
+          - cash_vat_on
+          - cash_vat_off
+          type: string
+        from:
+          type: string
+        to:
+          type: string
+        effective_date:
+          description: "Date published by ANAF, when it publishes one"
+          format: date
+          type: string
+          nullable: true
+      required:
+      - effective_date
+      - from
+      - kind
+      - to
+    ContactFiscalStatusWebhookData_open_invoices:
+      properties:
+        count:
+          type: integer
+        total:
+          description: "Decimal string: open balance of the ISSUED invoices, converted\
+            \ at each invoice exchange rate"
+          type: string
+        currency:
+          enum:
+          - RON
+          type: string
+      required:
+      - count
+      - currency
+      - total
   securitySchemes:
     bearerAuth:
       description: API key as Bearer token

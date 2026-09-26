@@ -87,6 +87,8 @@ type APIClient struct {
 
 	DomainsAPI *DomainsAPIService
 
+	EmailAPI *EmailAPIService
+
 	EmailDomainsAPI *EmailDomainsAPIService
 
 	EmailsAPI *EmailsAPIService
@@ -179,6 +181,7 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.DnsAPI = (*DnsAPIService)(&c.common)
 	c.DocumentsAPI = (*DocumentsAPIService)(&c.common)
 	c.DomainsAPI = (*DomainsAPIService)(&c.common)
+	c.EmailAPI = (*EmailAPIService)(&c.common)
 	c.EmailDomainsAPI = (*EmailDomainsAPIService)(&c.common)
 	c.EmailsAPI = (*EmailsAPIService)(&c.common)
 	c.ExpensesAPI = (*ExpensesAPIService)(&c.common)

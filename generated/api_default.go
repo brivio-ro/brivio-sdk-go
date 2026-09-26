@@ -22,6 +22,103 @@ import (
 // DefaultAPIService DefaultAPI service
 type DefaultAPIService service
 
+type ApiContactFiscalStatusChangedPostRequest struct {
+	ctx context.Context
+	ApiService *DefaultAPIService
+	contactFiscalStatusChangedPostRequest *ContactFiscalStatusChangedPostRequest
+}
+
+func (r ApiContactFiscalStatusChangedPostRequest) ContactFiscalStatusChangedPostRequest(contactFiscalStatusChangedPostRequest ContactFiscalStatusChangedPostRequest) ApiContactFiscalStatusChangedPostRequest {
+	r.contactFiscalStatusChangedPostRequest = &contactFiscalStatusChangedPostRequest
+	return r
+}
+
+func (r ApiContactFiscalStatusChangedPostRequest) Execute() (*http.Response, error) {
+	return r.ApiService.ContactFiscalStatusChangedPostExecute(r)
+}
+
+/*
+ContactFiscalStatusChangedPost A customer with open ISSUED invoices changed fiscal status at ANAF or the trade registry: became inactive (art. 92 CPF) or was reactivated, was struck off or dissolved, entered insolvency, registered or deregistered for VAT, or entered or left TVA la încasare. Checked daily; the first observation of a contact is a baseline and emits nothing. Idempotent: id = evt_fsc_<contactId>_<kind>_<date>, where kind and date are those of the first entry in changes.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiContactFiscalStatusChangedPostRequest
+*/
+func (a *DefaultAPIService) ContactFiscalStatusChangedPost(ctx context.Context) ApiContactFiscalStatusChangedPostRequest {
+	return ApiContactFiscalStatusChangedPostRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+func (a *DefaultAPIService) ContactFiscalStatusChangedPostExecute(r ApiContactFiscalStatusChangedPostRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.ContactFiscalStatusChangedPost")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/contact.fiscal_status_changed"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.contactFiscalStatusChangedPostRequest == nil {
+		return nil, reportError("contactFiscalStatusChangedPostRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.contactFiscalStatusChangedPostRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
 type ApiInvoicePaidPostRequest struct {
 	ctx context.Context
 	ApiService *DefaultAPIService

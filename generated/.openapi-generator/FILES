@@ -23,6 +23,7 @@ api_default.go
 api_dns.go
 api_documents.go
 api_domains.go
+api_email.go
 api_email_domains.go
 api_emails.go
 api_expenses.go
@@ -60,6 +61,10 @@ model_bank_rule_input.go
 model_cancel_payment_link_200_response.go
 model_contact.go
 model_contact_create.go
+model_contact_fiscal_status_changed_post_request.go
+model_contact_fiscal_status_webhook_data.go
+model_contact_fiscal_status_webhook_data_changes_inner.go
+model_contact_fiscal_status_webhook_data_open_invoices.go
 model_contract.go
 model_contract_create.go
 model_create_article_201_response.go
@@ -95,6 +100,9 @@ model_email_domain_checks.go
 model_email_domain_create.go
 model_email_domain_verify_result.go
 model_email_event.go
+model_email_message_accepted.go
+model_email_message_accepted_data.go
+model_email_message_send_request.go
 model_email_recipient.go
 model_email_send_request.go
 model_error.go
