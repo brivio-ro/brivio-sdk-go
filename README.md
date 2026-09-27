@@ -142,6 +142,6 @@ behaves identically. See
 ## Links
 
 - API reference — <https://brivio.ro/developers/docs>
-- Other SDKs — [TypeScript](https://www.npmjs.com/package/@brivio/sdk), [Python](https://pypi.org/project/brivio/), [PHP](https://packagist.org/packages/brivio/sdk)
+- Other SDKs — [TypeScript](https://www.npmjs.com/package/@brivio/sdk), [Python](https://pypi.org/project/brivio/), [PHP](https://packagist.org/packages/brivio-ro/sdk)
 
 MIT © Brivio
