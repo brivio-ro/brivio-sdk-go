@@ -119,6 +119,491 @@ func (a *DefaultAPIService) ContactFiscalStatusChangedPostExecute(r ApiContactFi
 	return localVarHTTPResponse, nil
 }
 
+type ApiCourtCaseHearingAddedPostRequest struct {
+	ctx context.Context
+	ApiService *DefaultAPIService
+	courtCaseHearingAddedPostRequest *CourtCaseHearingAddedPostRequest
+}
+
+func (r ApiCourtCaseHearingAddedPostRequest) CourtCaseHearingAddedPostRequest(courtCaseHearingAddedPostRequest CourtCaseHearingAddedPostRequest) ApiCourtCaseHearingAddedPostRequest {
+	r.courtCaseHearingAddedPostRequest = &courtCaseHearingAddedPostRequest
+	return r
+}
+
+func (r ApiCourtCaseHearingAddedPostRequest) Execute() (*http.Response, error) {
+	return r.ApiService.CourtCaseHearingAddedPostExecute(r)
+}
+
+/*
+CourtCaseHearingAddedPost A hearing was added to a court case. Case and hearing ids, date and court only; no parties, panel, solution or notes. Idempotent: id evt_court_hearing_<hearingId>.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiCourtCaseHearingAddedPostRequest
+*/
+func (a *DefaultAPIService) CourtCaseHearingAddedPost(ctx context.Context) ApiCourtCaseHearingAddedPostRequest {
+	return ApiCourtCaseHearingAddedPostRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+func (a *DefaultAPIService) CourtCaseHearingAddedPostExecute(r ApiCourtCaseHearingAddedPostRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.CourtCaseHearingAddedPost")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/court_case.hearing_added"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.courtCaseHearingAddedPostRequest == nil {
+		return nil, reportError("courtCaseHearingAddedPostRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.courtCaseHearingAddedPostRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
+type ApiDeliveryRouteDispatchedPostRequest struct {
+	ctx context.Context
+	ApiService *DefaultAPIService
+	deliveryRouteDispatchedPostRequest *DeliveryRouteDispatchedPostRequest
+}
+
+func (r ApiDeliveryRouteDispatchedPostRequest) DeliveryRouteDispatchedPostRequest(deliveryRouteDispatchedPostRequest DeliveryRouteDispatchedPostRequest) ApiDeliveryRouteDispatchedPostRequest {
+	r.deliveryRouteDispatchedPostRequest = &deliveryRouteDispatchedPostRequest
+	return r
+}
+
+func (r ApiDeliveryRouteDispatchedPostRequest) Execute() (*http.Response, error) {
+	return r.ApiService.DeliveryRouteDispatchedPostExecute(r)
+}
+
+/*
+DeliveryRouteDispatchedPost A delivery route was dispatched: the route sheet was sent to its driver and the route is DISPATCHED. Ids and counts only (no driver contact, recipients or addresses). A re-dispatch is a new event. Id evt_delivery_route_<id>_dispatched_<ms>.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiDeliveryRouteDispatchedPostRequest
+*/
+func (a *DefaultAPIService) DeliveryRouteDispatchedPost(ctx context.Context) ApiDeliveryRouteDispatchedPostRequest {
+	return ApiDeliveryRouteDispatchedPostRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+func (a *DefaultAPIService) DeliveryRouteDispatchedPostExecute(r ApiDeliveryRouteDispatchedPostRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.DeliveryRouteDispatchedPost")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/delivery_route.dispatched"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.deliveryRouteDispatchedPostRequest == nil {
+		return nil, reportError("deliveryRouteDispatchedPostRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.deliveryRouteDispatchedPostRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
+type ApiFleetVehicleCreatedPostRequest struct {
+	ctx context.Context
+	ApiService *DefaultAPIService
+	fleetVehicleCreatedPostRequest *FleetVehicleCreatedPostRequest
+}
+
+func (r ApiFleetVehicleCreatedPostRequest) FleetVehicleCreatedPostRequest(fleetVehicleCreatedPostRequest FleetVehicleCreatedPostRequest) ApiFleetVehicleCreatedPostRequest {
+	r.fleetVehicleCreatedPostRequest = &fleetVehicleCreatedPostRequest
+	return r
+}
+
+func (r ApiFleetVehicleCreatedPostRequest) Execute() (*http.Response, error) {
+	return r.ApiService.FleetVehicleCreatedPostExecute(r)
+}
+
+/*
+FleetVehicleCreatedPost A fleet vehicle was added (in the app or through the API). Idempotent: id evt_fleet_vehicle_<id>_created.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiFleetVehicleCreatedPostRequest
+*/
+func (a *DefaultAPIService) FleetVehicleCreatedPost(ctx context.Context) ApiFleetVehicleCreatedPostRequest {
+	return ApiFleetVehicleCreatedPostRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+func (a *DefaultAPIService) FleetVehicleCreatedPostExecute(r ApiFleetVehicleCreatedPostRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.FleetVehicleCreatedPost")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/fleet_vehicle.created"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.fleetVehicleCreatedPostRequest == nil {
+		return nil, reportError("fleetVehicleCreatedPostRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.fleetVehicleCreatedPostRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
+type ApiFleetVehicleDeletedPostRequest struct {
+	ctx context.Context
+	ApiService *DefaultAPIService
+	fleetVehicleDeletedPostRequest *FleetVehicleDeletedPostRequest
+}
+
+func (r ApiFleetVehicleDeletedPostRequest) FleetVehicleDeletedPostRequest(fleetVehicleDeletedPostRequest FleetVehicleDeletedPostRequest) ApiFleetVehicleDeletedPostRequest {
+	r.fleetVehicleDeletedPostRequest = &fleetVehicleDeletedPostRequest
+	return r
+}
+
+func (r ApiFleetVehicleDeletedPostRequest) Execute() (*http.Response, error) {
+	return r.ApiService.FleetVehicleDeletedPostExecute(r)
+}
+
+/*
+FleetVehicleDeletedPost A fleet vehicle was deleted, with its odometer and service logs. Idempotent: id evt_fleet_vehicle_<id>_del.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiFleetVehicleDeletedPostRequest
+*/
+func (a *DefaultAPIService) FleetVehicleDeletedPost(ctx context.Context) ApiFleetVehicleDeletedPostRequest {
+	return ApiFleetVehicleDeletedPostRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+func (a *DefaultAPIService) FleetVehicleDeletedPostExecute(r ApiFleetVehicleDeletedPostRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.FleetVehicleDeletedPost")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/fleet_vehicle.deleted"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.fleetVehicleDeletedPostRequest == nil {
+		return nil, reportError("fleetVehicleDeletedPostRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.fleetVehicleDeletedPostRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
+type ApiFleetVehicleUpdatedPostRequest struct {
+	ctx context.Context
+	ApiService *DefaultAPIService
+	fleetVehicleUpdatedPostRequest *FleetVehicleUpdatedPostRequest
+}
+
+func (r ApiFleetVehicleUpdatedPostRequest) FleetVehicleUpdatedPostRequest(fleetVehicleUpdatedPostRequest FleetVehicleUpdatedPostRequest) ApiFleetVehicleUpdatedPostRequest {
+	r.fleetVehicleUpdatedPostRequest = &fleetVehicleUpdatedPostRequest
+	return r
+}
+
+func (r ApiFleetVehicleUpdatedPostRequest) Execute() (*http.Response, error) {
+	return r.ApiService.FleetVehicleUpdatedPostExecute(r)
+}
+
+/*
+FleetVehicleUpdatedPost A fleet vehicle changed. changed_fields lists the wire names of the fields whose value changed, never the values; an edit that changes nothing emits nothing. Id evt_fleet_vehicle_<id>_upd_<ms>.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiFleetVehicleUpdatedPostRequest
+*/
+func (a *DefaultAPIService) FleetVehicleUpdatedPost(ctx context.Context) ApiFleetVehicleUpdatedPostRequest {
+	return ApiFleetVehicleUpdatedPostRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+func (a *DefaultAPIService) FleetVehicleUpdatedPostExecute(r ApiFleetVehicleUpdatedPostRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.FleetVehicleUpdatedPost")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/fleet_vehicle.updated"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.fleetVehicleUpdatedPostRequest == nil {
+		return nil, reportError("fleetVehicleUpdatedPostRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.fleetVehicleUpdatedPostRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
 type ApiInvoicePaidPostRequest struct {
 	ctx context.Context
 	ApiService *DefaultAPIService
@@ -382,6 +867,297 @@ func (a *DefaultAPIService) InvoicePaymentReversedPostExecute(r ApiInvoicePaymen
 	}
 	// body params
 	localVarPostBody = r.invoicePaymentReversedPostRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
+type ApiSubscriptionActivatedPostRequest struct {
+	ctx context.Context
+	ApiService *DefaultAPIService
+	subscriptionActivatedPostRequest *SubscriptionActivatedPostRequest
+}
+
+func (r ApiSubscriptionActivatedPostRequest) SubscriptionActivatedPostRequest(subscriptionActivatedPostRequest SubscriptionActivatedPostRequest) ApiSubscriptionActivatedPostRequest {
+	r.subscriptionActivatedPostRequest = &subscriptionActivatedPostRequest
+	return r
+}
+
+func (r ApiSubscriptionActivatedPostRequest) Execute() (*http.Response, error) {
+	return r.ApiService.SubscriptionActivatedPostExecute(r)
+}
+
+/*
+SubscriptionActivatedPost A merchant catalog subscription (POST /v1/subscriptions) became active or trialing — first payment confirmed, or recovered from past_due. Idempotent per underlying Stripe event: `id` = `evt_sub_<stripeEventId>`.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiSubscriptionActivatedPostRequest
+*/
+func (a *DefaultAPIService) SubscriptionActivatedPost(ctx context.Context) ApiSubscriptionActivatedPostRequest {
+	return ApiSubscriptionActivatedPostRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+func (a *DefaultAPIService) SubscriptionActivatedPostExecute(r ApiSubscriptionActivatedPostRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.SubscriptionActivatedPost")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/subscription.activated"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.subscriptionActivatedPostRequest == nil {
+		return nil, reportError("subscriptionActivatedPostRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.subscriptionActivatedPostRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
+type ApiSubscriptionCanceledPostRequest struct {
+	ctx context.Context
+	ApiService *DefaultAPIService
+	subscriptionCanceledPostRequest *SubscriptionCanceledPostRequest
+}
+
+func (r ApiSubscriptionCanceledPostRequest) SubscriptionCanceledPostRequest(subscriptionCanceledPostRequest SubscriptionCanceledPostRequest) ApiSubscriptionCanceledPostRequest {
+	r.subscriptionCanceledPostRequest = &subscriptionCanceledPostRequest
+	return r
+}
+
+func (r ApiSubscriptionCanceledPostRequest) Execute() (*http.Response, error) {
+	return r.ApiService.SubscriptionCanceledPostExecute(r)
+}
+
+/*
+SubscriptionCanceledPost A merchant catalog subscription ended (canceled or incomplete_expired). Revoke access here. Same idempotency as subscription.activated.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiSubscriptionCanceledPostRequest
+*/
+func (a *DefaultAPIService) SubscriptionCanceledPost(ctx context.Context) ApiSubscriptionCanceledPostRequest {
+	return ApiSubscriptionCanceledPostRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+func (a *DefaultAPIService) SubscriptionCanceledPostExecute(r ApiSubscriptionCanceledPostRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.SubscriptionCanceledPost")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/subscription.canceled"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.subscriptionCanceledPostRequest == nil {
+		return nil, reportError("subscriptionCanceledPostRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.subscriptionCanceledPostRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
+type ApiSubscriptionUpdatedPostRequest struct {
+	ctx context.Context
+	ApiService *DefaultAPIService
+	subscriptionUpdatedPostRequest *SubscriptionUpdatedPostRequest
+}
+
+func (r ApiSubscriptionUpdatedPostRequest) SubscriptionUpdatedPostRequest(subscriptionUpdatedPostRequest SubscriptionUpdatedPostRequest) ApiSubscriptionUpdatedPostRequest {
+	r.subscriptionUpdatedPostRequest = &subscriptionUpdatedPostRequest
+	return r
+}
+
+func (r ApiSubscriptionUpdatedPostRequest) Execute() (*http.Response, error) {
+	return r.ApiService.SubscriptionUpdatedPostExecute(r)
+}
+
+/*
+SubscriptionUpdatedPost A merchant catalog subscription changed status, renewed (new current_period_end) or toggled cancel_at_period_end. Same idempotency as subscription.activated.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiSubscriptionUpdatedPostRequest
+*/
+func (a *DefaultAPIService) SubscriptionUpdatedPost(ctx context.Context) ApiSubscriptionUpdatedPostRequest {
+	return ApiSubscriptionUpdatedPostRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+func (a *DefaultAPIService) SubscriptionUpdatedPostExecute(r ApiSubscriptionUpdatedPostRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.SubscriptionUpdatedPost")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/subscription.updated"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.subscriptionUpdatedPostRequest == nil {
+		return nil, reportError("subscriptionUpdatedPostRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.subscriptionUpdatedPostRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return nil, err
