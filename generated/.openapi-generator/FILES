@@ -17,6 +17,7 @@ api_compat.go
 api_connect.go
 api_construction.go
 api_contacts.go
+api_contract_obligations.go
 api_contracts.go
 api_customers.go
 api_default.go
@@ -78,6 +79,8 @@ model_attach_space_member_200_response.go
 model_attach_space_member_200_response_data.go
 model_bank_rule_input.go
 model_cancel_payment_link_200_response.go
+model_complete_contract_obligation_200_response.go
+model_complete_contract_obligation_200_response_data.go
 model_configure_campaign_ab_test_200_response.go
 model_confirm_import_declaration_202_response.go
 model_contact.go
@@ -88,6 +91,10 @@ model_contact_fiscal_status_webhook_data_changes_inner.go
 model_contact_fiscal_status_webhook_data_open_invoices.go
 model_contract.go
 model_contract_create.go
+model_contract_obligation.go
+model_contract_obligation_complete.go
+model_contract_obligation_create.go
+model_contract_obligation_update.go
 model_court_case.go
 model_court_case_create.go
 model_court_case_hearing_added_post_request.go
@@ -102,6 +109,7 @@ model_create_banking_statement_import_request.go
 model_create_company_search_request.go
 model_create_contact_201_response.go
 model_create_contract_201_response.go
+model_create_contract_obligation_201_response.go
 model_create_court_case_201_response.go
 model_create_court_case_hearing_201_response.go
 model_create_court_case_note_201_response.go
@@ -238,6 +246,7 @@ model_invoice_payment_webhook_data_payment.go
 model_list_access_grants_200_response.go
 model_list_articles_200_response.go
 model_list_contacts_200_response.go
+model_list_contract_obligations_200_response.go
 model_list_contracts_200_response.go
 model_list_court_case_hearings_200_response.go
 model_list_court_case_notes_200_response.go

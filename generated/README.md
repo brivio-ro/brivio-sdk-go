@@ -144,6 +144,13 @@ Class | Method | HTTP request | Description
 *ContactsAPI* | [**GetContact**](docs/ContactsAPI.md#getcontact) | **Get** /contacts/{id} | Get a contact
 *ContactsAPI* | [**ListContacts**](docs/ContactsAPI.md#listcontacts) | **Get** /contacts | List contacts
 *ContactsAPI* | [**UpdateContact**](docs/ContactsAPI.md#updatecontact) | **Patch** /contacts/{id} | Update a contact
+*ContractObligationsAPI* | [**CompleteContractObligation**](docs/ContractObligationsAPI.md#completecontractobligation) | **Post** /contract-obligations/{id}/complete | Complete a contract obligation; a recurring one returns its next occurrence (scope: contracts:write)
+*ContractObligationsAPI* | [**CreateContractObligation**](docs/ContractObligationsAPI.md#createcontractobligation) | **Post** /contract-obligations | Create a contract obligation (scope: contracts:write)
+*ContractObligationsAPI* | [**DeleteContractObligation**](docs/ContractObligationsAPI.md#deletecontractobligation) | **Delete** /contract-obligations/{id} | Delete a contract obligation (scope: contracts:write)
+*ContractObligationsAPI* | [**GetContractObligation**](docs/ContractObligationsAPI.md#getcontractobligation) | **Get** /contract-obligations/{id} | Get a contract obligation (scope: contracts:read)
+*ContractObligationsAPI* | [**ListContractObligations**](docs/ContractObligationsAPI.md#listcontractobligations) | **Get** /contract-obligations | Contract obligations register across contracts, oldest due first (scope: contracts:read)
+*ContractObligationsAPI* | [**ReopenContractObligation**](docs/ContractObligationsAPI.md#reopencontractobligation) | **Post** /contract-obligations/{id}/reopen | Reopen a completed contract obligation (scope: contracts:write)
+*ContractObligationsAPI* | [**UpdateContractObligation**](docs/ContractObligationsAPI.md#updatecontractobligation) | **Patch** /contract-obligations/{id} | Update a contract obligation (scope: contracts:write)
 *ContractsAPI* | [**CreateContract**](docs/ContractsAPI.md#createcontract) | **Post** /contracts | Create a contract
 *ContractsAPI* | [**DeleteContract**](docs/ContractsAPI.md#deletecontract) | **Delete** /contracts/{id} | Delete a contract
 *ContractsAPI* | [**GetContract**](docs/ContractsAPI.md#getcontract) | **Get** /contracts/{id} | Get a contract
@@ -382,6 +389,8 @@ Class | Method | HTTP request | Description
  - [AttachSpaceMember200ResponseData](docs/AttachSpaceMember200ResponseData.md)
  - [BankRuleInput](docs/BankRuleInput.md)
  - [CancelPaymentLink200Response](docs/CancelPaymentLink200Response.md)
+ - [CompleteContractObligation200Response](docs/CompleteContractObligation200Response.md)
+ - [CompleteContractObligation200ResponseData](docs/CompleteContractObligation200ResponseData.md)
  - [ConfigureCampaignAbTest200Response](docs/ConfigureCampaignAbTest200Response.md)
  - [ConfirmImportDeclaration202Response](docs/ConfirmImportDeclaration202Response.md)
  - [Contact](docs/Contact.md)
@@ -392,6 +401,10 @@ Class | Method | HTTP request | Description
  - [ContactFiscalStatusWebhookDataOpenInvoices](docs/ContactFiscalStatusWebhookDataOpenInvoices.md)
  - [Contract](docs/Contract.md)
  - [ContractCreate](docs/ContractCreate.md)
+ - [ContractObligation](docs/ContractObligation.md)
+ - [ContractObligationComplete](docs/ContractObligationComplete.md)
+ - [ContractObligationCreate](docs/ContractObligationCreate.md)
+ - [ContractObligationUpdate](docs/ContractObligationUpdate.md)
  - [CourtCase](docs/CourtCase.md)
  - [CourtCaseCreate](docs/CourtCaseCreate.md)
  - [CourtCaseHearingAddedPostRequest](docs/CourtCaseHearingAddedPostRequest.md)
@@ -406,6 +419,7 @@ Class | Method | HTTP request | Description
  - [CreateCompanySearchRequest](docs/CreateCompanySearchRequest.md)
  - [CreateContact201Response](docs/CreateContact201Response.md)
  - [CreateContract201Response](docs/CreateContract201Response.md)
+ - [CreateContractObligation201Response](docs/CreateContractObligation201Response.md)
  - [CreateCourtCase201Response](docs/CreateCourtCase201Response.md)
  - [CreateCourtCaseHearing201Response](docs/CreateCourtCaseHearing201Response.md)
  - [CreateCourtCaseNote201Response](docs/CreateCourtCaseNote201Response.md)
@@ -542,6 +556,7 @@ Class | Method | HTTP request | Description
  - [ListAccessGrants200Response](docs/ListAccessGrants200Response.md)
  - [ListArticles200Response](docs/ListArticles200Response.md)
  - [ListContacts200Response](docs/ListContacts200Response.md)
+ - [ListContractObligations200Response](docs/ListContractObligations200Response.md)
  - [ListContracts200Response](docs/ListContracts200Response.md)
  - [ListCourtCaseHearings200Response](docs/ListCourtCaseHearings200Response.md)
  - [ListCourtCaseNotes200Response](docs/ListCourtCaseNotes200Response.md)

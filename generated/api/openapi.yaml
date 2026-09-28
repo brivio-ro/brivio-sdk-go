@@ -1881,6 +1881,316 @@ paths:
       summary: Update a contract
       tags:
       - contracts
+  /contract-obligations:
+    get:
+      operationId: listContractObligations
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: contract_id
+        required: false
+        schema:
+          format: uuid
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: bucket
+        required: false
+        schema:
+          default: open
+          enum:
+          - open
+          - overdue
+          - due_soon
+          - upcoming
+          - undated
+          - done
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: obligor
+        required: false
+        schema:
+          enum:
+          - us
+          - counterparty
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: assignee_user_id
+        required: false
+        schema:
+          format: uuid
+          type: string
+        style: form
+      - description: "Matches title, clause label or contract name."
+        explode: true
+        in: query
+        name: q
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listContractObligations_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Contract obligations register across contracts, oldest due first (scope:\
+        \ contracts:read)"
+      tags:
+      - contract-obligations
+    post:
+      operationId: createContractObligation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContractObligationCreate"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createContractObligation_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Create a contract obligation (scope: contracts:write)"
+      tags:
+      - contract-obligations
+  /contract-obligations/{id}:
+    delete:
+      operationId: deleteContractObligation
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: "OK — `{ id, deleted: true }`"
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Delete a contract obligation (scope: contracts:write)"
+      tags:
+      - contract-obligations
+    get:
+      operationId: getContractObligation
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createContractObligation_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Get a contract obligation (scope: contracts:read)"
+      tags:
+      - contract-obligations
+    patch:
+      operationId: updateContractObligation
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContractObligationUpdate"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createContractObligation_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Update a contract obligation (scope: contracts:write)"
+      tags:
+      - contract-obligations
+  /contract-obligations/{id}/complete:
+    post:
+      operationId: completeContractObligation
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContractObligationComplete"
+        required: false
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/completeContractObligation_200_response"
+          description: "OK — `{ obligation, next }`"
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Complete a contract obligation; a recurring one returns its next occurrence\
+        \ (scope: contracts:write)"
+      tags:
+      - contract-obligations
+  /contract-obligations/{id}/reopen:
+    post:
+      operationId: reopenContractObligation
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createContractObligation_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Reopen a completed contract obligation (scope: contracts:write)"
+      tags:
+      - contract-obligations
   /documents:
     get:
       operationId: listDocuments
@@ -11790,6 +12100,288 @@ components:
           type: boolean
       required:
       - name
+    ContractObligation:
+      example:
+        clause_label: clause_label
+        contract_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        due_date: 2000-01-23
+        assignee_user_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        description: description
+        created_at: 2000-01-23T04:56:07.000+00:00
+        contract_name: contract_name
+        evidence_document_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        obligor: us
+        title: title
+        type: payment
+        assignee_name: assignee_name
+        recurrence: none
+        bucket: overdue
+        completed_at: 2000-01-23T04:56:07.000+00:00
+        overdue_notified_at: 2000-01-23T04:56:07.000+00:00
+        escalated_at: 2000-01-23T04:56:07.000+00:00
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        has_evidence: true
+        evidence_note: evidence_note
+        clause_excerpt: clause_excerpt
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        remind_days_before: 0
+        status: pending
+      properties:
+        id:
+          format: uuid
+          type: string
+        contract_id:
+          format: uuid
+          type: string
+        contract_name:
+          description: Only on register (list) rows.
+          type: string
+        title:
+          type: string
+        type:
+          enum:
+          - payment
+          - delivery
+          - report
+          - renewal_notice
+          - custom
+          type: string
+        due_date:
+          format: date
+          type: string
+          nullable: true
+        recurrence:
+          enum:
+          - none
+          - monthly
+          - quarterly
+          - yearly
+          type: string
+        remind_days_before:
+          type: integer
+        status:
+          enum:
+          - pending
+          - overdue
+          - done
+          type: string
+        bucket:
+          enum:
+          - overdue
+          - due_soon
+          - upcoming
+          - undated
+          - done
+          type: string
+        obligor:
+          enum:
+          - us
+          - counterparty
+          type: string
+        assignee_user_id:
+          format: uuid
+          type: string
+          nullable: true
+        assignee_name:
+          description: Only on register (list) rows.
+          type: string
+          nullable: true
+        clause_label:
+          type: string
+          nullable: true
+        clause_excerpt:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        evidence_document_id:
+          format: uuid
+          type: string
+          nullable: true
+        evidence_note:
+          type: string
+          nullable: true
+        has_evidence:
+          type: boolean
+        completed_at:
+          format: date-time
+          type: string
+          nullable: true
+        overdue_notified_at:
+          format: date-time
+          type: string
+          nullable: true
+        escalated_at:
+          format: date-time
+          type: string
+          nullable: true
+        created_at:
+          format: date-time
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+    ContractObligationCreate:
+      example:
+        clause_label: clause_label
+        contract_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        due_date: 2000-01-23
+        assignee_user_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        description: description
+        evidence_document_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        obligor: us
+        title: title
+        type: payment
+        recurrence: none
+        evidence_note: evidence_note
+        clause_excerpt: clause_excerpt
+        remind_days_before: 29
+      properties:
+        contract_id:
+          format: uuid
+          type: string
+        title:
+          maxLength: 255
+          type: string
+        type:
+          enum:
+          - payment
+          - delivery
+          - report
+          - renewal_notice
+          - custom
+          type: string
+        due_date:
+          format: date
+          type: string
+          nullable: true
+        recurrence:
+          enum:
+          - none
+          - monthly
+          - quarterly
+          - yearly
+          type: string
+        remind_days_before:
+          maximum: 365
+          minimum: 0
+          type: integer
+        obligor:
+          enum:
+          - us
+          - counterparty
+          type: string
+        assignee_user_id:
+          description: Must be a member of the organization (ASSIGNEE_NOT_MEMBER).
+          format: uuid
+          type: string
+          nullable: true
+        clause_label:
+          maxLength: 80
+          type: string
+          nullable: true
+        clause_excerpt:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        evidence_document_id:
+          description: An organization document (DOCUMENT_NOT_FOUND).
+          format: uuid
+          type: string
+          nullable: true
+        evidence_note:
+          maxLength: 2000
+          type: string
+          nullable: true
+      required:
+      - contract_id
+      - title
+    ContractObligationUpdate:
+      description: Any subset of the create fields except contract_id. Changing due_date
+        resets the overdue notice and escalation.
+      example:
+        recurrence: none
+        clause_label: clause_label
+        due_date: 2000-01-23
+        assignee_user_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        description: description
+        evidence_note: evidence_note
+        clause_excerpt: clause_excerpt
+        evidence_document_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        obligor: us
+        title: title
+        type: payment
+        remind_days_before: 29
+      properties:
+        title:
+          maxLength: 255
+          type: string
+        type:
+          enum:
+          - payment
+          - delivery
+          - report
+          - renewal_notice
+          - custom
+          type: string
+        due_date:
+          format: date
+          type: string
+          nullable: true
+        recurrence:
+          enum:
+          - none
+          - monthly
+          - quarterly
+          - yearly
+          type: string
+        remind_days_before:
+          maximum: 365
+          minimum: 0
+          type: integer
+        obligor:
+          enum:
+          - us
+          - counterparty
+          type: string
+        assignee_user_id:
+          format: uuid
+          type: string
+          nullable: true
+        clause_label:
+          maxLength: 80
+          type: string
+          nullable: true
+        clause_excerpt:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        evidence_document_id:
+          format: uuid
+          type: string
+          nullable: true
+        evidence_note:
+          maxLength: 2000
+          type: string
+          nullable: true
+    ContractObligationComplete:
+      description: Evidence (a document or a note) is required for our own payment/delivery/report
+        obligations (EVIDENCE_REQUIRED).
+      example:
+        evidence_note: evidence_note
+        evidence_document_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        evidence_document_id:
+          format: uuid
+          type: string
+        evidence_note:
+          maxLength: 2000
+          type: string
     Document:
       example:
         file_key: file_key
@@ -18555,6 +19147,179 @@ components:
       required:
       - data
       - error
+    listContractObligations_200_response:
+      example:
+        data:
+        - clause_label: clause_label
+          contract_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          due_date: 2000-01-23
+          assignee_user_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          description: description
+          created_at: 2000-01-23T04:56:07.000+00:00
+          contract_name: contract_name
+          evidence_document_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          obligor: us
+          title: title
+          type: payment
+          assignee_name: assignee_name
+          recurrence: none
+          bucket: overdue
+          completed_at: 2000-01-23T04:56:07.000+00:00
+          overdue_notified_at: 2000-01-23T04:56:07.000+00:00
+          escalated_at: 2000-01-23T04:56:07.000+00:00
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          has_evidence: true
+          evidence_note: evidence_note
+          clause_excerpt: clause_excerpt
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          remind_days_before: 0
+          status: pending
+        - clause_label: clause_label
+          contract_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          due_date: 2000-01-23
+          assignee_user_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          description: description
+          created_at: 2000-01-23T04:56:07.000+00:00
+          contract_name: contract_name
+          evidence_document_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          obligor: us
+          title: title
+          type: payment
+          assignee_name: assignee_name
+          recurrence: none
+          bucket: overdue
+          completed_at: 2000-01-23T04:56:07.000+00:00
+          overdue_notified_at: 2000-01-23T04:56:07.000+00:00
+          escalated_at: 2000-01-23T04:56:07.000+00:00
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          has_evidence: true
+          evidence_note: evidence_note
+          clause_excerpt: clause_excerpt
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          remind_days_before: 0
+          status: pending
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/ContractObligation"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    createContractObligation_201_response:
+      example:
+        data:
+          clause_label: clause_label
+          contract_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          due_date: 2000-01-23
+          assignee_user_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          description: description
+          created_at: 2000-01-23T04:56:07.000+00:00
+          contract_name: contract_name
+          evidence_document_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          obligor: us
+          title: title
+          type: payment
+          assignee_name: assignee_name
+          recurrence: none
+          bucket: overdue
+          completed_at: 2000-01-23T04:56:07.000+00:00
+          overdue_notified_at: 2000-01-23T04:56:07.000+00:00
+          escalated_at: 2000-01-23T04:56:07.000+00:00
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          has_evidence: true
+          evidence_note: evidence_note
+          clause_excerpt: clause_excerpt
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          remind_days_before: 0
+          status: pending
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/ContractObligation"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    completeContractObligation_200_response_data:
+      example:
+        next: ""
+        obligation:
+          clause_label: clause_label
+          contract_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          due_date: 2000-01-23
+          assignee_user_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          description: description
+          created_at: 2000-01-23T04:56:07.000+00:00
+          contract_name: contract_name
+          evidence_document_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          obligor: us
+          title: title
+          type: payment
+          assignee_name: assignee_name
+          recurrence: none
+          bucket: overdue
+          completed_at: 2000-01-23T04:56:07.000+00:00
+          overdue_notified_at: 2000-01-23T04:56:07.000+00:00
+          escalated_at: 2000-01-23T04:56:07.000+00:00
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          has_evidence: true
+          evidence_note: evidence_note
+          clause_excerpt: clause_excerpt
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          remind_days_before: 0
+          status: pending
+      properties:
+        obligation:
+          $ref: "#/components/schemas/ContractObligation"
+        next:
+          allOf:
+          - $ref: "#/components/schemas/ContractObligation"
+          nullable: true
+    completeContractObligation_200_response:
+      example:
+        data:
+          next: ""
+          obligation:
+            clause_label: clause_label
+            contract_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            due_date: 2000-01-23
+            assignee_user_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            description: description
+            created_at: 2000-01-23T04:56:07.000+00:00
+            contract_name: contract_name
+            evidence_document_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            obligor: us
+            title: title
+            type: payment
+            assignee_name: assignee_name
+            recurrence: none
+            bucket: overdue
+            completed_at: 2000-01-23T04:56:07.000+00:00
+            overdue_notified_at: 2000-01-23T04:56:07.000+00:00
+            escalated_at: 2000-01-23T04:56:07.000+00:00
+            updated_at: 2000-01-23T04:56:07.000+00:00
+            has_evidence: true
+            evidence_note: evidence_note
+            clause_excerpt: clause_excerpt
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            remind_days_before: 0
+            status: pending
+      properties:
+        data:
+          $ref: "#/components/schemas/completeContractObligation_200_response_data"
     listDocuments_200_response:
       example:
         data:
