@@ -54,6 +54,7 @@ api_purchases.go
 api_quotes.go
 api_realtime.go
 api_reservations.go
+api_resourcing.go
 api_saft.go
 api_series.go
 api_sites.go
@@ -73,6 +74,7 @@ model_access_grant.go
 model_access_grant_request.go
 model_add_delivery_route_stop_201_response.go
 model_add_gate_visit_weighing_200_response.go
+model_allocation_input.go
 model_article.go
 model_article_create.go
 model_attach_space_member_200_response.go

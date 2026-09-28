@@ -310,8 +310,10 @@ Class | Method | HTTP request | Description
 *ProjectsAPI* | [**CreateProject**](docs/ProjectsAPI.md#createproject) | **Post** /projects | Create a project
 *ProjectsAPI* | [**DeleteProject**](docs/ProjectsAPI.md#deleteproject) | **Delete** /projects/{id} | Delete a project
 *ProjectsAPI* | [**GetProject**](docs/ProjectsAPI.md#getproject) | **Get** /projects/{id} | Get a project
+*ProjectsAPI* | [**ListProjectAllocations**](docs/ProjectsAPI.md#listprojectallocations) | **Get** /projects/{id}/allocations | Project team with each person&#39;s org-wide weekly load vs capacity (L-R4-PROJ-07; scope: projects:read)
 *ProjectsAPI* | [**ListProjects**](docs/ProjectsAPI.md#listprojects) | **Get** /projects | List projects
 *ProjectsAPI* | [**UpdateProject**](docs/ProjectsAPI.md#updateproject) | **Patch** /projects/{id} | Update a project
+*ProjectsAPI* | [**UpdateProjectAllocation**](docs/ProjectsAPI.md#updateprojectallocation) | **Put** /projects/{id}/allocations | Book a person on the project for one ISO week; 0 hours clears; reports over_allocated (L-R4-PROJ-07; scope: projects:write)
 *ProspectingAPI* | [**CreateProspectingSavedSearch**](docs/ProspectingAPI.md#createprospectingsavedsearch) | **Post** /prospecting/saved-searches | Save a prospecting search. Counts toward the plan limit (402 PLAN_LIMIT_EXCEEDED). The row is attributed to the user who created the API key; 403 when the credential has no such member. Honours Idempotency-Key. (scope: prospecting:write)
 *ProspectingAPI* | [**DeleteProspectingSavedSearch**](docs/ProspectingAPI.md#deleteprospectingsavedsearch) | **Delete** /prospecting/saved-searches/{id} | Delete a saved prospecting search. Honours Idempotency-Key. (scope: prospecting:write)
 *ProspectingAPI* | [**GetProspectingSavedSearch**](docs/ProspectingAPI.md#getprospectingsavedsearch) | **Get** /prospecting/saved-searches/{id} | Get a saved prospecting search (scope: prospecting:read)
@@ -326,6 +328,7 @@ Class | Method | HTTP request | Description
 *RealtimeAPI* | [**ListRealtimeStream**](docs/RealtimeAPI.md#listrealtimestream) | **Get** /realtime/stream | Server-Sent Events stream of realtime org events (text/event-stream)
 *ReservationsAPI* | [**GetReservation**](docs/ReservationsAPI.md#getreservation) | **Get** /reservations/{id} | Get a hotel reservation
 *ReservationsAPI* | [**ListReservations**](docs/ReservationsAPI.md#listreservations) | **Get** /reservations | List hotel reservations (scope: reservations:read)
+*ResourcingAPI* | [**ListResourcing**](docs/ResourcingAPI.md#listresourcing) | **Get** /resourcing | People x ISO weeks across the org: allocated vs available hours, overage per week (L-R4-PROJ-07; scope: projects:read)
 *SaftAPI* | [**ApplySaftImport**](docs/SaftAPI.md#applysaftimport) | **Post** /saft/imports/{id}/apply | Apply a previewed SAF-T import: contacts, products, account links, opening stock and opening balances (one posted, immutable OP entry). 409 when already applied or opening balances are already posted. (scope: saft_import:write)
 *SaftAPI* | [**CreateSaftGeneration**](docs/SaftAPI.md#createsaftgeneration) | **Post** /saft/generations | Queue a SAF-T D406 generation on the worker (never rendered inline). 409 when the readiness pre-flight has blocking findings or a generation is already running; 503 when no worker is reachable. (scope: saft:write)
 *SaftAPI* | [**CreateSaftImport**](docs/SaftAPI.md#createsaftimport) | **Post** /saft/imports | Start a SAF-T D406 import (≤ 50 MB): returns a signed PUT URL to object storage; then call parse. 503 when object storage is not configured. (scope: saft_import:write)
@@ -385,6 +388,7 @@ Class | Method | HTTP request | Description
  - [AccessGrantRequest](docs/AccessGrantRequest.md)
  - [AddDeliveryRouteStop201Response](docs/AddDeliveryRouteStop201Response.md)
  - [AddGateVisitWeighing200Response](docs/AddGateVisitWeighing200Response.md)
+ - [AllocationInput](docs/AllocationInput.md)
  - [Article](docs/Article.md)
  - [ArticleCreate](docs/ArticleCreate.md)
  - [AttachSpaceMember200Response](docs/AttachSpaceMember200Response.md)

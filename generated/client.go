@@ -149,6 +149,8 @@ type APIClient struct {
 
 	ReservationsAPI *ReservationsAPIService
 
+	ResourcingAPI *ResourcingAPIService
+
 	SaftAPI *SaftAPIService
 
 	SeriesAPI *SeriesAPIService
@@ -240,6 +242,7 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.QuotesAPI = (*QuotesAPIService)(&c.common)
 	c.RealtimeAPI = (*RealtimeAPIService)(&c.common)
 	c.ReservationsAPI = (*ReservationsAPIService)(&c.common)
+	c.ResourcingAPI = (*ResourcingAPIService)(&c.common)
 	c.SaftAPI = (*SaftAPIService)(&c.common)
 	c.SeriesAPI = (*SeriesAPIService)(&c.common)
 	c.SitesAPI = (*SitesAPIService)(&c.common)

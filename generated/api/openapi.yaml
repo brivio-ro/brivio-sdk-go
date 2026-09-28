@@ -1421,6 +1421,114 @@ paths:
       summary: Update a project
       tags:
       - projects
+  /projects/{id}/allocations:
+    get:
+      operationId: listProjectAllocations
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: "Any date in the first ISO week (default: today)"
+        explode: true
+        in: query
+        name: from
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: weeks
+        required: false
+        schema:
+          default: 12
+          maximum: 26
+          minimum: 1
+          type: integer
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Project team with each person's org-wide weekly load vs capacity (L-R4-PROJ-07;\
+        \ scope: projects:read)"
+      tags:
+      - projects
+    put:
+      operationId: updateProjectAllocation
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AllocationInput"
+        required: true
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Book a person on the project for one ISO week; 0 hours clears; reports\
+        \ over_allocated (L-R4-PROJ-07; scope: projects:write)"
+      tags:
+      - projects
+  /resourcing:
+    get:
+      operationId: listResourcing
+      parameters:
+      - description: "Any date in the first ISO week (default: today)"
+        explode: true
+        in: query
+        name: from
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: weeks
+        required: false
+        schema:
+          default: 12
+          maximum: 26
+          minimum: 1
+          type: integer
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "People x ISO weeks across the org: allocated vs available hours, overage\
+        \ per week (L-R4-PROJ-07; scope: projects:read)"
+      tags:
+      - resourcing
   /quotes:
     get:
       operationId: listQuotes
@@ -12068,6 +12176,37 @@ components:
         updated_at:
           format: date-time
           type: string
+    AllocationInput:
+      description: One person on one project for one ISO week (L-R4-PROJ-07).
+      example:
+        note: note
+        role: role
+        user_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        week_start: 2000-01-23
+        allocated_hours: 13.453913599744993
+      properties:
+        user_id:
+          format: uuid
+          type: string
+        week_start:
+          description: Any date in the week; normalised to its Monday
+          format: date
+          type: string
+        allocated_hours:
+          description: 0 clears the cell
+          maximum: 168
+          minimum: 0
+          type: number
+        role:
+          type: string
+          nullable: true
+        note:
+          type: string
+          nullable: true
+      required:
+      - allocated_hours
+      - user_id
+      - week_start
     Project:
       example:
         name: name
