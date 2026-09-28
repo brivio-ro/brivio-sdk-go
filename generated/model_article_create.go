@@ -25,6 +25,13 @@ type ArticleCreate struct {
 	Name string `json:"name"`
 	DefaultPrice *float32 `json:"default_price,omitempty"`
 	VatRate *float32 `json:"vat_rate,omitempty"`
+	BundleDiscountPercent *float32 `json:"bundle_discount_percent,omitempty"`
+	BundleCompositeSupply *bool `json:"bundle_composite_supply,omitempty"`
+	BundlePrincipalComponentId *string `json:"bundle_principal_component_id,omitempty"`
+	BundleReturnPolicy *string `json:"bundle_return_policy,omitempty"`
+	BundleValidFrom *string `json:"bundle_valid_from,omitempty"`
+	BundleValidTo *string `json:"bundle_valid_to,omitempty"`
+	ExplodeOnInvoice *bool `json:"explode_on_invoice,omitempty"`
 }
 
 type _ArticleCreate ArticleCreate
@@ -167,6 +174,230 @@ func (o *ArticleCreate) SetVatRate(v float32) {
 	o.VatRate = &v
 }
 
+// GetBundleDiscountPercent returns the BundleDiscountPercent field value if set, zero value otherwise.
+func (o *ArticleCreate) GetBundleDiscountPercent() float32 {
+	if o == nil || IsNil(o.BundleDiscountPercent) {
+		var ret float32
+		return ret
+	}
+	return *o.BundleDiscountPercent
+}
+
+// GetBundleDiscountPercentOk returns a tuple with the BundleDiscountPercent field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ArticleCreate) GetBundleDiscountPercentOk() (*float32, bool) {
+	if o == nil || IsNil(o.BundleDiscountPercent) {
+		return nil, false
+	}
+	return o.BundleDiscountPercent, true
+}
+
+// HasBundleDiscountPercent returns a boolean if a field has been set.
+func (o *ArticleCreate) HasBundleDiscountPercent() bool {
+	if o != nil && !IsNil(o.BundleDiscountPercent) {
+		return true
+	}
+
+	return false
+}
+
+// SetBundleDiscountPercent gets a reference to the given float32 and assigns it to the BundleDiscountPercent field.
+func (o *ArticleCreate) SetBundleDiscountPercent(v float32) {
+	o.BundleDiscountPercent = &v
+}
+
+// GetBundleCompositeSupply returns the BundleCompositeSupply field value if set, zero value otherwise.
+func (o *ArticleCreate) GetBundleCompositeSupply() bool {
+	if o == nil || IsNil(o.BundleCompositeSupply) {
+		var ret bool
+		return ret
+	}
+	return *o.BundleCompositeSupply
+}
+
+// GetBundleCompositeSupplyOk returns a tuple with the BundleCompositeSupply field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ArticleCreate) GetBundleCompositeSupplyOk() (*bool, bool) {
+	if o == nil || IsNil(o.BundleCompositeSupply) {
+		return nil, false
+	}
+	return o.BundleCompositeSupply, true
+}
+
+// HasBundleCompositeSupply returns a boolean if a field has been set.
+func (o *ArticleCreate) HasBundleCompositeSupply() bool {
+	if o != nil && !IsNil(o.BundleCompositeSupply) {
+		return true
+	}
+
+	return false
+}
+
+// SetBundleCompositeSupply gets a reference to the given bool and assigns it to the BundleCompositeSupply field.
+func (o *ArticleCreate) SetBundleCompositeSupply(v bool) {
+	o.BundleCompositeSupply = &v
+}
+
+// GetBundlePrincipalComponentId returns the BundlePrincipalComponentId field value if set, zero value otherwise.
+func (o *ArticleCreate) GetBundlePrincipalComponentId() string {
+	if o == nil || IsNil(o.BundlePrincipalComponentId) {
+		var ret string
+		return ret
+	}
+	return *o.BundlePrincipalComponentId
+}
+
+// GetBundlePrincipalComponentIdOk returns a tuple with the BundlePrincipalComponentId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ArticleCreate) GetBundlePrincipalComponentIdOk() (*string, bool) {
+	if o == nil || IsNil(o.BundlePrincipalComponentId) {
+		return nil, false
+	}
+	return o.BundlePrincipalComponentId, true
+}
+
+// HasBundlePrincipalComponentId returns a boolean if a field has been set.
+func (o *ArticleCreate) HasBundlePrincipalComponentId() bool {
+	if o != nil && !IsNil(o.BundlePrincipalComponentId) {
+		return true
+	}
+
+	return false
+}
+
+// SetBundlePrincipalComponentId gets a reference to the given string and assigns it to the BundlePrincipalComponentId field.
+func (o *ArticleCreate) SetBundlePrincipalComponentId(v string) {
+	o.BundlePrincipalComponentId = &v
+}
+
+// GetBundleReturnPolicy returns the BundleReturnPolicy field value if set, zero value otherwise.
+func (o *ArticleCreate) GetBundleReturnPolicy() string {
+	if o == nil || IsNil(o.BundleReturnPolicy) {
+		var ret string
+		return ret
+	}
+	return *o.BundleReturnPolicy
+}
+
+// GetBundleReturnPolicyOk returns a tuple with the BundleReturnPolicy field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ArticleCreate) GetBundleReturnPolicyOk() (*string, bool) {
+	if o == nil || IsNil(o.BundleReturnPolicy) {
+		return nil, false
+	}
+	return o.BundleReturnPolicy, true
+}
+
+// HasBundleReturnPolicy returns a boolean if a field has been set.
+func (o *ArticleCreate) HasBundleReturnPolicy() bool {
+	if o != nil && !IsNil(o.BundleReturnPolicy) {
+		return true
+	}
+
+	return false
+}
+
+// SetBundleReturnPolicy gets a reference to the given string and assigns it to the BundleReturnPolicy field.
+func (o *ArticleCreate) SetBundleReturnPolicy(v string) {
+	o.BundleReturnPolicy = &v
+}
+
+// GetBundleValidFrom returns the BundleValidFrom field value if set, zero value otherwise.
+func (o *ArticleCreate) GetBundleValidFrom() string {
+	if o == nil || IsNil(o.BundleValidFrom) {
+		var ret string
+		return ret
+	}
+	return *o.BundleValidFrom
+}
+
+// GetBundleValidFromOk returns a tuple with the BundleValidFrom field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ArticleCreate) GetBundleValidFromOk() (*string, bool) {
+	if o == nil || IsNil(o.BundleValidFrom) {
+		return nil, false
+	}
+	return o.BundleValidFrom, true
+}
+
+// HasBundleValidFrom returns a boolean if a field has been set.
+func (o *ArticleCreate) HasBundleValidFrom() bool {
+	if o != nil && !IsNil(o.BundleValidFrom) {
+		return true
+	}
+
+	return false
+}
+
+// SetBundleValidFrom gets a reference to the given string and assigns it to the BundleValidFrom field.
+func (o *ArticleCreate) SetBundleValidFrom(v string) {
+	o.BundleValidFrom = &v
+}
+
+// GetBundleValidTo returns the BundleValidTo field value if set, zero value otherwise.
+func (o *ArticleCreate) GetBundleValidTo() string {
+	if o == nil || IsNil(o.BundleValidTo) {
+		var ret string
+		return ret
+	}
+	return *o.BundleValidTo
+}
+
+// GetBundleValidToOk returns a tuple with the BundleValidTo field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ArticleCreate) GetBundleValidToOk() (*string, bool) {
+	if o == nil || IsNil(o.BundleValidTo) {
+		return nil, false
+	}
+	return o.BundleValidTo, true
+}
+
+// HasBundleValidTo returns a boolean if a field has been set.
+func (o *ArticleCreate) HasBundleValidTo() bool {
+	if o != nil && !IsNil(o.BundleValidTo) {
+		return true
+	}
+
+	return false
+}
+
+// SetBundleValidTo gets a reference to the given string and assigns it to the BundleValidTo field.
+func (o *ArticleCreate) SetBundleValidTo(v string) {
+	o.BundleValidTo = &v
+}
+
+// GetExplodeOnInvoice returns the ExplodeOnInvoice field value if set, zero value otherwise.
+func (o *ArticleCreate) GetExplodeOnInvoice() bool {
+	if o == nil || IsNil(o.ExplodeOnInvoice) {
+		var ret bool
+		return ret
+	}
+	return *o.ExplodeOnInvoice
+}
+
+// GetExplodeOnInvoiceOk returns a tuple with the ExplodeOnInvoice field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ArticleCreate) GetExplodeOnInvoiceOk() (*bool, bool) {
+	if o == nil || IsNil(o.ExplodeOnInvoice) {
+		return nil, false
+	}
+	return o.ExplodeOnInvoice, true
+}
+
+// HasExplodeOnInvoice returns a boolean if a field has been set.
+func (o *ArticleCreate) HasExplodeOnInvoice() bool {
+	if o != nil && !IsNil(o.ExplodeOnInvoice) {
+		return true
+	}
+
+	return false
+}
+
+// SetExplodeOnInvoice gets a reference to the given bool and assigns it to the ExplodeOnInvoice field.
+func (o *ArticleCreate) SetExplodeOnInvoice(v bool) {
+	o.ExplodeOnInvoice = &v
+}
+
 func (o ArticleCreate) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -186,6 +417,27 @@ func (o ArticleCreate) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.VatRate) {
 		toSerialize["vat_rate"] = o.VatRate
+	}
+	if !IsNil(o.BundleDiscountPercent) {
+		toSerialize["bundle_discount_percent"] = o.BundleDiscountPercent
+	}
+	if !IsNil(o.BundleCompositeSupply) {
+		toSerialize["bundle_composite_supply"] = o.BundleCompositeSupply
+	}
+	if !IsNil(o.BundlePrincipalComponentId) {
+		toSerialize["bundle_principal_component_id"] = o.BundlePrincipalComponentId
+	}
+	if !IsNil(o.BundleReturnPolicy) {
+		toSerialize["bundle_return_policy"] = o.BundleReturnPolicy
+	}
+	if !IsNil(o.BundleValidFrom) {
+		toSerialize["bundle_valid_from"] = o.BundleValidFrom
+	}
+	if !IsNil(o.BundleValidTo) {
+		toSerialize["bundle_valid_to"] = o.BundleValidTo
+	}
+	if !IsNil(o.ExplodeOnInvoice) {
+		toSerialize["explode_on_invoice"] = o.ExplodeOnInvoice
 	}
 	return toSerialize, nil
 }

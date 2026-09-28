@@ -95,9 +95,11 @@ Class | Method | HTTP request | Description
 *ArticlesAPI* | [**CreateArticleSync**](docs/ArticlesAPI.md#createarticlesync) | **Post** /articles/sync | Upsert articles by external_id (idempotent bulk sync, ADR-0212; scope: articles:write)
 *ArticlesAPI* | [**DeleteArticle**](docs/ArticlesAPI.md#deletearticle) | **Delete** /articles/{id} | Delete a article
 *ArticlesAPI* | [**GetArticle**](docs/ArticlesAPI.md#getarticle) | **Get** /articles/{id} | Get a article
+*ArticlesAPI* | [**ListArticleComponents**](docs/ArticlesAPI.md#listarticlecomponents) | **Get** /articles/{id}/components | List a bundle&#39;s components (ADR-0225; scope: articles:read)
 *ArticlesAPI* | [**ListArticlePrices**](docs/ArticlesAPI.md#listarticleprices) | **Get** /articles/{id}/prices | List an article&#39;s prices (scope: articles:read)
 *ArticlesAPI* | [**ListArticles**](docs/ArticlesAPI.md#listarticles) | **Get** /articles | List articles
 *ArticlesAPI* | [**UpdateArticle**](docs/ArticlesAPI.md#updatearticle) | **Patch** /articles/{id} | Update a article
+*ArticlesAPI* | [**UpdateArticleComponent**](docs/ArticlesAPI.md#updatearticlecomponent) | **Put** /articles/{id}/components | Replace a bundle&#39;s components — no nesting, no duplicates (ADR-0225; scope: articles:write)
 *BankingAPI* | [**CreateBankingRule**](docs/BankingAPI.md#createbankingrule) | **Post** /banking/rules | Create a bank rule. At least one condition and one action are required; a new rule goes last in priority. (scope: banking:write)
 *BankingAPI* | [**CreateBankingStatementImport**](docs/BankingAPI.md#createbankingstatementimport) | **Post** /banking/statements/import | Import a bank statement file (csv, mt940, mt942, camt052/053/054, ofx). Parses, de-duplicates against previously imported lines, auto-matches open invoices and applies bank rules. Re-importing the same file is a safe no-op. Honours Idempotency-Key. (scope: banking:write)
 *BankingAPI* | [**DeleteBankingRule**](docs/BankingAPI.md#deletebankingrule) | **Delete** /banking/rules/{id} | Delete a bank rule (scope: banking:write)
@@ -388,6 +390,8 @@ Class | Method | HTTP request | Description
  - [AttachSpaceMember200Response](docs/AttachSpaceMember200Response.md)
  - [AttachSpaceMember200ResponseData](docs/AttachSpaceMember200ResponseData.md)
  - [BankRuleInput](docs/BankRuleInput.md)
+ - [BundleComponent](docs/BundleComponent.md)
+ - [BundleSettings](docs/BundleSettings.md)
  - [CancelPaymentLink200Response](docs/CancelPaymentLink200Response.md)
  - [CompleteContractObligation200Response](docs/CompleteContractObligation200Response.md)
  - [CompleteContractObligation200ResponseData](docs/CompleteContractObligation200ResponseData.md)
@@ -668,6 +672,7 @@ Class | Method | HTTP request | Description
  - [TripSheet](docs/TripSheet.md)
  - [TripSheetCreate](docs/TripSheetCreate.md)
  - [UnmatchBankingTransactionRequest](docs/UnmatchBankingTransactionRequest.md)
+ - [UpdateArticleComponentRequest](docs/UpdateArticleComponentRequest.md)
  - [UsageSubscriptionRequest](docs/UsageSubscriptionRequest.md)
  - [VerifyEmailDomain200Response](docs/VerifyEmailDomain200Response.md)
  - [WebhookDelivery](docs/WebhookDelivery.md)

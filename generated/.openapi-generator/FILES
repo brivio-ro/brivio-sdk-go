@@ -78,6 +78,8 @@ model_article_create.go
 model_attach_space_member_200_response.go
 model_attach_space_member_200_response_data.go
 model_bank_rule_input.go
+model_bundle_component.go
+model_bundle_settings.go
 model_cancel_payment_link_200_response.go
 model_complete_contract_obligation_200_response.go
 model_complete_contract_obligation_200_response_data.go
@@ -358,6 +360,7 @@ model_time_entry.go
 model_trip_sheet.go
 model_trip_sheet_create.go
 model_unmatch_banking_transaction_request.go
+model_update_article_component_request.go
 model_usage_subscription_request.go
 model_verify_email_domain_200_response.go
 model_webhook_delivery.go

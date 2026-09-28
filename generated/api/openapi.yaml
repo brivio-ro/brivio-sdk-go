@@ -667,6 +667,58 @@ paths:
         \ articles:write)"
       tags:
       - articles
+  /articles/{id}/components:
+    get:
+      operationId: listArticleComponents
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List a bundle's components (ADR-0225; scope: articles:read)"
+      tags:
+      - articles
+    put:
+      operationId: updateArticleComponent
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/updateArticleComponent_request"
+        required: true
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Replace a bundle's components — no nesting, no duplicates (ADR-0225;\
+        \ scope: articles:write)"
+      tags:
+      - articles
   /articles/{id}/prices/sync:
     post:
       operationId: createArticlePriceSync
@@ -11477,6 +11529,14 @@ components:
         currency: currency
         id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         type: PRODUCT
+        bundle:
+          valid_to: 2000-01-23
+          return_policy: per_component
+          explode_on_invoice: true
+          valid_from: 2000-01-23
+          discount_percent: discount_percent
+          composite_supply: true
+          principal_component_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         vat_rate: vat_rate
       properties:
         id:
@@ -11486,6 +11546,7 @@ components:
           enum:
           - PRODUCT
           - SERVICE
+          - BUNDLE
           type: string
         name:
           type: string
@@ -11498,10 +11559,74 @@ components:
           type: string
         vat_rate:
           type: string
+        bundle:
+          $ref: "#/components/schemas/BundleSettings"
+    BundleSettings:
+      description: "Kit settings (type=BUNDLE only, ADR-0225)."
+      example:
+        valid_to: 2000-01-23
+        return_policy: per_component
+        explode_on_invoice: true
+        valid_from: 2000-01-23
+        discount_percent: discount_percent
+        composite_supply: true
+        principal_component_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        discount_percent:
+          type: string
+          nullable: true
+        composite_supply:
+          type: boolean
+        principal_component_id:
+          format: uuid
+          type: string
+          nullable: true
+        return_policy:
+          enum:
+          - per_component
+          - whole_only
+          type: string
+        valid_from:
+          format: date
+          type: string
+          nullable: true
+        valid_to:
+          format: date
+          type: string
+          nullable: true
+        explode_on_invoice:
+          type: boolean
+    BundleComponent:
+      properties:
+        component_article_id:
+          format: uuid
+          type: string
+        quantity:
+          type: number
+        is_optional:
+          type: boolean
+        option_group:
+          type: string
+          nullable: true
+        substitutes:
+          items:
+            format: uuid
+            type: string
+          type: array
+      required:
+      - component_article_id
+      - quantity
     ArticleCreate:
       example:
+        bundle_valid_from: 2000-01-23
+        bundle_discount_percent: 1.4658129805029452
+        bundle_composite_supply: true
+        bundle_principal_component_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         default_price: 0.8008281904610115
         name: name
+        explode_on_invoice: true
+        bundle_return_policy: per_component
+        bundle_valid_to: 2000-01-23
         type: PRODUCT
         vat_rate: 6.027456183070403
       properties:
@@ -11509,6 +11634,7 @@ components:
           enum:
           - PRODUCT
           - SERVICE
+          - BUNDLE
           type: string
         name:
           type: string
@@ -11516,6 +11642,30 @@ components:
           type: number
         vat_rate:
           type: number
+        bundle_discount_percent:
+          type: number
+          nullable: true
+        bundle_composite_supply:
+          type: boolean
+        bundle_principal_component_id:
+          format: uuid
+          type: string
+          nullable: true
+        bundle_return_policy:
+          enum:
+          - per_component
+          - whole_only
+          type: string
+        bundle_valid_from:
+          format: date
+          type: string
+          nullable: true
+        bundle_valid_to:
+          format: date
+          type: string
+          nullable: true
+        explode_on_invoice:
+          type: boolean
       required:
       - name
     Invoice:
@@ -18690,6 +18840,14 @@ components:
           currency: currency
           id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: PRODUCT
+          bundle:
+            valid_to: 2000-01-23
+            return_policy: per_component
+            explode_on_invoice: true
+            valid_from: 2000-01-23
+            discount_percent: discount_percent
+            composite_supply: true
+            principal_component_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           vat_rate: vat_rate
         - unit: unit
           default_price: default_price
@@ -18697,6 +18855,14 @@ components:
           currency: currency
           id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: PRODUCT
+          bundle:
+            valid_to: 2000-01-23
+            return_policy: per_component
+            explode_on_invoice: true
+            valid_from: 2000-01-23
+            discount_percent: discount_percent
+            composite_supply: true
+            principal_component_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           vat_rate: vat_rate
         meta:
           nextCursor: nextCursor
@@ -18726,6 +18892,14 @@ components:
           currency: currency
           id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: PRODUCT
+          bundle:
+            valid_to: 2000-01-23
+            return_policy: per_component
+            explode_on_invoice: true
+            valid_from: 2000-01-23
+            discount_percent: discount_percent
+            composite_supply: true
+            principal_component_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           vat_rate: vat_rate
         error: ""
       properties:
@@ -18736,6 +18910,14 @@ components:
       required:
       - data
       - error
+    updateArticleComponent_request:
+      properties:
+        components:
+          items:
+            $ref: "#/components/schemas/BundleComponent"
+          type: array
+      required:
+      - components
     listInvoices_200_response:
       example:
         data:
