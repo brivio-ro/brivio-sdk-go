@@ -390,7 +390,7 @@ type ApiDeleteSpaceRequest struct {
 	id string
 }
 
-func (r ApiDeleteSpaceRequest) Execute() (*DeleteSpace200Response, *http.Response, error) {
+func (r ApiDeleteSpaceRequest) Execute() (*DeleteProspectingSavedSearch200Response, *http.Response, error) {
 	return r.ApiService.DeleteSpaceExecute(r)
 }
 
@@ -410,13 +410,13 @@ func (a *SpacesAPIService) DeleteSpace(ctx context.Context, id string) ApiDelete
 }
 
 // Execute executes the request
-//  @return DeleteSpace200Response
-func (a *SpacesAPIService) DeleteSpaceExecute(r ApiDeleteSpaceRequest) (*DeleteSpace200Response, *http.Response, error) {
+//  @return DeleteProspectingSavedSearch200Response
+func (a *SpacesAPIService) DeleteSpaceExecute(r ApiDeleteSpaceRequest) (*DeleteProspectingSavedSearch200Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodDelete
 		localVarPostBody     interface{}
 		formFiles            []formFile
-		localVarReturnValue  *DeleteSpace200Response
+		localVarReturnValue  *DeleteProspectingSavedSearch200Response
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SpacesAPIService.DeleteSpace")

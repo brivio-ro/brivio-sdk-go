@@ -16,40 +16,40 @@ import (
 	"fmt"
 )
 
-// checks if the DeleteSpace200Response type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &DeleteSpace200Response{}
+// checks if the CreateImport202Response type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &CreateImport202Response{}
 
-// DeleteSpace200Response struct for DeleteSpace200Response
-type DeleteSpace200Response struct {
-	Data DeleteSpace200ResponseData `json:"data"`
+// CreateImport202Response struct for CreateImport202Response
+type CreateImport202Response struct {
+	Data ImportJob `json:"data"`
 	Error interface{} `json:"error"`
 }
 
-type _DeleteSpace200Response DeleteSpace200Response
+type _CreateImport202Response CreateImport202Response
 
-// NewDeleteSpace200Response instantiates a new DeleteSpace200Response object
+// NewCreateImport202Response instantiates a new CreateImport202Response object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewDeleteSpace200Response(data DeleteSpace200ResponseData, error_ interface{}) *DeleteSpace200Response {
-	this := DeleteSpace200Response{}
+func NewCreateImport202Response(data ImportJob, error_ interface{}) *CreateImport202Response {
+	this := CreateImport202Response{}
 	this.Data = data
 	this.Error = error_
 	return &this
 }
 
-// NewDeleteSpace200ResponseWithDefaults instantiates a new DeleteSpace200Response object
+// NewCreateImport202ResponseWithDefaults instantiates a new CreateImport202Response object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewDeleteSpace200ResponseWithDefaults() *DeleteSpace200Response {
-	this := DeleteSpace200Response{}
+func NewCreateImport202ResponseWithDefaults() *CreateImport202Response {
+	this := CreateImport202Response{}
 	return &this
 }
 
 // GetData returns the Data field value
-func (o *DeleteSpace200Response) GetData() DeleteSpace200ResponseData {
+func (o *CreateImport202Response) GetData() ImportJob {
 	if o == nil {
-		var ret DeleteSpace200ResponseData
+		var ret ImportJob
 		return ret
 	}
 
@@ -58,7 +58,7 @@ func (o *DeleteSpace200Response) GetData() DeleteSpace200ResponseData {
 
 // GetDataOk returns a tuple with the Data field value
 // and a boolean to check if the value has been set.
-func (o *DeleteSpace200Response) GetDataOk() (*DeleteSpace200ResponseData, bool) {
+func (o *CreateImport202Response) GetDataOk() (*ImportJob, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -66,13 +66,13 @@ func (o *DeleteSpace200Response) GetDataOk() (*DeleteSpace200ResponseData, bool)
 }
 
 // SetData sets field value
-func (o *DeleteSpace200Response) SetData(v DeleteSpace200ResponseData) {
+func (o *CreateImport202Response) SetData(v ImportJob) {
 	o.Data = v
 }
 
 // GetError returns the Error field value
 // If the value is explicit nil, the zero value for interface{} will be returned
-func (o *DeleteSpace200Response) GetError() interface{} {
+func (o *CreateImport202Response) GetError() interface{} {
 	if o == nil {
 		var ret interface{}
 		return ret
@@ -84,7 +84,7 @@ func (o *DeleteSpace200Response) GetError() interface{} {
 // GetErrorOk returns a tuple with the Error field value
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
-func (o *DeleteSpace200Response) GetErrorOk() (*interface{}, bool) {
+func (o *CreateImport202Response) GetErrorOk() (*interface{}, bool) {
 	if o == nil || IsNil(o.Error) {
 		return nil, false
 	}
@@ -92,11 +92,11 @@ func (o *DeleteSpace200Response) GetErrorOk() (*interface{}, bool) {
 }
 
 // SetError sets field value
-func (o *DeleteSpace200Response) SetError(v interface{}) {
+func (o *CreateImport202Response) SetError(v interface{}) {
 	o.Error = v
 }
 
-func (o DeleteSpace200Response) MarshalJSON() ([]byte, error) {
+func (o CreateImport202Response) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -104,7 +104,7 @@ func (o DeleteSpace200Response) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o DeleteSpace200Response) ToMap() (map[string]interface{}, error) {
+func (o CreateImport202Response) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["data"] = o.Data
 	if o.Error != nil {
@@ -113,7 +113,7 @@ func (o DeleteSpace200Response) ToMap() (map[string]interface{}, error) {
 	return toSerialize, nil
 }
 
-func (o *DeleteSpace200Response) UnmarshalJSON(data []byte) (err error) {
+func (o *CreateImport202Response) UnmarshalJSON(data []byte) (err error) {
 	// This validates that all required properties are included in the JSON object
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
@@ -136,53 +136,53 @@ func (o *DeleteSpace200Response) UnmarshalJSON(data []byte) (err error) {
 		}
 	}
 
-	varDeleteSpace200Response := _DeleteSpace200Response{}
+	varCreateImport202Response := _CreateImport202Response{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varDeleteSpace200Response)
+	err = decoder.Decode(&varCreateImport202Response)
 
 	if err != nil {
 		return err
 	}
 
-	*o = DeleteSpace200Response(varDeleteSpace200Response)
+	*o = CreateImport202Response(varCreateImport202Response)
 
 	return err
 }
 
-type NullableDeleteSpace200Response struct {
-	value *DeleteSpace200Response
+type NullableCreateImport202Response struct {
+	value *CreateImport202Response
 	isSet bool
 }
 
-func (v NullableDeleteSpace200Response) Get() *DeleteSpace200Response {
+func (v NullableCreateImport202Response) Get() *CreateImport202Response {
 	return v.value
 }
 
-func (v *NullableDeleteSpace200Response) Set(val *DeleteSpace200Response) {
+func (v *NullableCreateImport202Response) Set(val *CreateImport202Response) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableDeleteSpace200Response) IsSet() bool {
+func (v NullableCreateImport202Response) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableDeleteSpace200Response) Unset() {
+func (v *NullableCreateImport202Response) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableDeleteSpace200Response(val *DeleteSpace200Response) *NullableDeleteSpace200Response {
-	return &NullableDeleteSpace200Response{value: val, isSet: true}
+func NewNullableCreateImport202Response(val *CreateImport202Response) *NullableCreateImport202Response {
+	return &NullableCreateImport202Response{value: val, isSet: true}
 }
 
-func (v NullableDeleteSpace200Response) MarshalJSON() ([]byte, error) {
+func (v NullableCreateImport202Response) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableDeleteSpace200Response) UnmarshalJSON(src []byte) error {
+func (v *NullableCreateImport202Response) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

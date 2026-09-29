@@ -26,6 +26,7 @@ type Article struct {
 	Currency *string `json:"currency,omitempty"`
 	Unit *string `json:"unit,omitempty"`
 	VatRate *string `json:"vat_rate,omitempty"`
+	Bundle *BundleSettings `json:"bundle,omitempty"`
 }
 
 // NewArticle instantiates a new Article object
@@ -269,6 +270,38 @@ func (o *Article) SetVatRate(v string) {
 	o.VatRate = &v
 }
 
+// GetBundle returns the Bundle field value if set, zero value otherwise.
+func (o *Article) GetBundle() BundleSettings {
+	if o == nil || IsNil(o.Bundle) {
+		var ret BundleSettings
+		return ret
+	}
+	return *o.Bundle
+}
+
+// GetBundleOk returns a tuple with the Bundle field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Article) GetBundleOk() (*BundleSettings, bool) {
+	if o == nil || IsNil(o.Bundle) {
+		return nil, false
+	}
+	return o.Bundle, true
+}
+
+// HasBundle returns a boolean if a field has been set.
+func (o *Article) HasBundle() bool {
+	if o != nil && !IsNil(o.Bundle) {
+		return true
+	}
+
+	return false
+}
+
+// SetBundle gets a reference to the given BundleSettings and assigns it to the Bundle field.
+func (o *Article) SetBundle(v BundleSettings) {
+	o.Bundle = &v
+}
+
 func (o Article) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -299,6 +332,9 @@ func (o Article) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.VatRate) {
 		toSerialize["vat_rate"] = o.VatRate
+	}
+	if !IsNil(o.Bundle) {
+		toSerialize["bundle"] = o.Bundle
 	}
 	return toSerialize, nil
 }

@@ -61,6 +61,8 @@ type APIClient struct {
 
 	BookingsAPI *BookingsAPIService
 
+	CabinetAPI *CabinetAPIService
+
 	CatalogAPI *CatalogAPIService
 
 	CommsAPI *CommsAPIService
@@ -75,9 +77,13 @@ type APIClient struct {
 
 	ContactsAPI *ContactsAPIService
 
+	ContractObligationsAPI *ContractObligationsAPIService
+
 	ContractsAPI *ContractsAPIService
 
 	CustomersAPI *CustomersAPIService
+
+	DeliveryRoutesAPI *DeliveryRoutesAPIService
 
 	DnsAPI *DnsAPIService
 
@@ -85,15 +91,31 @@ type APIClient struct {
 
 	DomainsAPI *DomainsAPIService
 
+	EmailAPI *EmailAPIService
+
+	EmailDomainsAPI *EmailDomainsAPIService
+
+	EmailsAPI *EmailsAPIService
+
 	ExpensesAPI *ExpensesAPIService
+
+	ExportsAPI *ExportsAPIService
 
 	FixedAssetsAPI *FixedAssetsAPIService
 
+	FleetAPI *FleetAPIService
+
+	GateAPI *GateAPIService
+
 	HrAPI *HrAPIService
+
+	ImportsAPI *ImportsAPIService
 
 	InventoryAPI *InventoryAPIService
 
 	InvoicesAPI *InvoicesAPIService
+
+	LegalAPI *LegalAPIService
 
 	LocationsAPI *LocationsAPIService
 
@@ -117,11 +139,19 @@ type APIClient struct {
 
 	ProjectsAPI *ProjectsAPIService
 
+	ProspectingAPI *ProspectingAPIService
+
+	PurchasesAPI *PurchasesAPIService
+
 	QuotesAPI *QuotesAPIService
 
 	RealtimeAPI *RealtimeAPIService
 
 	ReservationsAPI *ReservationsAPIService
+
+	ResourcingAPI *ResourcingAPIService
+
+	SaftAPI *SaftAPIService
 
 	SeriesAPI *SeriesAPIService
 
@@ -137,7 +167,11 @@ type APIClient struct {
 
 	TimeEntriesAPI *TimeEntriesAPIService
 
+	TripSheetsAPI *TripSheetsAPIService
+
 	TrustAPI *TrustAPIService
+
+	VehiclesAPI *VehiclesAPIService
 
 	WebhooksAPI *WebhooksAPIService
 }
@@ -164,6 +198,7 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.ArticlesAPI = (*ArticlesAPIService)(&c.common)
 	c.BankingAPI = (*BankingAPIService)(&c.common)
 	c.BookingsAPI = (*BookingsAPIService)(&c.common)
+	c.CabinetAPI = (*CabinetAPIService)(&c.common)
 	c.CatalogAPI = (*CatalogAPIService)(&c.common)
 	c.CommsAPI = (*CommsAPIService)(&c.common)
 	c.CompaniesAPI = (*CompaniesAPIService)(&c.common)
@@ -171,16 +206,26 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.ConnectAPI = (*ConnectAPIService)(&c.common)
 	c.ConstructionAPI = (*ConstructionAPIService)(&c.common)
 	c.ContactsAPI = (*ContactsAPIService)(&c.common)
+	c.ContractObligationsAPI = (*ContractObligationsAPIService)(&c.common)
 	c.ContractsAPI = (*ContractsAPIService)(&c.common)
 	c.CustomersAPI = (*CustomersAPIService)(&c.common)
+	c.DeliveryRoutesAPI = (*DeliveryRoutesAPIService)(&c.common)
 	c.DnsAPI = (*DnsAPIService)(&c.common)
 	c.DocumentsAPI = (*DocumentsAPIService)(&c.common)
 	c.DomainsAPI = (*DomainsAPIService)(&c.common)
+	c.EmailAPI = (*EmailAPIService)(&c.common)
+	c.EmailDomainsAPI = (*EmailDomainsAPIService)(&c.common)
+	c.EmailsAPI = (*EmailsAPIService)(&c.common)
 	c.ExpensesAPI = (*ExpensesAPIService)(&c.common)
+	c.ExportsAPI = (*ExportsAPIService)(&c.common)
 	c.FixedAssetsAPI = (*FixedAssetsAPIService)(&c.common)
+	c.FleetAPI = (*FleetAPIService)(&c.common)
+	c.GateAPI = (*GateAPIService)(&c.common)
 	c.HrAPI = (*HrAPIService)(&c.common)
+	c.ImportsAPI = (*ImportsAPIService)(&c.common)
 	c.InventoryAPI = (*InventoryAPIService)(&c.common)
 	c.InvoicesAPI = (*InvoicesAPIService)(&c.common)
+	c.LegalAPI = (*LegalAPIService)(&c.common)
 	c.LocationsAPI = (*LocationsAPIService)(&c.common)
 	c.MarketingAPI = (*MarketingAPIService)(&c.common)
 	c.MeAPI = (*MeAPIService)(&c.common)
@@ -192,9 +237,13 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.PaymentsAPI = (*PaymentsAPIService)(&c.common)
 	c.PayoutsAPI = (*PayoutsAPIService)(&c.common)
 	c.ProjectsAPI = (*ProjectsAPIService)(&c.common)
+	c.ProspectingAPI = (*ProspectingAPIService)(&c.common)
+	c.PurchasesAPI = (*PurchasesAPIService)(&c.common)
 	c.QuotesAPI = (*QuotesAPIService)(&c.common)
 	c.RealtimeAPI = (*RealtimeAPIService)(&c.common)
 	c.ReservationsAPI = (*ReservationsAPIService)(&c.common)
+	c.ResourcingAPI = (*ResourcingAPIService)(&c.common)
+	c.SaftAPI = (*SaftAPIService)(&c.common)
 	c.SeriesAPI = (*SeriesAPIService)(&c.common)
 	c.SitesAPI = (*SitesAPIService)(&c.common)
 	c.SpaceTransfersAPI = (*SpaceTransfersAPIService)(&c.common)
@@ -202,7 +251,9 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.SubscriptionsAPI = (*SubscriptionsAPIService)(&c.common)
 	c.TaxesAPI = (*TaxesAPIService)(&c.common)
 	c.TimeEntriesAPI = (*TimeEntriesAPIService)(&c.common)
+	c.TripSheetsAPI = (*TripSheetsAPIService)(&c.common)
 	c.TrustAPI = (*TrustAPIService)(&c.common)
+	c.VehiclesAPI = (*VehiclesAPIService)(&c.common)
 	c.WebhooksAPI = (*WebhooksAPIService)(&c.common)
 
 	return c
