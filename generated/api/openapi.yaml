@@ -7603,6 +7603,77 @@ paths:
         \ when the campaign is not a draft. Honours Idempotency-Key. (scope: marketing_ab:write)"
       tags:
       - marketing
+  /marketing/subscribers:
+    post:
+      operationId: createMarketingSubscriber
+      parameters:
+      - description: Optional. A retry with the same key replays the first response
+          (24 h).
+        explode: false
+        in: header
+        name: Idempotency-Key
+        required: false
+        schema:
+          maxLength: 200
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MarketingSubscriberCreate"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createMarketingSubscriber_200_response"
+          description: OK
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createMarketingSubscriber_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Add a newsletter subscriber from a public form, with double opt-in:\
+        \ the address stays pending and receives ONE confirmation email; nothing else\
+        \ is sent until the person confirms. Idempotent per address (201 created,\
+        \ 200 already known; a confirmed address is never re-mailed and a pending\
+        \ one at most every 10 minutes). Rate limit 600/h per organisation. Honours\
+        \ Idempotency-Key. (scope: marketing_subscribers:write)"
+      tags:
+      - marketing
   /prospecting/saved-searches:
     get:
       operationId: listProspectingSavedSearches
@@ -11451,6 +11522,841 @@ paths:
         \ space_transfers:read)"
       tags:
       - space-transfers
+  /display/me:
+    get:
+      operationId: getDisplayMe
+      parameters:
+      - description: ETag from a previous response; a match answers 304 with no body
+          (no database work on the server).
+        explode: false
+        in: header
+        name: If-None-Match
+        required: false
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getDisplayMe_200_response"
+          description: OK
+          headers:
+            ETag:
+              description: "Strong validator of the JSON body; per transfer encoding\
+                \ (`\"<hash>\"`, `\"<hash>-br\"`, `\"<hash>-gzip\"`). Any of them\
+                \ matches If-None-Match."
+              explode: false
+              schema:
+                type: string
+              style: simple
+            Cache-Control:
+              description: "`private, no-cache` — keep the body, revalidate with If-None-Match."
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "304":
+          description: Not Modified — the If-None-Match ETag is current; empty body.
+          headers:
+            ETag:
+              description: "Strong validator of the JSON body; per transfer encoding\
+                \ (`\"<hash>\"`, `\"<hash>-br\"`, `\"<hash>-gzip\"`). Any of them\
+                \ matches If-None-Match."
+              explode: false
+              schema:
+                type: string
+              style: simple
+            Cache-Control:
+              description: "`private, no-cache` — keep the body, revalidate with If-None-Match."
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "The paired display: device, organization branding, config and the\
+        \ screens it can show (scope: display:read)"
+      tags:
+      - display
+  /display/snapshot:
+    get:
+      operationId: getDisplaySnapshot
+      parameters:
+      - explode: true
+        in: query
+        name: screen
+        required: true
+        schema:
+          enum:
+          - pulse
+          - feed
+          - present
+          - kitchen
+          - orders
+          - bookings
+          - gate
+          - promo
+          - queue
+          - menu
+          - slides
+          type: string
+        style: form
+      - description: ETag from a previous response; a match answers 304 with no body
+          (no database work on the server).
+        explode: false
+        in: header
+        name: If-None-Match
+        required: false
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getDisplaySnapshot_200_response"
+          description: OK
+          headers:
+            ETag:
+              description: "Strong validator of the JSON body; per transfer encoding\
+                \ (`\"<hash>\"`, `\"<hash>-br\"`, `\"<hash>-gzip\"`). Any of them\
+                \ matches If-None-Match."
+              explode: false
+              schema:
+                type: string
+              style: simple
+            Cache-Control:
+              description: "`private, no-cache` — keep the body, revalidate with If-None-Match."
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "304":
+          description: Not Modified — the If-None-Match ETag is current; empty body.
+          headers:
+            ETag:
+              description: "Strong validator of the JSON body; per transfer encoding\
+                \ (`\"<hash>\"`, `\"<hash>-br\"`, `\"<hash>-gzip\"`). Any of them\
+                \ matches If-None-Match."
+              explode: false
+              schema:
+                type: string
+              style: simple
+            Cache-Control:
+              description: "`private, no-cache` — keep the body, revalidate with If-None-Match."
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Pre-aggregated, read-only data for one screen; 403 when the display\
+        \ is not configured for it (scope: display:read)"
+      tags:
+      - display
+  /display/stream:
+    get:
+      operationId: streamDisplayEvents
+      parameters:
+      - description: Bearer fallback for clients whose EventSource cannot set headers
+          (https only).
+        explode: true
+        in: query
+        name: access_token
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          description: SSE stream
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Server-Sent Events for a display (text/event-stream, never compressed):\
+        \ invalidate {screens} → re-fetch with If-None-Match, feed {item}, config,\
+        \ revoked, ping every 20 s; closes after 15 min (scope: display:read)"
+      tags:
+      - display
+  /display/assistant:
+    post:
+      operationId: askDisplayAssistant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DisplayAssistantRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/askDisplayAssistant_200_response"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "501":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Ask the display assistant a question about the pulse data; read-only,\
+        \ 20/min per device; 501 STT_UNAVAILABLE for audio (scope: display:assistant)"
+      tags:
+      - display
+  /display/unlock:
+    post:
+      operationId: unlockDisplay
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DisplayUnlockRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/unlockDisplay_200_response"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Re-check a locked display’s PIN server-side: 200 { ok }, 5 attempts/min\
+        \ per device (429 + retryAfterSec), every attempt audited without the PIN;\
+        \ 400 for personal tokens or when no PIN is set (scope: display:read)"
+      tags:
+      - display
+  /rewards/program:
+    get:
+      operationId: getRewardsProgram
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getRewardsProgram_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Your organization's own rewards programme (scope: rewards:read)"
+      tags:
+      - rewards
+  /rewards/members:
+    post:
+      operationId: upsertRewardsMember
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RewardMemberUpsert"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/upsertRewardsMember_200_response"
+          description: OK
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/upsertRewardsMember_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Create or fetch a member by externalRef or customerId; 201 when created\
+        \ (scope: rewards:write)"
+      tags:
+      - rewards
+  /rewards/members/{ref}:
+    get:
+      operationId: getRewardsMember
+      parameters:
+      - description: "`customer:<uuid>` for an end customer of your organization,\
+          \ otherwise your own external id (URL-encode it)."
+        explode: false
+        in: path
+        name: ref
+        required: true
+        schema:
+          maxLength: 200
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/upsertRewardsMember_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Member balance, level, streak and expiry (scope: rewards:read)"
+      tags:
+      - rewards
+  /rewards/members/{ref}/history:
+    get:
+      operationId: listRewardsMemberHistory
+      parameters:
+      - description: "`customer:<uuid>` for an end customer of your organization,\
+          \ otherwise your own external id (URL-encode it)."
+        explode: false
+        in: path
+        name: ref
+        required: true
+        schema:
+          maxLength: 200
+          type: string
+        style: simple
+      - explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 50
+          maximum: 200
+          minimum: 1
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listRewardsMemberHistory_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Newest ledger movements of a member, up to 200 (scope: rewards:read)"
+      tags:
+      - rewards
+  /rewards/members/{ref}/redemptions:
+    post:
+      operationId: createRewardsRedemption
+      parameters:
+      - description: "`customer:<uuid>` for an end customer of your organization,\
+          \ otherwise your own external id (URL-encode it)."
+        explode: false
+        in: path
+        name: ref
+        required: true
+        schema:
+          maxLength: 200
+          type: string
+        style: simple
+      - description: Required. Retries with the same key replay the first response
+          instead of starting a second job (24 h).
+        explode: false
+        in: header
+        name: Idempotency-Key
+        required: false
+        schema:
+          maxLength: 200
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RewardRedemptionCreate"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createRewardsRedemption_200_response"
+          description: OK
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createRewardsRedemption_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Redeem a catalogue item for a member; units are burnt at once, above\
+        \ the auto-approve threshold the redemption waits for your approval. 409 insufficient_units\
+        \ / in_debt (scope: rewards:write)"
+      tags:
+      - rewards
+  /rewards/events:
+    post:
+      operationId: createRewardsEvent
+      parameters:
+      - description: Required. Retries with the same key replay the first response
+          instead of starting a second job (24 h).
+        explode: false
+        in: header
+        name: Idempotency-Key
+        required: false
+        schema:
+          maxLength: 200
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RewardEventCreate"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createRewardsEvent_200_response"
+          description: OK
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createRewardsEvent_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Record a business event and process it inline; payload.units is the\
+        \ award. Idempotency-Key (or type+ref+member) dedupes (scope: rewards:write)"
+      tags:
+      - rewards
+  /rewards/catalog:
+    get:
+      operationId: listRewardsCatalog
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listRewardsCatalog_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Active catalogue of your programme (scope: rewards:read)"
+      tags:
+      - rewards
+  /rewards/clawbacks:
+    post:
+      operationId: createRewardsClawback
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RewardClawbackCreate"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createRewardsClawback_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Reverse the units a refunded or voided business object earned; spent\
+        \ units become debt (scope: rewards:write)"
+      tags:
+      - rewards
+  /rewards/widget-keys:
+    post:
+      operationId: createRewardsWidgetKey
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RewardWidgetKeyCreate"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createRewardsWidgetKey_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Create a widget signing key; the secret is returned once (scope: rewards:write)"
+      tags:
+      - rewards
+  /rewards/widget-keys/{kid}:
+    delete:
+      operationId: revokeRewardsWidgetKey
+      parameters:
+      - explode: false
+        in: path
+        name: kid
+        required: true
+        schema:
+          maxLength: 40
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/revokeRewardsWidgetKey_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Revoke a widget key; its sessions stop working at once (scope: rewards:write)"
+      tags:
+      - rewards
+  /rewards/widget/session:
+    post:
+      operationId: createRewardsWidgetSession
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RewardWidgetSessionCreate"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createRewardsWidgetSession_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      security: []
+      summary: "PUBLIC (no API key): exchange a host-signed token for a 15-minute\
+        \ read-only session. Each token works once (jti); CORS limited to the key's\
+        \ allowedOrigins"
+      tags:
+      - rewards
+  /rewards/widget/me:
+    get:
+      operationId: getRewardsWidgetMe
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getRewardsWidgetMe_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      security:
+      - bearerAuth: []
+      summary: "PUBLIC (widget session token as Bearer): the member summary and last\
+        \ 10 movements the widget renders"
+      tags:
+      - rewards
 components:
   schemas:
     Meta:
@@ -13688,6 +14594,53 @@ components:
       - hearing_date
       - id
       - object
+    EmailReceivedWebhookData:
+      properties:
+        object:
+          enum:
+          - email_message
+          type: string
+        id:
+          description: The stored message id
+          format: uuid
+          type: string
+        message_id:
+          description: "RFC 5322 Message-ID, with angle brackets"
+          type: string
+          nullable: true
+        mailbox:
+          description: The Brivio mailbox the message landed in
+          format: email
+          type: string
+        recipient:
+          description: The mailbox or alias address it was delivered to (never another
+            recipient of the message)
+          format: email
+          type: string
+        from:
+          description: "Sender address, lowercased"
+          type: string
+        subject:
+          type: string
+        received_at:
+          format: date-time
+          type: string
+        size_bytes:
+          type: integer
+          nullable: true
+        has_attachments:
+          type: boolean
+      required:
+      - from
+      - has_attachments
+      - id
+      - mailbox
+      - message_id
+      - object
+      - received_at
+      - recipient
+      - size_bytes
+      - subject
     SubscriptionWebhookData:
       properties:
         subscription_id:
@@ -14931,6 +15884,131 @@ components:
       - id
       - status
       - variants
+    MarketingSubscriberCreate:
+      example:
+        name: name
+        source: source
+        locale: ro
+        consent:
+          ip: ip
+          text_version: text_version
+          text: text
+          user_agent: user_agent
+        email: email
+        redirect_url: https://openapi-generator.tech
+      properties:
+        email:
+          format: email
+          maxLength: 320
+          type: string
+        name:
+          maxLength: 200
+          type: string
+        locale:
+          default: ro
+          description: Language of the confirmation email and pages
+          enum:
+          - ro
+          - en
+          type: string
+        source:
+          description: "Where the form lives, e.g. \"example.ro/footer\""
+          maxLength: 120
+          type: string
+        redirect_url:
+          description: https only. After a successful confirm the person is sent here
+            (303) with ?status=confirmed.
+          format: uri
+          maxLength: 2048
+          type: string
+        consent:
+          $ref: "#/components/schemas/MarketingSubscriberCreate_consent"
+      required:
+      - consent
+      - email
+    MarketingSubscriber:
+      example:
+        consent_at: 2000-01-23T04:56:07.000+00:00
+        created_at: 2000-01-23T04:56:07.000+00:00
+        source: source
+        locale: ro
+        unsubscribe_url: https://openapi-generator.tech
+        unsubscribed_at: 2000-01-23T04:56:07.000+00:00
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        name: name
+        confirmation_sent: true
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        confirmed_at: 2000-01-23T04:56:07.000+00:00
+        email: email
+        object: marketing_subscriber
+        status: pending
+        consent_text_version: consent_text_version
+      properties:
+        id:
+          format: uuid
+          type: string
+        object:
+          enum:
+          - marketing_subscriber
+          type: string
+        email:
+          format: email
+          type: string
+        name:
+          nullable: true
+          type: string
+        status:
+          enum:
+          - pending
+          - subscribed
+          - unsubscribed
+          type: string
+        locale:
+          enum:
+          - ro
+          - en
+          type: string
+        source:
+          nullable: true
+          type: string
+        consent_text_version:
+          type: string
+        consent_at:
+          format: date-time
+          type: string
+        confirmation_sent:
+          description: Whether THIS call sent a confirmation email
+          type: boolean
+        confirmed_at:
+          format: date-time
+          nullable: true
+          type: string
+        unsubscribed_at:
+          format: date-time
+          nullable: true
+          type: string
+        unsubscribe_url:
+          description: Signed RFC 8058 one-click unsubscribe URL
+          format: uri
+          nullable: true
+          type: string
+        created_at:
+          format: date-time
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+      required:
+      - confirmation_sent
+      - consent_at
+      - consent_text_version
+      - created_at
+      - email
+      - id
+      - locale
+      - object
+      - status
+      - updated_at
     ProspectingSavedSearch:
       example:
         notify_in_app: true
@@ -18878,6 +19956,1883 @@ components:
       - space_id
       - status
       - target_organization_id
+    DisplayMoney:
+      example:
+        minor: 0
+        currency: currency
+      properties:
+        minor:
+          description: Integer minor units (bani).
+          type: integer
+        currency:
+          maxLength: 3
+          minLength: 3
+          type: string
+      required:
+      - currency
+      - minor
+    DisplayConfig:
+      example:
+        rotateSec: 828
+        audience: internal
+        profileSettings:
+          orientation: landscape
+          lateAfterMin: 145
+          slides:
+          - kind: image
+            subtitle: subtitle
+            imageUrl: https://openapi-generator.tech
+            articleId: articleId
+            id: id
+            title: title
+            durationSec: 68
+          - kind: image
+            subtitle: subtitle
+            imageUrl: https://openapi-generator.tech
+            articleId: articleId
+            id: id
+            title: title
+            durationSec: 68
+          - kind: image
+            subtitle: subtitle
+            imageUrl: https://openapi-generator.tech
+            articleId: articleId
+            id: id
+            title: title
+            durationSec: 68
+          - kind: image
+            subtitle: subtitle
+            imageUrl: https://openapi-generator.tech
+            articleId: articleId
+            id: id
+            title: title
+            durationSec: 68
+          - kind: image
+            subtitle: subtitle
+            imageUrl: https://openapi-generator.tech
+            articleId: articleId
+            id: id
+            title: title
+            durationSec: 68
+          qrUrl: https://openapi-generator.tech
+          counters:
+          - counters
+          - counters
+          - counters
+          - counters
+          - counters
+          clearReadyAfterMin: 18
+          showModifiers: true
+          showPrices: true
+          warnAfterMin: 10
+          showBookings: true
+          showClock: true
+          transition: fade
+          showVisitors: true
+          showBrand: true
+          showNext: 7
+          welcome: welcome
+          chime: true
+        burnInGuard: true
+        quietHours:
+        - 16
+        - 16
+        screens:
+        - pulse
+        - pulse
+        - pulse
+        - pulse
+        - pulse
+        profile: wallboard
+        lock:
+          pinHash: pinHash
+          pinSalt: pinSalt
+          enabled: true
+        locale: ro
+        autostart: true
+      properties:
+        profile:
+          description: What the device is for; every profile except wallboard ignores
+            `screens`.
+          enum:
+          - wallboard
+          - kitchen
+          - pickup
+          - queue
+          - reception
+          - bookings
+          - gate
+          - showcase
+          - menu
+          - announcements
+          - feed
+          type: string
+        profileSettings:
+          $ref: "#/components/schemas/DisplayConfig_profileSettings"
+        screens:
+          items:
+            enum:
+            - pulse
+            - feed
+            - present
+            - kitchen
+            - orders
+            - bookings
+            - gate
+            - promo
+            - queue
+            - menu
+            - slides
+            type: string
+          maxItems: 12
+          type: array
+        rotateSec:
+          maximum: 3600
+          minimum: 0
+          type: integer
+        burnInGuard:
+          type: boolean
+        quietHours:
+          items:
+            maximum: 23
+            minimum: 0
+            type: integer
+          maxItems: 2
+          minItems: 2
+          nullable: true
+          type: array
+        locale:
+          enum:
+          - ro
+          - en
+          type: string
+        audience:
+          description: public = customer-facing; internal numbers are withheld. Forced
+            to public for pickup/queue/reception/showcase/menu/announcements.
+          enum:
+          - internal
+          - public
+          type: string
+        lock:
+          $ref: "#/components/schemas/DisplayConfig_lock"
+        autostart:
+          description: Start the app after a power cycle (device capability permitting).
+          type: boolean
+      required:
+      - audience
+      - autostart
+      - burnInGuard
+      - locale
+      - lock
+      - profile
+      - profileSettings
+      - quietHours
+      - rotateSec
+      - screens
+    DisplayMe:
+      example:
+        mode: org
+        org:
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          accent: accent
+          logoUrl: logoUrl
+        assistant: true
+        name: name
+        available:
+        - pulse
+        - pulse
+        deviceId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        config:
+          rotateSec: 828
+          audience: internal
+          profileSettings:
+            orientation: landscape
+            lateAfterMin: 145
+            slides:
+            - kind: image
+              subtitle: subtitle
+              imageUrl: https://openapi-generator.tech
+              articleId: articleId
+              id: id
+              title: title
+              durationSec: 68
+            - kind: image
+              subtitle: subtitle
+              imageUrl: https://openapi-generator.tech
+              articleId: articleId
+              id: id
+              title: title
+              durationSec: 68
+            - kind: image
+              subtitle: subtitle
+              imageUrl: https://openapi-generator.tech
+              articleId: articleId
+              id: id
+              title: title
+              durationSec: 68
+            - kind: image
+              subtitle: subtitle
+              imageUrl: https://openapi-generator.tech
+              articleId: articleId
+              id: id
+              title: title
+              durationSec: 68
+            - kind: image
+              subtitle: subtitle
+              imageUrl: https://openapi-generator.tech
+              articleId: articleId
+              id: id
+              title: title
+              durationSec: 68
+            qrUrl: https://openapi-generator.tech
+            counters:
+            - counters
+            - counters
+            - counters
+            - counters
+            - counters
+            clearReadyAfterMin: 18
+            showModifiers: true
+            showPrices: true
+            warnAfterMin: 10
+            showBookings: true
+            showClock: true
+            transition: fade
+            showVisitors: true
+            showBrand: true
+            showNext: 7
+            welcome: welcome
+            chime: true
+          burnInGuard: true
+          quietHours:
+          - 16
+          - 16
+          screens:
+          - pulse
+          - pulse
+          - pulse
+          - pulse
+          - pulse
+          profile: wallboard
+          lock:
+            pinHash: pinHash
+            pinSalt: pinSalt
+            enabled: true
+          locale: ro
+          autostart: true
+      properties:
+        deviceId:
+          description: null for a personal (non-device) token.
+          format: uuid
+          nullable: true
+          type: string
+        name:
+          type: string
+        mode:
+          enum:
+          - org
+          - personal
+          type: string
+        org:
+          $ref: "#/components/schemas/DisplayMe_org"
+        config:
+          $ref: "#/components/schemas/DisplayConfig"
+        available:
+          items:
+            enum:
+            - pulse
+            - feed
+            - present
+            - kitchen
+            - orders
+            - bookings
+            - gate
+            - promo
+            - queue
+            - menu
+            - slides
+            type: string
+          type: array
+        assistant:
+          description: Token carries display:assistant.
+          type: boolean
+      required:
+      - assistant
+      - available
+      - config
+      - deviceId
+      - mode
+      - name
+      - org
+    DisplaySnapshot:
+      description: "Discriminated by `kind` (= the requested screen). pulse: kpis,\
+        \ banks (IBAN last 4 only), collections (30 days), alerts. feed: items (≤\
+        \ 50, newest first). present: period + slides (bars | line | waterfall | table).\
+        \ kitchen: tickets. orders: preparing/ready numbers. bookings: today. gate:\
+        \ last 40 visits. promo: items + payUrl. queue: serving per counter + next\
+        \ (initials only) + waitMin. menu: categories ≤ 12 × items ≤ 40. slides (showcase/announcements):\
+        \ resolved slides + qrUrl."
+      example:
+        next:
+        - next
+        - next
+        - next
+        - next
+        - next
+        period: period
+        slides:
+        - total:
+            minor: 0
+            currency: currency
+          series:
+          - label: label
+            points:
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+          - label: label
+            points:
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+          - label: label
+            points:
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+          - label: label
+            points:
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+          id: id
+          title: title
+          chart: bars
+          titleKey: titleKey
+        - total:
+            minor: 0
+            currency: currency
+          series:
+          - label: label
+            points:
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+          - label: label
+            points:
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+          - label: label
+            points:
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+          - label: label
+            points:
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+          id: id
+          title: title
+          chart: bars
+          titleKey: titleKey
+        - total:
+            minor: 0
+            currency: currency
+          series:
+          - label: label
+            points:
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+          - label: label
+            points:
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+          - label: label
+            points:
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+          - label: label
+            points:
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+          id: id
+          title: title
+          chart: bars
+          titleKey: titleKey
+        - total:
+            minor: 0
+            currency: currency
+          series:
+          - label: label
+            points:
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+          - label: label
+            points:
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+          - label: label
+            points:
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+          - label: label
+            points:
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+          id: id
+          title: title
+          chart: bars
+          titleKey: titleKey
+        - total:
+            minor: 0
+            currency: currency
+          series:
+          - label: label
+            points:
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+          - label: label
+            points:
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+          - label: label
+            points:
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+          - label: label
+            points:
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+            - x: x
+              "y": 2.3021358869347655
+          id: id
+          title: title
+          chart: bars
+          titleKey: titleKey
+        tickets:
+        - number: number
+          id: id
+          title: title
+          lines:
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          status: new
+          since: since
+        - number: number
+          id: id
+          title: title
+          lines:
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          status: new
+          since: since
+        - number: number
+          id: id
+          title: title
+          lines:
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          status: new
+          since: since
+        - number: number
+          id: id
+          title: title
+          lines:
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          status: new
+          since: since
+        - number: number
+          id: id
+          title: title
+          lines:
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          - note: note
+            qty: 7.061401241503109
+            name: name
+          status: new
+          since: since
+        orgName: orgName
+        qrUrl: qrUrl
+        banks:
+        - balance:
+            minor: 0
+            currency: currency
+          name: name
+          ibanTail: ibanTail
+        - balance:
+            minor: 0
+            currency: currency
+          name: name
+          ibanTail: ibanTail
+        - balance:
+            minor: 0
+            currency: currency
+          name: name
+          ibanTail: ibanTail
+        - balance:
+            minor: 0
+            currency: currency
+          name: name
+          ibanTail: ibanTail
+        - balance:
+            minor: 0
+            currency: currency
+          name: name
+          ibanTail: ibanTail
+        kind: pulse
+        payUrl: payUrl
+        logoUrl: logoUrl
+        serving:
+        - number: number
+          at: at
+          counter: counter
+        - number: number
+          at: at
+          counter: counter
+        - number: number
+          at: at
+          counter: counter
+        - number: number
+          at: at
+          counter: counter
+        - number: number
+          at: at
+          counter: counter
+        alerts:
+        - severity: info
+          at: at
+          id: id
+          title: title
+          titleKey: titleKey
+        - severity: info
+          at: at
+          id: id
+          title: title
+          titleKey: titleKey
+        - severity: info
+          at: at
+          id: id
+          title: title
+          titleKey: titleKey
+        - severity: info
+          at: at
+          id: id
+          title: title
+          titleKey: titleKey
+        - severity: info
+          at: at
+          id: id
+          title: title
+          titleKey: titleKey
+        preparing:
+        - preparing
+        - preparing
+        - preparing
+        - preparing
+        - preparing
+        waitMin: 9
+        collections:
+        - minor: 5
+          day: 2000-01-23
+        - minor: 5
+          day: 2000-01-23
+        - minor: 5
+          day: 2000-01-23
+        - minor: 5
+          day: 2000-01-23
+        - minor: 5
+          day: 2000-01-23
+        ready:
+        - ready
+        - ready
+        - ready
+        - ready
+        - ready
+        categories:
+        - name: name
+          items:
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+        - name: name
+          items:
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+        - name: name
+          items:
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+        - name: name
+          items:
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+        - name: name
+          items:
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+          - price:
+              minor: 0
+              currency: currency
+            imageUrl: imageUrl
+            name: name
+            description: description
+            id: id
+        kpis:
+        - tone: neutral
+          spark:
+          - 5.962133916683182
+          - 5.962133916683182
+          - 5.962133916683182
+          - 5.962133916683182
+          - 5.962133916683182
+          count: 6
+          delta: 1.4658129805029452
+          id: id
+          label: label
+          labelKey: labelKey
+          value:
+            minor: 0
+            currency: currency
+        - tone: neutral
+          spark:
+          - 5.962133916683182
+          - 5.962133916683182
+          - 5.962133916683182
+          - 5.962133916683182
+          - 5.962133916683182
+          count: 6
+          delta: 1.4658129805029452
+          id: id
+          label: label
+          labelKey: labelKey
+          value:
+            minor: 0
+            currency: currency
+        - tone: neutral
+          spark:
+          - 5.962133916683182
+          - 5.962133916683182
+          - 5.962133916683182
+          - 5.962133916683182
+          - 5.962133916683182
+          count: 6
+          delta: 1.4658129805029452
+          id: id
+          label: label
+          labelKey: labelKey
+          value:
+            minor: 0
+            currency: currency
+        - tone: neutral
+          spark:
+          - 5.962133916683182
+          - 5.962133916683182
+          - 5.962133916683182
+          - 5.962133916683182
+          - 5.962133916683182
+          count: 6
+          delta: 1.4658129805029452
+          id: id
+          label: label
+          labelKey: labelKey
+          value:
+            minor: 0
+            currency: currency
+        - tone: neutral
+          spark:
+          - 5.962133916683182
+          - 5.962133916683182
+          - 5.962133916683182
+          - 5.962133916683182
+          - 5.962133916683182
+          count: 6
+          delta: 1.4658129805029452
+          id: id
+          label: label
+          labelKey: labelKey
+          value:
+            minor: 0
+            currency: currency
+        items:
+        - "{}"
+        - "{}"
+      properties:
+        kind:
+          enum:
+          - pulse
+          - feed
+          - present
+          - kitchen
+          - orders
+          - bookings
+          - gate
+          - promo
+          - queue
+          - menu
+          - slides
+          type: string
+        kpis:
+          items:
+            $ref: "#/components/schemas/DisplaySnapshot_kpis_inner"
+          maxItems: 12
+          type: array
+        banks:
+          items:
+            $ref: "#/components/schemas/DisplaySnapshot_banks_inner"
+          maxItems: 12
+          type: array
+        collections:
+          items:
+            $ref: "#/components/schemas/DisplaySnapshot_collections_inner"
+          maxItems: 31
+          type: array
+        alerts:
+          items:
+            $ref: "#/components/schemas/DisplaySnapshot_alerts_inner"
+          maxItems: 10
+          type: array
+        items:
+          description: "feed: DisplayFeedItem; bookings / gate / promo: per-screen\
+            \ rows."
+          items:
+            type: object
+          type: array
+        period:
+          type: string
+        slides:
+          description: "present: chart slides (≤ 12). slides: DisplayResolvedSlide\
+            \ (≤ 40)."
+          items:
+            $ref: "#/components/schemas/DisplaySnapshot_slides_inner"
+          maxItems: 40
+          type: array
+        tickets:
+          items:
+            $ref: "#/components/schemas/DisplaySnapshot_tickets_inner"
+          maxItems: 40
+          type: array
+        preparing:
+          items:
+            type: string
+          maxItems: 40
+          type: array
+        ready:
+          items:
+            type: string
+          maxItems: 40
+          type: array
+        orgName:
+          type: string
+        logoUrl:
+          nullable: true
+          type: string
+        payUrl:
+          nullable: true
+          type: string
+        serving:
+          items:
+            $ref: "#/components/schemas/DisplaySnapshot_serving_inner"
+          maxItems: 12
+          type: array
+        next:
+          items:
+            type: string
+          maxItems: 12
+          type: array
+        waitMin:
+          description: "queue: estimated wait in minutes."
+          nullable: true
+          type: integer
+        categories:
+          items:
+            $ref: "#/components/schemas/DisplaySnapshot_categories_inner"
+          maxItems: 12
+          type: array
+        qrUrl:
+          nullable: true
+          type: string
+      required:
+      - kind
+    DisplayResolvedSlide:
+      properties:
+        id:
+          type: string
+        kind:
+          enum:
+          - image
+          - text
+          - product
+          type: string
+        title:
+          nullable: true
+          type: string
+        subtitle:
+          nullable: true
+          type: string
+        imageUrl:
+          nullable: true
+          type: string
+        price:
+          $ref: "#/components/schemas/DisplayMoney"
+        durationSec:
+          type: integer
+      required:
+      - durationSec
+      - id
+      - imageUrl
+      - kind
+      - price
+      - subtitle
+      - title
+    DisplayFeedItem:
+      properties:
+        id:
+          type: string
+        type:
+          enum:
+          - efactura.received
+          - efactura.accepted
+          - efactura.rejected
+          - payment.received
+          - invoice.issued
+          - invoice.overdue
+          - spv.message
+          type: string
+        title:
+          type: string
+        counterparty:
+          nullable: true
+          type: string
+        amount:
+          $ref: "#/components/schemas/DisplayMoney"
+        at:
+          format: date-time
+          type: string
+      required:
+      - amount
+      - at
+      - counterparty
+      - id
+      - title
+      - type
+    DisplayKpi:
+      example:
+        tone: neutral
+        spark:
+        - 1.4658129805029452
+        - 1.4658129805029452
+        - 1.4658129805029452
+        - 1.4658129805029452
+        - 1.4658129805029452
+        count: 0
+        delta: 6.027456183070403
+        id: id
+        label: label
+        labelKey: labelKey
+        value:
+          minor: 0
+          currency: currency
+      properties:
+        id:
+          type: string
+        labelKey:
+          type: string
+        label:
+          type: string
+        value:
+          $ref: "#/components/schemas/DisplayMoney"
+        count:
+          nullable: true
+          type: integer
+        delta:
+          description: Signed fraction vs the comparison period (0.12 = +12 %).
+          nullable: true
+          type: number
+        spark:
+          items:
+            type: number
+          maxItems: 60
+          type: array
+        tone:
+          enum:
+          - neutral
+          - good
+          - warn
+          - bad
+          type: string
+      required:
+      - count
+      - delta
+      - id
+      - label
+      - labelKey
+      - spark
+      - tone
+      - value
+    DisplayUnlockRequest:
+      additionalProperties: false
+      example:
+        pin: pin
+      properties:
+        pin:
+          pattern: "^\\d{4,8}$"
+          type: string
+      required:
+      - pin
+    DisplayUnlockResponse:
+      example:
+        retryAfterSec: 0
+        ok: true
+      properties:
+        ok:
+          description: true when the PIN matched the display lock.
+          type: boolean
+        retryAfterSec:
+          description: "Set on 429: seconds until the next attempt is accepted."
+          nullable: true
+          type: integer
+      required:
+      - ok
+      - retryAfterSec
+    DisplayAssistantRequest:
+      additionalProperties: false
+      description: "Send `text` (on-device speech recognition) or `audio` (base64,\
+        \ ≤ 15 s). One of them is required."
+      example:
+        mime: mime
+        text: text
+        audio: audio
+        locale: ro
+      properties:
+        text:
+          maxLength: 500
+          minLength: 1
+          type: string
+        audio:
+          maxLength: 400000
+          type: string
+        mime:
+          maxLength: 40
+          type: string
+        locale:
+          default: ro
+          enum:
+          - ro
+          - en
+          type: string
+    DisplayAssistantResponse:
+      example:
+        transcript: transcript
+        answer: answer
+        kpi:
+          tone: neutral
+          spark:
+          - 1.4658129805029452
+          - 1.4658129805029452
+          - 1.4658129805029452
+          - 1.4658129805029452
+          - 1.4658129805029452
+          count: 0
+          delta: 6.027456183070403
+          id: id
+          label: label
+          labelKey: labelKey
+          value:
+            minor: 0
+            currency: currency
+      properties:
+        transcript:
+          type: string
+        answer:
+          type: string
+        kpi:
+          $ref: "#/components/schemas/DisplayKpi"
+      required:
+      - answer
+      - kpi
+      - transcript
+    RewardProgram:
+      description: Your organization's own programme (created on first use). Internal
+        cost settings are never exposed.
+      example:
+        unitLabel: unitLabel
+        kind: tenant_shop
+        regulationVersion: regulationVersion
+        name: name
+        partnerRewardsEnabled: true
+        config: "{}"
+        key: key
+        status: status
+      properties:
+        key:
+          type: string
+        kind:
+          enum:
+          - tenant_shop
+          type: string
+        name:
+          type: string
+        unitLabel:
+          type: string
+        status:
+          type: string
+        regulationVersion:
+          type: string
+        partnerRewardsEnabled:
+          type: boolean
+        config:
+          additionalProperties: false
+          description: "Expiry, hold, caps, auto-approve threshold, time zone."
+          type: object
+      required:
+      - key
+      - kind
+      - name
+      - status
+      - unitLabel
+    RewardMemberUpsert:
+      additionalProperties: false
+      description: Exactly one of externalRef or customerId.
+      example:
+        customerId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        externalRef: externalRef
+      properties:
+        externalRef:
+          maxLength: 200
+          minLength: 1
+          type: string
+        customerId:
+          description: An end customer of your organization.
+          format: uuid
+          type: string
+    RewardMemberSummary:
+      example:
+        ref: ref
+        optedIn: true
+        balance:
+          inDebt: true
+          pending: 1
+          available: 6
+        level:
+          next: 7
+          level: 5
+          xp: 5
+          floor: 2
+          ratio: 9.301444243932576
+        programKey: programKey
+        optedInAt: 2000-01-23T04:56:07.000+00:00
+        streak:
+          current: 3
+          longest: 2
+          activeThisPeriod: true
+          atRisk: true
+          currentPeriod: currentPeriod
+          freezes: 4
+        expiry:
+          at: 2000-01-23T04:56:07.000+00:00
+          units: 7
+        holdout: true
+        perks:
+        - perks
+        - perks
+        memberId: 0
+      properties:
+        ref:
+          type: string
+        programKey:
+          type: string
+        memberId:
+          type: integer
+        optedIn:
+          type: boolean
+        optedInAt:
+          format: date-time
+          nullable: true
+          type: string
+        holdout:
+          type: boolean
+        balance:
+          $ref: "#/components/schemas/RewardMemberSummary_balance"
+        level:
+          $ref: "#/components/schemas/RewardMemberSummary_level"
+        streak:
+          $ref: "#/components/schemas/RewardMemberSummary_streak"
+        expiry:
+          $ref: "#/components/schemas/RewardMemberSummary_expiry"
+        perks:
+          items:
+            type: string
+          type: array
+      required:
+      - balance
+      - level
+      - memberId
+      - programKey
+      - ref
+    RewardHistoryItem:
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        kind: kind
+        memo: memo
+        units: 6
+        ruleKey: ruleKey
+        txnId: 0
+      properties:
+        txnId:
+          type: integer
+        kind:
+          type: string
+        units:
+          description: "Signed, from the member's point of view."
+          type: integer
+        ruleKey:
+          nullable: true
+          type: string
+        memo:
+          nullable: true
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+      required:
+      - createdAt
+      - kind
+      - txnId
+      - units
+    RewardEventCreate:
+      additionalProperties: {}
+      example:
+        ref: ref
+        occurredAt: 2000-01-23T04:56:07.000+00:00
+        payload:
+          units: 80083
+        memberRef: memberRef
+        type: profile.completed
+      properties:
+        type:
+          enum:
+          - profile.completed
+          - import.completed
+          - bank.connected
+          - integration.connected
+          - tour.completed
+          - quest.completed
+          - feedback.accepted
+          - bug.confirmed
+          - forum.answer_accepted
+          - referral.converted
+          - referral.first_payment
+          - activity.weekly
+          - cabinet.client_migrated
+          - academy.badge_earned
+          - order.paid
+          - order.refunded
+          - custom
+        ref:
+          description: "Your stable business reference (order id, …)."
+          maxLength: 200
+        memberRef:
+          maxLength: 200
+          type: string
+        payload:
+          $ref: "#/components/schemas/RewardEventCreate_payload"
+        occurredAt:
+          format: date-time
+          type: string
+      required:
+      - memberRef
+      - ref
+      - type
+    RewardEventResult:
+      example:
+        badges:
+        - badges
+        - badges
+        eventId: 0
+        reason: reason
+        levelUp:
+          from: 5
+          to: 5
+        duplicate: true
+        unitsAwarded: 6
+        xpAwarded: 1
+        status: processed
+      properties:
+        eventId:
+          nullable: true
+          type: integer
+        duplicate:
+          type: boolean
+        status:
+          enum:
+          - processed
+          - skipped
+          - already_processed
+          - duplicate
+          type: string
+        reason:
+          nullable: true
+          type: string
+        unitsAwarded:
+          type: integer
+        xpAwarded:
+          type: integer
+        levelUp:
+          $ref: "#/components/schemas/RewardEventResult_levelUp"
+        badges:
+          items:
+            type: string
+          type: array
+      required:
+      - duplicate
+      - eventId
+      - status
+      - unitsAwarded
+    RewardRedemptionCreate:
+      additionalProperties: false
+      example:
+        catalogKey: catalogKey
+      properties:
+        catalogKey:
+          maxLength: 120
+          type: string
+      required:
+      - catalogKey
+    RewardRedemptionResult:
+      example:
+        id: 0
+        duplicate: true
+        status: pending_approval
+      properties:
+        id:
+          type: integer
+        status:
+          enum:
+          - pending_approval
+          - approved
+          - fulfilled
+          - rejected
+          - cancelled
+          - failed
+          type: string
+        duplicate:
+          type: boolean
+      required:
+      - duplicate
+      - id
+      - status
+    RewardCatalogItem:
+      example:
+        unitsCost: 6
+        credits: 1
+        kind: ai_credit
+        available: true
+        perk: perk
+        id: 0
+        key: key
+      properties:
+        id:
+          type: integer
+        key:
+          type: string
+        kind:
+          enum:
+          - ai_credit
+          - discount_code
+          - partner_offer
+          - gift_card
+          - perk
+          type: string
+        unitsCost:
+          type: integer
+        credits:
+          nullable: true
+          type: integer
+        perk:
+          nullable: true
+          type: string
+        available:
+          type: boolean
+      required:
+      - id
+      - key
+      - kind
+      - unitsCost
+    RewardClawbackCreate:
+      additionalProperties: false
+      example:
+        reason: reason
+        refType: refType
+        refId: refId
+      properties:
+        refType:
+          description: The event `type` that earned (e.g. order.paid).
+          maxLength: 80
+          type: string
+        refId:
+          description: The event `ref` that earned.
+          maxLength: 200
+          type: string
+        reason:
+          maxLength: 200
+          type: string
+      required:
+      - reason
+      - refId
+      - refType
+    RewardClawbackResult:
+      example:
+        reversedUnits: 0
+      properties:
+        reversedUnits:
+          type: integer
+      required:
+      - reversedUnits
+    RewardWidgetKeyCreate:
+      additionalProperties: false
+      example:
+        allowedOrigins:
+        - https://openapi-generator.tech
+        - https://openapi-generator.tech
+        - https://openapi-generator.tech
+        - https://openapi-generator.tech
+        - https://openapi-generator.tech
+      properties:
+        allowedOrigins:
+          items:
+            description: "scheme://host[:port], no path."
+            format: uri
+            type: string
+          maxItems: 20
+          minItems: 1
+          type: array
+      required:
+      - allowedOrigins
+    RewardWidgetKey:
+      description: '`secret` is returned ONLY by the create call. Keep it on your
+        server.'
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        allowedOrigins:
+        - allowedOrigins
+        - allowedOrigins
+        kid: kid
+        programKey: programKey
+        secret: secret
+      properties:
+        kid:
+          type: string
+        secret:
+          type: string
+        programKey:
+          type: string
+        allowedOrigins:
+          items:
+            type: string
+          type: array
+        createdAt:
+          format: date-time
+          type: string
+      required:
+      - allowedOrigins
+      - kid
+      - programKey
+      - secret
+    RewardWidgetKeyRevoked:
+      example:
+        kid: kid
+        revoked: true
+      properties:
+        kid:
+          type: string
+        revoked:
+          type: boolean
+      required:
+      - kid
+      - revoked
+    RewardWidgetSessionCreate:
+      additionalProperties: false
+      example:
+        kid: kid
+        token: token
+      properties:
+        kid:
+          type: string
+        token:
+          description: "HS256 JWT signed by your server: sub, prg, iat, exp (≤ 15\
+            \ min after iat), jti."
+          type: string
+      required:
+      - kid
+      - token
+    RewardWidgetSession:
+      example:
+        scope: read
+        sessionToken: sessionToken
+        expiresAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        sessionToken:
+          type: string
+        expiresAt:
+          format: date-time
+          type: string
+        scope:
+          enum:
+          - read
+          type: string
+      required:
+      - expiresAt
+      - scope
+      - sessionToken
+    RewardWidgetMe:
+      example:
+        summary:
+          ref: ref
+          optedIn: true
+          balance:
+            inDebt: true
+            pending: 1
+            available: 6
+          level:
+            next: 7
+            level: 5
+            xp: 5
+            floor: 2
+            ratio: 9.301444243932576
+          programKey: programKey
+          optedInAt: 2000-01-23T04:56:07.000+00:00
+          streak:
+            current: 3
+            longest: 2
+            activeThisPeriod: true
+            atRisk: true
+            currentPeriod: currentPeriod
+            freezes: 4
+          expiry:
+            at: 2000-01-23T04:56:07.000+00:00
+            units: 7
+          holdout: true
+          perks:
+          - perks
+          - perks
+          memberId: 0
+        badges:
+        - awardedAt: 2000-01-23T04:56:07.000+00:00
+          icon: icon
+          family: family
+          key: key
+        - awardedAt: 2000-01-23T04:56:07.000+00:00
+          icon: icon
+          family: family
+          key: key
+        program:
+          unitLabel: unitLabel
+          name: name
+        history:
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          kind: kind
+          memo: memo
+          units: 6
+          ruleKey: ruleKey
+          txnId: 0
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          kind: kind
+          memo: memo
+          units: 6
+          ruleKey: ruleKey
+          txnId: 0
+      properties:
+        program:
+          $ref: "#/components/schemas/RewardWidgetMe_program"
+        summary:
+          $ref: "#/components/schemas/RewardMemberSummary"
+        history:
+          items:
+            $ref: "#/components/schemas/RewardHistoryItem"
+          type: array
+        badges:
+          description: Badges the member has earned (newest catalogue order).
+          items:
+            $ref: "#/components/schemas/RewardWidgetMe_badges_inner"
+          type: array
+      required:
+      - history
+      - program
+      - summary
     listMe_401_response_error:
       example:
         code: code
@@ -21089,6 +24044,33 @@ components:
       required:
       - data
       - error
+    createMarketingSubscriber_200_response:
+      example:
+        data:
+          consent_at: 2000-01-23T04:56:07.000+00:00
+          created_at: 2000-01-23T04:56:07.000+00:00
+          source: source
+          locale: ro
+          unsubscribe_url: https://openapi-generator.tech
+          unsubscribed_at: 2000-01-23T04:56:07.000+00:00
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          name: name
+          confirmation_sent: true
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          confirmed_at: 2000-01-23T04:56:07.000+00:00
+          email: email
+          object: marketing_subscriber
+          status: pending
+          consent_text_version: consent_text_version
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/MarketingSubscriber"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
     listProspectingSavedSearches_200_response:
       example:
         data:
@@ -23225,6 +26207,1218 @@ components:
       required:
       - data
       - error
+    getDisplayMe_200_response:
+      example:
+        data:
+          mode: org
+          org:
+            name: name
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            accent: accent
+            logoUrl: logoUrl
+          assistant: true
+          name: name
+          available:
+          - pulse
+          - pulse
+          deviceId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          config:
+            rotateSec: 828
+            audience: internal
+            profileSettings:
+              orientation: landscape
+              lateAfterMin: 145
+              slides:
+              - kind: image
+                subtitle: subtitle
+                imageUrl: https://openapi-generator.tech
+                articleId: articleId
+                id: id
+                title: title
+                durationSec: 68
+              - kind: image
+                subtitle: subtitle
+                imageUrl: https://openapi-generator.tech
+                articleId: articleId
+                id: id
+                title: title
+                durationSec: 68
+              - kind: image
+                subtitle: subtitle
+                imageUrl: https://openapi-generator.tech
+                articleId: articleId
+                id: id
+                title: title
+                durationSec: 68
+              - kind: image
+                subtitle: subtitle
+                imageUrl: https://openapi-generator.tech
+                articleId: articleId
+                id: id
+                title: title
+                durationSec: 68
+              - kind: image
+                subtitle: subtitle
+                imageUrl: https://openapi-generator.tech
+                articleId: articleId
+                id: id
+                title: title
+                durationSec: 68
+              qrUrl: https://openapi-generator.tech
+              counters:
+              - counters
+              - counters
+              - counters
+              - counters
+              - counters
+              clearReadyAfterMin: 18
+              showModifiers: true
+              showPrices: true
+              warnAfterMin: 10
+              showBookings: true
+              showClock: true
+              transition: fade
+              showVisitors: true
+              showBrand: true
+              showNext: 7
+              welcome: welcome
+              chime: true
+            burnInGuard: true
+            quietHours:
+            - 16
+            - 16
+            screens:
+            - pulse
+            - pulse
+            - pulse
+            - pulse
+            - pulse
+            profile: wallboard
+            lock:
+              pinHash: pinHash
+              pinSalt: pinSalt
+              enabled: true
+            locale: ro
+            autostart: true
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/DisplayMe"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    getDisplaySnapshot_200_response:
+      example:
+        data:
+          next:
+          - next
+          - next
+          - next
+          - next
+          - next
+          period: period
+          slides:
+          - total:
+              minor: 0
+              currency: currency
+            series:
+            - label: label
+              points:
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+            - label: label
+              points:
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+            - label: label
+              points:
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+            - label: label
+              points:
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+            id: id
+            title: title
+            chart: bars
+            titleKey: titleKey
+          - total:
+              minor: 0
+              currency: currency
+            series:
+            - label: label
+              points:
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+            - label: label
+              points:
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+            - label: label
+              points:
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+            - label: label
+              points:
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+            id: id
+            title: title
+            chart: bars
+            titleKey: titleKey
+          - total:
+              minor: 0
+              currency: currency
+            series:
+            - label: label
+              points:
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+            - label: label
+              points:
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+            - label: label
+              points:
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+            - label: label
+              points:
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+            id: id
+            title: title
+            chart: bars
+            titleKey: titleKey
+          - total:
+              minor: 0
+              currency: currency
+            series:
+            - label: label
+              points:
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+            - label: label
+              points:
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+            - label: label
+              points:
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+            - label: label
+              points:
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+            id: id
+            title: title
+            chart: bars
+            titleKey: titleKey
+          - total:
+              minor: 0
+              currency: currency
+            series:
+            - label: label
+              points:
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+            - label: label
+              points:
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+            - label: label
+              points:
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+            - label: label
+              points:
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+              - x: x
+                "y": 2.3021358869347655
+            id: id
+            title: title
+            chart: bars
+            titleKey: titleKey
+          tickets:
+          - number: number
+            id: id
+            title: title
+            lines:
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            status: new
+            since: since
+          - number: number
+            id: id
+            title: title
+            lines:
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            status: new
+            since: since
+          - number: number
+            id: id
+            title: title
+            lines:
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            status: new
+            since: since
+          - number: number
+            id: id
+            title: title
+            lines:
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            status: new
+            since: since
+          - number: number
+            id: id
+            title: title
+            lines:
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            - note: note
+              qty: 7.061401241503109
+              name: name
+            status: new
+            since: since
+          orgName: orgName
+          qrUrl: qrUrl
+          banks:
+          - balance:
+              minor: 0
+              currency: currency
+            name: name
+            ibanTail: ibanTail
+          - balance:
+              minor: 0
+              currency: currency
+            name: name
+            ibanTail: ibanTail
+          - balance:
+              minor: 0
+              currency: currency
+            name: name
+            ibanTail: ibanTail
+          - balance:
+              minor: 0
+              currency: currency
+            name: name
+            ibanTail: ibanTail
+          - balance:
+              minor: 0
+              currency: currency
+            name: name
+            ibanTail: ibanTail
+          kind: pulse
+          payUrl: payUrl
+          logoUrl: logoUrl
+          serving:
+          - number: number
+            at: at
+            counter: counter
+          - number: number
+            at: at
+            counter: counter
+          - number: number
+            at: at
+            counter: counter
+          - number: number
+            at: at
+            counter: counter
+          - number: number
+            at: at
+            counter: counter
+          alerts:
+          - severity: info
+            at: at
+            id: id
+            title: title
+            titleKey: titleKey
+          - severity: info
+            at: at
+            id: id
+            title: title
+            titleKey: titleKey
+          - severity: info
+            at: at
+            id: id
+            title: title
+            titleKey: titleKey
+          - severity: info
+            at: at
+            id: id
+            title: title
+            titleKey: titleKey
+          - severity: info
+            at: at
+            id: id
+            title: title
+            titleKey: titleKey
+          preparing:
+          - preparing
+          - preparing
+          - preparing
+          - preparing
+          - preparing
+          waitMin: 9
+          collections:
+          - minor: 5
+            day: 2000-01-23
+          - minor: 5
+            day: 2000-01-23
+          - minor: 5
+            day: 2000-01-23
+          - minor: 5
+            day: 2000-01-23
+          - minor: 5
+            day: 2000-01-23
+          ready:
+          - ready
+          - ready
+          - ready
+          - ready
+          - ready
+          categories:
+          - name: name
+            items:
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+          - name: name
+            items:
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+          - name: name
+            items:
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+          - name: name
+            items:
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+          - name: name
+            items:
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+            - price:
+                minor: 0
+                currency: currency
+              imageUrl: imageUrl
+              name: name
+              description: description
+              id: id
+          kpis:
+          - tone: neutral
+            spark:
+            - 5.962133916683182
+            - 5.962133916683182
+            - 5.962133916683182
+            - 5.962133916683182
+            - 5.962133916683182
+            count: 6
+            delta: 1.4658129805029452
+            id: id
+            label: label
+            labelKey: labelKey
+            value:
+              minor: 0
+              currency: currency
+          - tone: neutral
+            spark:
+            - 5.962133916683182
+            - 5.962133916683182
+            - 5.962133916683182
+            - 5.962133916683182
+            - 5.962133916683182
+            count: 6
+            delta: 1.4658129805029452
+            id: id
+            label: label
+            labelKey: labelKey
+            value:
+              minor: 0
+              currency: currency
+          - tone: neutral
+            spark:
+            - 5.962133916683182
+            - 5.962133916683182
+            - 5.962133916683182
+            - 5.962133916683182
+            - 5.962133916683182
+            count: 6
+            delta: 1.4658129805029452
+            id: id
+            label: label
+            labelKey: labelKey
+            value:
+              minor: 0
+              currency: currency
+          - tone: neutral
+            spark:
+            - 5.962133916683182
+            - 5.962133916683182
+            - 5.962133916683182
+            - 5.962133916683182
+            - 5.962133916683182
+            count: 6
+            delta: 1.4658129805029452
+            id: id
+            label: label
+            labelKey: labelKey
+            value:
+              minor: 0
+              currency: currency
+          - tone: neutral
+            spark:
+            - 5.962133916683182
+            - 5.962133916683182
+            - 5.962133916683182
+            - 5.962133916683182
+            - 5.962133916683182
+            count: 6
+            delta: 1.4658129805029452
+            id: id
+            label: label
+            labelKey: labelKey
+            value:
+              minor: 0
+              currency: currency
+          items:
+          - "{}"
+          - "{}"
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/DisplaySnapshot"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    askDisplayAssistant_200_response:
+      example:
+        data:
+          transcript: transcript
+          answer: answer
+          kpi:
+            tone: neutral
+            spark:
+            - 1.4658129805029452
+            - 1.4658129805029452
+            - 1.4658129805029452
+            - 1.4658129805029452
+            - 1.4658129805029452
+            count: 0
+            delta: 6.027456183070403
+            id: id
+            label: label
+            labelKey: labelKey
+            value:
+              minor: 0
+              currency: currency
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/DisplayAssistantResponse"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    unlockDisplay_200_response:
+      example:
+        data:
+          retryAfterSec: 0
+          ok: true
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/DisplayUnlockResponse"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    getRewardsProgram_200_response:
+      example:
+        data:
+          unitLabel: unitLabel
+          kind: tenant_shop
+          regulationVersion: regulationVersion
+          name: name
+          partnerRewardsEnabled: true
+          config: "{}"
+          key: key
+          status: status
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/RewardProgram"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    upsertRewardsMember_200_response:
+      example:
+        data:
+          ref: ref
+          optedIn: true
+          balance:
+            inDebt: true
+            pending: 1
+            available: 6
+          level:
+            next: 7
+            level: 5
+            xp: 5
+            floor: 2
+            ratio: 9.301444243932576
+          programKey: programKey
+          optedInAt: 2000-01-23T04:56:07.000+00:00
+          streak:
+            current: 3
+            longest: 2
+            activeThisPeriod: true
+            atRisk: true
+            currentPeriod: currentPeriod
+            freezes: 4
+          expiry:
+            at: 2000-01-23T04:56:07.000+00:00
+            units: 7
+          holdout: true
+          perks:
+          - perks
+          - perks
+          memberId: 0
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/RewardMemberSummary"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    listRewardsMemberHistory_200_response:
+      example:
+        data:
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          kind: kind
+          memo: memo
+          units: 6
+          ruleKey: ruleKey
+          txnId: 0
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          kind: kind
+          memo: memo
+          units: 6
+          ruleKey: ruleKey
+          txnId: 0
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/RewardHistoryItem"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    createRewardsRedemption_200_response:
+      example:
+        data:
+          id: 0
+          duplicate: true
+          status: pending_approval
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/RewardRedemptionResult"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    createRewardsEvent_200_response:
+      example:
+        data:
+          badges:
+          - badges
+          - badges
+          eventId: 0
+          reason: reason
+          levelUp:
+            from: 5
+            to: 5
+          duplicate: true
+          unitsAwarded: 6
+          xpAwarded: 1
+          status: processed
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/RewardEventResult"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    listRewardsCatalog_200_response:
+      example:
+        data:
+        - unitsCost: 6
+          credits: 1
+          kind: ai_credit
+          available: true
+          perk: perk
+          id: 0
+          key: key
+        - unitsCost: 6
+          credits: 1
+          kind: ai_credit
+          available: true
+          perk: perk
+          id: 0
+          key: key
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/RewardCatalogItem"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    createRewardsClawback_200_response:
+      example:
+        data:
+          reversedUnits: 0
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/RewardClawbackResult"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    createRewardsWidgetKey_201_response:
+      example:
+        data:
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          allowedOrigins:
+          - allowedOrigins
+          - allowedOrigins
+          kid: kid
+          programKey: programKey
+          secret: secret
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/RewardWidgetKey"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    revokeRewardsWidgetKey_200_response:
+      example:
+        data:
+          kid: kid
+          revoked: true
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/RewardWidgetKeyRevoked"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    createRewardsWidgetSession_200_response:
+      example:
+        data:
+          scope: read
+          sessionToken: sessionToken
+          expiresAt: 2000-01-23T04:56:07.000+00:00
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/RewardWidgetSession"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    getRewardsWidgetMe_200_response:
+      example:
+        data:
+          summary:
+            ref: ref
+            optedIn: true
+            balance:
+              inDebt: true
+              pending: 1
+              available: 6
+            level:
+              next: 7
+              level: 5
+              xp: 5
+              floor: 2
+              ratio: 9.301444243932576
+            programKey: programKey
+            optedInAt: 2000-01-23T04:56:07.000+00:00
+            streak:
+              current: 3
+              longest: 2
+              activeThisPeriod: true
+              atRisk: true
+              currentPeriod: currentPeriod
+              freezes: 4
+            expiry:
+              at: 2000-01-23T04:56:07.000+00:00
+              units: 7
+            holdout: true
+            perks:
+            - perks
+            - perks
+            memberId: 0
+          badges:
+          - awardedAt: 2000-01-23T04:56:07.000+00:00
+            icon: icon
+            family: family
+            key: key
+          - awardedAt: 2000-01-23T04:56:07.000+00:00
+            icon: icon
+            family: family
+            key: key
+          program:
+            unitLabel: unitLabel
+            name: name
+          history:
+          - createdAt: 2000-01-23T04:56:07.000+00:00
+            kind: kind
+            memo: memo
+            units: 6
+            ruleKey: ruleKey
+            txnId: 0
+          - createdAt: 2000-01-23T04:56:07.000+00:00
+            kind: kind
+            memo: memo
+            units: 6
+            ruleKey: ruleKey
+            txnId: 0
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/RewardWidgetMe"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
     invoice_paid_post_request:
       allOf:
       - $ref: "#/components/schemas/WebhookDelivery"
@@ -23306,6 +27500,15 @@ components:
             - court_case.hearing_added
           data:
             $ref: "#/components/schemas/CourtHearingAddedWebhookData"
+    email_received_post_request:
+      allOf:
+      - $ref: "#/components/schemas/WebhookDelivery"
+      - properties:
+          type:
+            enum:
+            - email.received
+          data:
+            $ref: "#/components/schemas/EmailReceivedWebhookData"
     subscription_activated_post_request:
       allOf:
       - $ref: "#/components/schemas/WebhookDelivery"
@@ -23604,6 +27807,34 @@ components:
           type: string
       required:
       - subject
+    MarketingSubscriberCreate_consent:
+      description: GDPR art. 7(1) evidence. The text and the IP are stored only as
+        hashes.
+      example:
+        ip: ip
+        text_version: text_version
+        text: text
+        user_agent: user_agent
+      properties:
+        text_version:
+          description: Version of the consent wording the person saw
+          maxLength: 64
+          minLength: 1
+          type: string
+        text:
+          description: Consent wording; stored only as sha256
+          maxLength: 2000
+          type: string
+        ip:
+          description: The end user's IP; stored only as a salted hash
+          maxLength: 64
+          type: string
+        user_agent:
+          description: Truncated to 300 characters
+          maxLength: 1000
+          type: string
+      required:
+      - text_version
     ProspectingSavedSearchCreate_filters:
       description: "The @brivio/registry-search filter model: `{ groups: FilterGroup[]\
         \ }` (AND between groups, OR within)."
@@ -23934,6 +28165,730 @@ components:
       required:
       - created_at
       - type
+    DisplayConfig_profileSettings_slides_inner:
+      example:
+        kind: image
+        subtitle: subtitle
+        imageUrl: https://openapi-generator.tech
+        articleId: articleId
+        id: id
+        title: title
+        durationSec: 68
+      properties:
+        id:
+          maxLength: 40
+          minLength: 1
+          type: string
+        kind:
+          enum:
+          - image
+          - text
+          - product
+          type: string
+        title:
+          maxLength: 120
+          type: string
+        subtitle:
+          maxLength: 240
+          type: string
+        imageUrl:
+          format: uri
+          maxLength: 1000
+          type: string
+        articleId:
+          description: "product slides: catalog product or article id."
+          maxLength: 64
+          type: string
+        durationSec:
+          default: 10
+          maximum: 120
+          minimum: 3
+          type: integer
+      required:
+      - durationSec
+      - id
+      - kind
+    DisplayConfig_profileSettings:
+      description: Per-profile settings; every field optional with a default.
+      example:
+        orientation: landscape
+        lateAfterMin: 145
+        slides:
+        - kind: image
+          subtitle: subtitle
+          imageUrl: https://openapi-generator.tech
+          articleId: articleId
+          id: id
+          title: title
+          durationSec: 68
+        - kind: image
+          subtitle: subtitle
+          imageUrl: https://openapi-generator.tech
+          articleId: articleId
+          id: id
+          title: title
+          durationSec: 68
+        - kind: image
+          subtitle: subtitle
+          imageUrl: https://openapi-generator.tech
+          articleId: articleId
+          id: id
+          title: title
+          durationSec: 68
+        - kind: image
+          subtitle: subtitle
+          imageUrl: https://openapi-generator.tech
+          articleId: articleId
+          id: id
+          title: title
+          durationSec: 68
+        - kind: image
+          subtitle: subtitle
+          imageUrl: https://openapi-generator.tech
+          articleId: articleId
+          id: id
+          title: title
+          durationSec: 68
+        qrUrl: https://openapi-generator.tech
+        counters:
+        - counters
+        - counters
+        - counters
+        - counters
+        - counters
+        clearReadyAfterMin: 18
+        showModifiers: true
+        showPrices: true
+        warnAfterMin: 10
+        showBookings: true
+        showClock: true
+        transition: fade
+        showVisitors: true
+        showBrand: true
+        showNext: 7
+        welcome: welcome
+        chime: true
+      properties:
+        orientation:
+          enum:
+          - landscape
+          - portrait
+          type: string
+        showClock:
+          type: boolean
+        showBrand:
+          type: boolean
+        welcome:
+          maxLength: 160
+          type: string
+        warnAfterMin:
+          maximum: 120
+          minimum: 1
+          type: integer
+        lateAfterMin:
+          maximum: 240
+          minimum: 2
+          type: integer
+        showModifiers:
+          type: boolean
+        clearReadyAfterMin:
+          maximum: 120
+          minimum: 1
+          type: integer
+        chime:
+          type: boolean
+        showNext:
+          maximum: 12
+          minimum: 0
+          type: integer
+        counters:
+          items:
+            maxLength: 40
+            type: string
+          maxItems: 12
+          type: array
+        slides:
+          items:
+            $ref: "#/components/schemas/DisplayConfig_profileSettings_slides_inner"
+          maxItems: 40
+          type: array
+        transition:
+          enum:
+          - fade
+          - slide
+          - morph
+          type: string
+        showPrices:
+          type: boolean
+        qrUrl:
+          format: uri
+          maxLength: 1000
+          type: string
+        showBookings:
+          type: boolean
+        showVisitors:
+          type: boolean
+    DisplayConfig_lock:
+      example:
+        pinHash: pinHash
+        pinSalt: pinSalt
+        enabled: true
+      properties:
+        enabled:
+          type: boolean
+        pinSalt:
+          maxLength: 64
+          nullable: true
+          type: string
+        pinHash:
+          description: hex SHA-256(salt + pin); the PIN itself is never stored.
+          maxLength: 128
+          nullable: true
+          type: string
+      required:
+      - enabled
+      - pinHash
+      - pinSalt
+    DisplayMe_org:
+      example:
+        name: name
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        accent: accent
+        logoUrl: logoUrl
+      properties:
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        logoUrl:
+          nullable: true
+          type: string
+        accent:
+          nullable: true
+          type: string
+      required:
+      - accent
+      - id
+      - logoUrl
+      - name
+    DisplaySnapshot_kpis_inner:
+      example:
+        tone: neutral
+        spark:
+        - 5.962133916683182
+        - 5.962133916683182
+        - 5.962133916683182
+        - 5.962133916683182
+        - 5.962133916683182
+        count: 6
+        delta: 1.4658129805029452
+        id: id
+        label: label
+        labelKey: labelKey
+        value:
+          minor: 0
+          currency: currency
+      properties:
+        id:
+          type: string
+        labelKey:
+          type: string
+        label:
+          type: string
+        value:
+          $ref: "#/components/schemas/DisplayMoney"
+        count:
+          nullable: true
+          type: integer
+        delta:
+          description: Signed fraction vs the comparison period (0.12 = +12 %).
+          nullable: true
+          type: number
+        spark:
+          items:
+            type: number
+          maxItems: 60
+          type: array
+        tone:
+          enum:
+          - neutral
+          - good
+          - warn
+          - bad
+          type: string
+      required:
+      - count
+      - delta
+      - id
+      - label
+      - labelKey
+      - spark
+      - tone
+      - value
+    DisplaySnapshot_banks_inner:
+      example:
+        balance:
+          minor: 0
+          currency: currency
+        name: name
+        ibanTail: ibanTail
+      properties:
+        name:
+          type: string
+        ibanTail:
+          maxLength: 6
+          type: string
+        balance:
+          $ref: "#/components/schemas/DisplayMoney"
+      required:
+      - balance
+      - ibanTail
+      - name
+    DisplaySnapshot_collections_inner:
+      example:
+        minor: 5
+        day: 2000-01-23
+      properties:
+        day:
+          format: date
+          type: string
+        minor:
+          type: integer
+      required:
+      - day
+      - minor
+    DisplaySnapshot_alerts_inner:
+      example:
+        severity: info
+        at: at
+        id: id
+        title: title
+        titleKey: titleKey
+      properties:
+        id:
+          type: string
+        severity:
+          enum:
+          - info
+          - warn
+          - critical
+          type: string
+        titleKey:
+          type: string
+        title:
+          type: string
+        at:
+          type: string
+      required:
+      - at
+      - id
+      - severity
+      - title
+      - titleKey
+    DisplaySnapshot_slides_inner_oneOf_series_inner_points_inner:
+      example:
+        x: x
+        "y": 2.3021358869347655
+      properties:
+        x:
+          type: string
+        "y":
+          type: number
+      required:
+      - x
+      - "y"
+    DisplaySnapshot_slides_inner_oneOf_series_inner:
+      example:
+        label: label
+        points:
+        - x: x
+          "y": 2.3021358869347655
+        - x: x
+          "y": 2.3021358869347655
+        - x: x
+          "y": 2.3021358869347655
+        - x: x
+          "y": 2.3021358869347655
+        - x: x
+          "y": 2.3021358869347655
+      properties:
+        label:
+          type: string
+        points:
+          items:
+            $ref: "#/components/schemas/DisplaySnapshot_slides_inner_oneOf_series_inner_points_inner"
+          maxItems: 36
+          type: array
+      required:
+      - label
+      - points
+    DisplaySnapshot_slides_inner_oneOf:
+      example:
+        total:
+          minor: 0
+          currency: currency
+        series:
+        - label: label
+          points:
+          - x: x
+            "y": 2.3021358869347655
+          - x: x
+            "y": 2.3021358869347655
+          - x: x
+            "y": 2.3021358869347655
+          - x: x
+            "y": 2.3021358869347655
+          - x: x
+            "y": 2.3021358869347655
+        - label: label
+          points:
+          - x: x
+            "y": 2.3021358869347655
+          - x: x
+            "y": 2.3021358869347655
+          - x: x
+            "y": 2.3021358869347655
+          - x: x
+            "y": 2.3021358869347655
+          - x: x
+            "y": 2.3021358869347655
+        - label: label
+          points:
+          - x: x
+            "y": 2.3021358869347655
+          - x: x
+            "y": 2.3021358869347655
+          - x: x
+            "y": 2.3021358869347655
+          - x: x
+            "y": 2.3021358869347655
+          - x: x
+            "y": 2.3021358869347655
+        - label: label
+          points:
+          - x: x
+            "y": 2.3021358869347655
+          - x: x
+            "y": 2.3021358869347655
+          - x: x
+            "y": 2.3021358869347655
+          - x: x
+            "y": 2.3021358869347655
+          - x: x
+            "y": 2.3021358869347655
+        id: id
+        title: title
+        chart: bars
+        titleKey: titleKey
+      properties:
+        id:
+          type: string
+        titleKey:
+          type: string
+        title:
+          type: string
+        chart:
+          enum:
+          - bars
+          - line
+          - waterfall
+          - table
+          type: string
+        series:
+          items:
+            $ref: "#/components/schemas/DisplaySnapshot_slides_inner_oneOf_series_inner"
+          maxItems: 4
+          type: array
+        total:
+          $ref: "#/components/schemas/DisplayMoney"
+      required:
+      - chart
+      - id
+      - series
+      - title
+      - titleKey
+      - total
+    DisplaySnapshot_slides_inner:
+      oneOf:
+      - $ref: "#/components/schemas/DisplaySnapshot_slides_inner_oneOf"
+      - $ref: "#/components/schemas/DisplayResolvedSlide"
+    DisplaySnapshot_tickets_inner_lines_inner:
+      example:
+        note: note
+        qty: 7.061401241503109
+        name: name
+      properties:
+        qty:
+          type: number
+        name:
+          type: string
+        note:
+          nullable: true
+          type: string
+      required:
+      - name
+      - note
+      - qty
+    DisplaySnapshot_tickets_inner:
+      example:
+        number: number
+        id: id
+        title: title
+        lines:
+        - note: note
+          qty: 7.061401241503109
+          name: name
+        - note: note
+          qty: 7.061401241503109
+          name: name
+        - note: note
+          qty: 7.061401241503109
+          name: name
+        - note: note
+          qty: 7.061401241503109
+          name: name
+        - note: note
+          qty: 7.061401241503109
+          name: name
+        status: new
+        since: since
+      properties:
+        id:
+          type: string
+        number:
+          type: string
+        title:
+          type: string
+        lines:
+          items:
+            $ref: "#/components/schemas/DisplaySnapshot_tickets_inner_lines_inner"
+          maxItems: 30
+          type: array
+        status:
+          enum:
+          - new
+          - preparing
+          - ready
+          - done
+          type: string
+        since:
+          type: string
+      required:
+      - id
+      - lines
+      - number
+      - since
+      - status
+      - title
+    DisplaySnapshot_serving_inner:
+      example:
+        number: number
+        at: at
+        counter: counter
+      properties:
+        counter:
+          type: string
+        number:
+          type: string
+        at:
+          type: string
+      required:
+      - at
+      - counter
+      - number
+    DisplaySnapshot_categories_inner_items_inner:
+      example:
+        price:
+          minor: 0
+          currency: currency
+        imageUrl: imageUrl
+        name: name
+        description: description
+        id: id
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          nullable: true
+          type: string
+        price:
+          $ref: "#/components/schemas/DisplayMoney"
+        imageUrl:
+          nullable: true
+          type: string
+      required:
+      - description
+      - id
+      - imageUrl
+      - name
+      - price
+    DisplaySnapshot_categories_inner:
+      example:
+        name: name
+        items:
+        - price:
+            minor: 0
+            currency: currency
+          imageUrl: imageUrl
+          name: name
+          description: description
+          id: id
+        - price:
+            minor: 0
+            currency: currency
+          imageUrl: imageUrl
+          name: name
+          description: description
+          id: id
+        - price:
+            minor: 0
+            currency: currency
+          imageUrl: imageUrl
+          name: name
+          description: description
+          id: id
+        - price:
+            minor: 0
+            currency: currency
+          imageUrl: imageUrl
+          name: name
+          description: description
+          id: id
+        - price:
+            minor: 0
+            currency: currency
+          imageUrl: imageUrl
+          name: name
+          description: description
+          id: id
+      properties:
+        name:
+          type: string
+        items:
+          items:
+            $ref: "#/components/schemas/DisplaySnapshot_categories_inner_items_inner"
+          maxItems: 40
+          type: array
+      required:
+      - items
+      - name
+    RewardMemberSummary_balance:
+      example:
+        inDebt: true
+        pending: 1
+        available: 6
+      properties:
+        available:
+          type: integer
+        pending:
+          type: integer
+        inDebt:
+          type: boolean
+      required:
+      - available
+      - inDebt
+      - pending
+    RewardMemberSummary_level:
+      example:
+        next: 7
+        level: 5
+        xp: 5
+        floor: 2
+        ratio: 9.301444243932576
+      properties:
+        level:
+          type: integer
+        xp:
+          type: integer
+        floor:
+          type: integer
+        next:
+          nullable: true
+          type: integer
+        ratio:
+          type: number
+    RewardMemberSummary_streak:
+      example:
+        current: 3
+        longest: 2
+        activeThisPeriod: true
+        atRisk: true
+        currentPeriod: currentPeriod
+        freezes: 4
+      properties:
+        current:
+          type: integer
+        longest:
+          type: integer
+        freezes:
+          type: integer
+        atRisk:
+          type: boolean
+        currentPeriod:
+          type: string
+        activeThisPeriod:
+          type: boolean
+    RewardMemberSummary_expiry:
+      example:
+        at: 2000-01-23T04:56:07.000+00:00
+        units: 7
+      properties:
+        units:
+          type: integer
+        at:
+          format: date-time
+          type: string
+    RewardEventCreate_payload:
+      additionalProperties: false
+      example:
+        units: 80083
+      properties:
+        units:
+          description: Units to award (issuer-defined).
+          maximum: 1000000
+          minimum: 1
+    RewardEventResult_levelUp:
+      example:
+        from: 5
+        to: 5
+      properties:
+        from:
+          type: integer
+        to:
+          type: integer
+    RewardWidgetMe_program:
+      example:
+        unitLabel: unitLabel
+        name: name
+      properties:
+        name:
+          type: string
+        unitLabel:
+          type: string
+    RewardWidgetMe_badges_inner:
+      example:
+        awardedAt: 2000-01-23T04:56:07.000+00:00
+        icon: icon
+        family: family
+        key: key
+      properties:
+        key:
+          type: string
+        family:
+          type: string
+        icon:
+          type: string
+        awardedAt:
+          format: date-time
+          nullable: true
+          type: string
+      required:
+      - family
+      - icon
+      - key
   securitySchemes:
     bearerAuth:
       description: API key as Bearer token

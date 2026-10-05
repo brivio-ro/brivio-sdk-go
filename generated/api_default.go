@@ -313,6 +313,103 @@ func (a *DefaultAPIService) DeliveryRouteDispatchedPostExecute(r ApiDeliveryRout
 	return localVarHTTPResponse, nil
 }
 
+type ApiEmailReceivedPostRequest struct {
+	ctx context.Context
+	ApiService *DefaultAPIService
+	emailReceivedPostRequest *EmailReceivedPostRequest
+}
+
+func (r ApiEmailReceivedPostRequest) EmailReceivedPostRequest(emailReceivedPostRequest EmailReceivedPostRequest) ApiEmailReceivedPostRequest {
+	r.emailReceivedPostRequest = &emailReceivedPostRequest
+	return r
+}
+
+func (r ApiEmailReceivedPostRequest) Execute() (*http.Response, error) {
+	return r.ApiService.EmailReceivedPostExecute(r)
+}
+
+/*
+EmailReceivedPost An inbound message landed in one of the organisation's Brivio mailboxes (inbox or a custom folder; not spam, trash, drafts or its own outbound mail; history imported by a first sync is not announced). Metadata only — never the body, snippet, cc/bcc or attachment names. Idempotent per stored message: a re-sync never announces it twice.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiEmailReceivedPostRequest
+*/
+func (a *DefaultAPIService) EmailReceivedPost(ctx context.Context) ApiEmailReceivedPostRequest {
+	return ApiEmailReceivedPostRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+func (a *DefaultAPIService) EmailReceivedPostExecute(r ApiEmailReceivedPostRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.EmailReceivedPost")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/email.received"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.emailReceivedPostRequest == nil {
+		return nil, reportError("emailReceivedPostRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.emailReceivedPostRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
 type ApiFleetVehicleCreatedPostRequest struct {
 	ctx context.Context
 	ApiService *DefaultAPIService

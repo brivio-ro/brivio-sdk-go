@@ -85,6 +85,8 @@ type APIClient struct {
 
 	DeliveryRoutesAPI *DeliveryRoutesAPIService
 
+	DisplayAPI *DisplayAPIService
+
 	DnsAPI *DnsAPIService
 
 	DocumentsAPI *DocumentsAPIService
@@ -151,6 +153,8 @@ type APIClient struct {
 
 	ResourcingAPI *ResourcingAPIService
 
+	RewardsAPI *RewardsAPIService
+
 	SaftAPI *SaftAPIService
 
 	SeriesAPI *SeriesAPIService
@@ -210,6 +214,7 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.ContractsAPI = (*ContractsAPIService)(&c.common)
 	c.CustomersAPI = (*CustomersAPIService)(&c.common)
 	c.DeliveryRoutesAPI = (*DeliveryRoutesAPIService)(&c.common)
+	c.DisplayAPI = (*DisplayAPIService)(&c.common)
 	c.DnsAPI = (*DnsAPIService)(&c.common)
 	c.DocumentsAPI = (*DocumentsAPIService)(&c.common)
 	c.DomainsAPI = (*DomainsAPIService)(&c.common)
@@ -243,6 +248,7 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.RealtimeAPI = (*RealtimeAPIService)(&c.common)
 	c.ReservationsAPI = (*ReservationsAPIService)(&c.common)
 	c.ResourcingAPI = (*ResourcingAPIService)(&c.common)
+	c.RewardsAPI = (*RewardsAPIService)(&c.common)
 	c.SaftAPI = (*SaftAPIService)(&c.common)
 	c.SeriesAPI = (*SeriesAPIService)(&c.common)
 	c.SitesAPI = (*SitesAPIService)(&c.common)
