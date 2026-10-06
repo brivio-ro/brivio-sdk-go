@@ -27,6 +27,7 @@ type EmailDomainVerifyResult struct {
 	Checks EmailDomainChecks `json:"checks"`
 	DnsRecords []EmailDnsRecord `json:"dns_records"`
 	LastError *string `json:"last_error,omitempty"`
+	SenderIdentity *EmailDomainVerifyResultSenderIdentity `json:"sender_identity,omitempty"`
 }
 
 type _EmailDomainVerifyResult EmailDomainVerifyResult
@@ -205,6 +206,38 @@ func (o *EmailDomainVerifyResult) SetLastError(v string) {
 	o.LastError = &v
 }
 
+// GetSenderIdentity returns the SenderIdentity field value if set, zero value otherwise.
+func (o *EmailDomainVerifyResult) GetSenderIdentity() EmailDomainVerifyResultSenderIdentity {
+	if o == nil || IsNil(o.SenderIdentity) {
+		var ret EmailDomainVerifyResultSenderIdentity
+		return ret
+	}
+	return *o.SenderIdentity
+}
+
+// GetSenderIdentityOk returns a tuple with the SenderIdentity field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EmailDomainVerifyResult) GetSenderIdentityOk() (*EmailDomainVerifyResultSenderIdentity, bool) {
+	if o == nil || IsNil(o.SenderIdentity) {
+		return nil, false
+	}
+	return o.SenderIdentity, true
+}
+
+// HasSenderIdentity returns a boolean if a field has been set.
+func (o *EmailDomainVerifyResult) HasSenderIdentity() bool {
+	if o != nil && !IsNil(o.SenderIdentity) {
+		return true
+	}
+
+	return false
+}
+
+// SetSenderIdentity gets a reference to the given EmailDomainVerifyResultSenderIdentity and assigns it to the SenderIdentity field.
+func (o *EmailDomainVerifyResult) SetSenderIdentity(v EmailDomainVerifyResultSenderIdentity) {
+	o.SenderIdentity = &v
+}
+
 func (o EmailDomainVerifyResult) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -222,6 +255,9 @@ func (o EmailDomainVerifyResult) ToMap() (map[string]interface{}, error) {
 	toSerialize["dns_records"] = o.DnsRecords
 	if !IsNil(o.LastError) {
 		toSerialize["last_error"] = o.LastError
+	}
+	if !IsNil(o.SenderIdentity) {
+		toSerialize["sender_identity"] = o.SenderIdentity
 	}
 	return toSerialize, nil
 }

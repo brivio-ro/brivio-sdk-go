@@ -217,6 +217,7 @@ model_email_domain.go
 model_email_domain_checks.go
 model_email_domain_create.go
 model_email_domain_verify_result.go
+model_email_domain_verify_result_sender_identity.go
 model_email_event.go
 model_email_message_accepted.go
 model_email_message_accepted_data.go

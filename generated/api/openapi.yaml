@@ -14383,6 +14383,10 @@ components:
           type: TXT
           value: v=DKIM1; k=rsa; p=MIIB...
           status: pending
+        sender_identity:
+          mode: exists
+          reason: not_verified
+          ready: true
         verified: true
         id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         last_error: last_error
@@ -14408,6 +14412,8 @@ components:
         last_error:
           type: string
           nullable: true
+        sender_identity:
+          $ref: "#/components/schemas/EmailDomainVerifyResult_sender_identity"
       required:
       - checks
       - dns_records
@@ -23600,6 +23606,10 @@ components:
             type: TXT
             value: v=DKIM1; k=rsa; p=MIIB...
             status: pending
+          sender_identity:
+            mode: exists
+            reason: not_verified
+            ready: true
           verified: true
           id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           last_error: last_error
@@ -27591,6 +27601,35 @@ components:
       - id
       - message_id
       - status
+    EmailDomainVerifyResult_sender_identity:
+      description: "Whether the verified domain can send as itself (its own SMTP identity,\
+        \ ADR-0210 D10). null while not verified. ready=false means sends From this\
+        \ domain answer 422 sender_identity_missing until fixed."
+      example:
+        mode: exists
+        reason: not_verified
+        ready: true
+      properties:
+        ready:
+          type: boolean
+        mode:
+          enum:
+          - exists
+          - created
+          - adopted
+          - rotated
+          type: string
+        reason:
+          enum:
+          - not_verified
+          - not_configured
+          - no_provider_domain
+          - secret_conflict
+          - error
+          type: string
+      required:
+      - ready
+      nullable: true
     InvoicePaymentWebhookData_payment:
       properties:
         id:

@@ -548,6 +548,7 @@ Class | Method | HTTP request | Description
  - [EmailDomainChecks](docs/EmailDomainChecks.md)
  - [EmailDomainCreate](docs/EmailDomainCreate.md)
  - [EmailDomainVerifyResult](docs/EmailDomainVerifyResult.md)
+ - [EmailDomainVerifyResultSenderIdentity](docs/EmailDomainVerifyResultSenderIdentity.md)
  - [EmailEvent](docs/EmailEvent.md)
  - [EmailMessageAccepted](docs/EmailMessageAccepted.md)
  - [EmailMessageAcceptedData](docs/EmailMessageAcceptedData.md)
