@@ -6191,10 +6191,13 @@ paths:
         \ org opt-outs) are reported per recipient and never handed to the MTA; if\
         \ every `to` is suppressed the message is recorded with `status: suppressed`.\
         \ `category: marketing` → 422 (use campaigns). `from` on an unverified domain\
-        \ → 422. A verified `from` domain whose sending identity is not provisioned\
-        \ yet → 422 `sender_identity_missing` (nothing recorded; re-run `/email-domains/{id}/verify`).\
-        \ Attachments over 2 MB decoded → 413. Webhooks: `email.sent`, `email.delivered`,\
-        \ `email.bounced`, `email.complained`, `email.suppressed`."
+        \ → 422. A `from` on a verified domain that no sending identity may send as\
+        \ → 422 `sender_identity_missing` (nothing recorded). Sendable: the sending\
+        \ address of the domain (`<from_local_part>@<domain>`; re-run `/email-domains/{id}/verify`\
+        \ if its identity is missing), or a hosted mailbox of the organisation or\
+        \ one of its aliases with API sending enabled (Mail settings). Attachments\
+        \ over 2 MB decoded → 413. Webhooks: `email.sent`, `email.delivered`, `email.bounced`,\
+        \ `email.complained`, `email.suppressed`."
       operationId: createEmailSend
       parameters:
       - explode: false
@@ -6369,8 +6372,9 @@ paths:
         \ DKIM-Signature, ARC-*, …; no CR/LF). `category` defaults to `transactional`;\
         \ `auth` and `alert` are aliases for `transactional` and `notification`; `marketing`\
         \ → 422. `from` on an unverified domain → 422 `from_domain_not_verified`;\
-        \ omit it for the org default sender. A verified domain whose sending identity\
-        \ is not provisioned yet → 422 `sender_identity_missing` (nothing recorded).\
+        \ omit it for the org default sender. A `from` that no sending identity may\
+        \ send as → 422 `sender_identity_missing` (nothing recorded): use the sending\
+        \ address of the domain, or a hosted mailbox / alias with API sending enabled.\
         \ 202 whenever the message is recorded — `status` is `sent`, `queued` (including\
         \ a transport failure parked for retry) or `suppressed` (non-error). A transport\
         \ refusal that could not be queued → 502 `send_failed`. `id`, `status` and\
