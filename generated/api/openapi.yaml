@@ -9155,6 +9155,144 @@ paths:
         \ (scope: delivery:dispatch)"
       tags:
       - delivery-routes
+  /delivery-routes/cost-analytics:
+    get:
+      operationId: getDeliveryRouteCostAnalytics
+      parameters:
+      - description: Look-back window in days
+        explode: true
+        in: query
+        name: window
+        required: false
+        schema:
+          default: "30"
+          enum:
+          - "30"
+          - "90"
+          type: string
+        style: form
+      - description: '`marginal` (default) or `full` (adds depreciation and insurance)'
+        explode: true
+        in: query
+        name: mode
+        required: false
+        schema:
+          default: marginal
+          enum:
+          - marginal
+          - full
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getDeliveryRouteCostAnalytics_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Own fleet vs courier over the last 30 or 90 days, from the snapshots\
+        \ stored when routes were completed: totals, saving, verdict counts, hybrid\
+        \ saving, CO2, break-even stop count and the routes that lost money. (scope:\
+        \ delivery:read)"
+      tags:
+      - delivery-routes
+  /delivery-routes/{id}/cost-comparison:
+    get:
+      operationId: getDeliveryRouteCostComparison
+      parameters:
+      - description: Delivery route id
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - description: '`marginal` (default) or `full` (adds depreciation and insurance)'
+        explode: true
+        in: query
+        name: mode
+        required: false
+        schema:
+          default: marginal
+          enum:
+          - marginal
+          - full
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getDeliveryRouteCostComparison_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Compare the own-fleet cost of a route with live courier quotes for\
+        \ the same parcels: verdict, saving, hybrid split, break-even stop count and\
+        \ CO2. 422 when the route has no stops. Heavy rate tier. (scope: delivery:read)"
+      tags:
+      - delivery-routes
   /legal/court-cases:
     get:
       operationId: listCourtCases
@@ -18225,6 +18363,232 @@ components:
       - route_id
       - sent_to_driver
       - status
+    DeliveryRouteCostComparison:
+      description: Own fleet vs courier for one route (F-VS). Every *Minor amount
+        is an integer in minor units of `currency`.
+      example:
+        fleetPerKmMinor: 6
+        breakdown:
+        - category: FUEL
+          amountMinor: 3
+        - category: FUEL
+          amountMinor: 3
+        hybridStops:
+        - courier: courier
+          courierMinor: 2
+          stopId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          fleetMinor: 4
+          label: label
+        - courier: courier
+          courierMinor: 2
+          stopId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          fleetMinor: 4
+          label: label
+        hybridSavingMinor: 7
+        breakEvenStops: 1
+        fleetMinor: 0
+        estimatedPercent: 1.4658129805029452
+        savingMinor: 9
+        co2Grams: 1
+        mode: MARGINAL
+        courierProjectedMinor: 5
+        estimatedStops: 7
+        senderMissing: true
+        verdict: FLEET
+        currency: currency
+        pricedStops: 5
+        unpricedStops: 2
+      properties:
+        currency:
+          description: ISO 4217
+          type: string
+        mode:
+          description: FULL adds depreciation and insurance
+          enum:
+          - MARGINAL
+          - FULL
+          type: string
+        fleetMinor:
+          description: Own-fleet cost of the route
+          type: integer
+        fleetPerKmMinor:
+          description: Fleet cost per km; null without a distance
+          nullable: true
+          type: integer
+        estimatedPercent:
+          description: Share of the fleet cost that is estimated (0-100)
+          type: number
+        courierProjectedMinor:
+          description: Courier price of the same parcels; null when no stop could
+            be priced
+          nullable: true
+          type: integer
+        pricedStops:
+          type: integer
+        unpricedStops:
+          type: integer
+        estimatedStops:
+          type: integer
+        savingMinor:
+          description: Courier minus fleet; positive means the fleet is cheaper
+          nullable: true
+          type: integer
+        verdict:
+          enum:
+          - FLEET
+          - COURIER
+          - TIE
+          - UNKNOWN
+          type: string
+        breakdown:
+          description: Per-category fleet cost. Always null for API keys (it would
+            expose driver pay).
+          items:
+            $ref: "#/components/schemas/DeliveryRouteCostComparison_breakdown_inner"
+          nullable: true
+          type: array
+        hybridStops:
+          description: Stops cheaper to hand to a courier
+          items:
+            $ref: "#/components/schemas/DeliveryRouteCostComparison_hybridStops_inner"
+          type: array
+        hybridSavingMinor:
+          type: integer
+        breakEvenStops:
+          description: Stop count at which the fleet breaks even
+          nullable: true
+          type: integer
+        co2Grams:
+          nullable: true
+          type: integer
+        senderMissing:
+          description: True when the org has no sender address for courier quotes
+          type: boolean
+      required:
+      - breakEvenStops
+      - breakdown
+      - co2Grams
+      - courierProjectedMinor
+      - currency
+      - estimatedPercent
+      - estimatedStops
+      - fleetMinor
+      - fleetPerKmMinor
+      - hybridSavingMinor
+      - hybridStops
+      - mode
+      - pricedStops
+      - savingMinor
+      - senderMissing
+      - unpricedStops
+      - verdict
+    DeliveryRouteCostAnalytics:
+      description: "Own fleet vs courier over the last 30 or 90 days, from the cost\
+        \ snapshots stored when each route was completed (F-VS). Every *Minor amount\
+        \ is an integer in minor units of `currency`."
+      example:
+        verdicts:
+          FLEET: 7
+          TIE: 3
+          COURIER: 9
+          UNKNOWN: 2
+        avgStops: 1.2315135367772556
+        courierMinor: 5
+        hybridSavingMinor: 4
+        breakEvenStops: 1
+        fleetMinor: 5
+        estimatedPercent: 1.4894159098541704
+        savingMinor: 2
+        co2Grams: 7
+        losing:
+        - number: number
+          routeDate: 2000-01-23T04:56:07.000+00:00
+          routeId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          courierMinor: 7
+          name: name
+          fleetMinor: 6
+          lossMinor: 1
+        - number: number
+          routeDate: 2000-01-23T04:56:07.000+00:00
+          routeId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          courierMinor: 7
+          name: name
+          fleetMinor: 6
+          lossMinor: 1
+        mode: MARGINAL
+        routes: 6
+        comparableRoutes: 1
+        currency: currency
+        windowDays: 0
+      properties:
+        windowDays:
+          enum:
+          - 30
+          - 90
+          type: integer
+        mode:
+          description: FULL adds depreciation and insurance
+          enum:
+          - MARGINAL
+          - FULL
+          type: string
+        currency:
+          description: ISO 4217
+          type: string
+        routes:
+          description: Completed routes with a snapshot in the window
+          type: integer
+        comparableRoutes:
+          description: Routes that had a courier price to compare against
+          type: integer
+        fleetMinor:
+          description: Own-fleet cost over comparable routes
+          type: integer
+        courierMinor:
+          description: Courier price over comparable routes
+          type: integer
+        savingMinor:
+          description: Courier minus fleet; positive means the fleet saved money
+          type: integer
+        verdicts:
+          $ref: "#/components/schemas/DeliveryRouteCostAnalytics_verdicts"
+        hybridSavingMinor:
+          description: What handing the cheaper stops to a courier would have saved
+          type: integer
+        co2Grams:
+          type: integer
+        avgStops:
+          description: Average stops per comparable route
+          nullable: true
+          type: number
+        breakEvenStops:
+          description: Stop count at which the fleet starts winning
+          nullable: true
+          type: integer
+        estimatedPercent:
+          description: "Share of fleet cost that was estimated, weighted by cost (0-100)"
+          type: number
+        losing:
+          description: Routes whose fleet cost exceeded the courier price
+          items:
+            $ref: "#/components/schemas/DeliveryRouteCostAnalytics_losing_inner"
+          type: array
+      required:
+      - avgStops
+      - breakEvenStops
+      - co2Grams
+      - comparableRoutes
+      - courierMinor
+      - currency
+      - estimatedPercent
+      - fleetMinor
+      - hybridSavingMinor
+      - losing
+      - mode
+      - routes
+      - savingMinor
+      - verdicts
+      - windowDays
     CourtCase:
       example:
         role: RECLAMANT
@@ -25930,6 +26294,94 @@ components:
       required:
       - data
       - error
+    getDeliveryRouteCostAnalytics_200_response:
+      example:
+        data:
+          verdicts:
+            FLEET: 7
+            TIE: 3
+            COURIER: 9
+            UNKNOWN: 2
+          avgStops: 1.2315135367772556
+          courierMinor: 5
+          hybridSavingMinor: 4
+          breakEvenStops: 1
+          fleetMinor: 5
+          estimatedPercent: 1.4894159098541704
+          savingMinor: 2
+          co2Grams: 7
+          losing:
+          - number: number
+            routeDate: 2000-01-23T04:56:07.000+00:00
+            routeId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            courierMinor: 7
+            name: name
+            fleetMinor: 6
+            lossMinor: 1
+          - number: number
+            routeDate: 2000-01-23T04:56:07.000+00:00
+            routeId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            courierMinor: 7
+            name: name
+            fleetMinor: 6
+            lossMinor: 1
+          mode: MARGINAL
+          routes: 6
+          comparableRoutes: 1
+          currency: currency
+          windowDays: 0
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/DeliveryRouteCostAnalytics"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    getDeliveryRouteCostComparison_200_response:
+      example:
+        data:
+          fleetPerKmMinor: 6
+          breakdown:
+          - category: FUEL
+            amountMinor: 3
+          - category: FUEL
+            amountMinor: 3
+          hybridStops:
+          - courier: courier
+            courierMinor: 2
+            stopId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            fleetMinor: 4
+            label: label
+          - courier: courier
+            courierMinor: 2
+            stopId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            fleetMinor: 4
+            label: label
+          hybridSavingMinor: 7
+          breakEvenStops: 1
+          fleetMinor: 0
+          estimatedPercent: 1.4658129805029452
+          savingMinor: 9
+          co2Grams: 1
+          mode: MARGINAL
+          courierProjectedMinor: 5
+          estimatedStops: 7
+          senderMissing: true
+          verdict: FLEET
+          currency: currency
+          pricedStops: 5
+          unpricedStops: 2
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/DeliveryRouteCostComparison"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
     listCourtCases_200_response:
       example:
         data:
@@ -29373,6 +29825,114 @@ components:
           $ref: "#/components/schemas/DeliveryRouteOptimizeResult_warnings_overweight"
         over_parcels:
           $ref: "#/components/schemas/DeliveryRouteOptimizeResult_warnings_over_parcels"
+    DeliveryRouteCostComparison_breakdown_inner:
+      example:
+        category: FUEL
+        amountMinor: 3
+      properties:
+        category:
+          enum:
+          - FUEL
+          - TOLLS
+          - DRIVER_WAGES
+          - PER_DIEM
+          - MAINTENANCE
+          - TYRES
+          - INSURANCE
+          - DEPRECIATION
+          - LEASING
+          - SUBCONTRACTOR
+          - CUSTOMS
+          - FINES
+          - OTHER
+          type: string
+        amountMinor:
+          type: integer
+      required:
+      - amountMinor
+      - category
+    DeliveryRouteCostComparison_hybridStops_inner:
+      example:
+        courier: courier
+        courierMinor: 2
+        stopId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        fleetMinor: 4
+        label: label
+      properties:
+        stopId:
+          format: uuid
+          type: string
+        label:
+          type: string
+        courier:
+          type: string
+        courierMinor:
+          type: integer
+        fleetMinor:
+          nullable: true
+          type: integer
+      required:
+      - courier
+      - courierMinor
+      - fleetMinor
+      - label
+      - stopId
+    DeliveryRouteCostAnalytics_verdicts:
+      example:
+        FLEET: 7
+        TIE: 3
+        COURIER: 9
+        UNKNOWN: 2
+      properties:
+        FLEET:
+          type: integer
+        COURIER:
+          type: integer
+        TIE:
+          type: integer
+        UNKNOWN:
+          type: integer
+      required:
+      - COURIER
+      - FLEET
+      - TIE
+      - UNKNOWN
+    DeliveryRouteCostAnalytics_losing_inner:
+      example:
+        number: number
+        routeDate: 2000-01-23T04:56:07.000+00:00
+        routeId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        courierMinor: 7
+        name: name
+        fleetMinor: 6
+        lossMinor: 1
+      properties:
+        routeId:
+          format: uuid
+          type: string
+        number:
+          nullable: true
+          type: string
+        name:
+          nullable: true
+          type: string
+        routeDate:
+          format: date-time
+          type: string
+        fleetMinor:
+          type: integer
+        courierMinor:
+          type: integer
+        lossMinor:
+          type: integer
+      required:
+      - courierMinor
+      - fleetMinor
+      - lossMinor
+      - name
+      - number
+      - routeDate
+      - routeId
     ImportDeclarationCreate_lines_inner:
       additionalProperties: false
       example:
