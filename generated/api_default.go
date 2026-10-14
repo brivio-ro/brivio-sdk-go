@@ -701,6 +701,103 @@ func (a *DefaultAPIService) FleetVehicleUpdatedPostExecute(r ApiFleetVehicleUpda
 	return localVarHTTPResponse, nil
 }
 
+type ApiInvoiceCreditedPostRequest struct {
+	ctx context.Context
+	ApiService *DefaultAPIService
+	invoiceCreditedPostRequest *InvoiceCreditedPostRequest
+}
+
+func (r ApiInvoiceCreditedPostRequest) InvoiceCreditedPostRequest(invoiceCreditedPostRequest InvoiceCreditedPostRequest) ApiInvoiceCreditedPostRequest {
+	r.invoiceCreditedPostRequest = &invoiceCreditedPostRequest
+	return r
+}
+
+func (r ApiInvoiceCreditedPostRequest) Execute() (*http.Response, error) {
+	return r.ApiService.InvoiceCreditedPostExecute(r)
+}
+
+/*
+InvoiceCreditedPost A credit note (storno) reversing an ISSUED invoice was issued or cancelled and changed the source invoice's credited amount. A storno cancels debt — it is not a payment. Idempotent per credited amount: id = evt_cred_<sourceId>_<creditedAmountCents>, so a re-sync landing on the same amount is a re-delivery of the same event.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiInvoiceCreditedPostRequest
+*/
+func (a *DefaultAPIService) InvoiceCreditedPost(ctx context.Context) ApiInvoiceCreditedPostRequest {
+	return ApiInvoiceCreditedPostRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+func (a *DefaultAPIService) InvoiceCreditedPostExecute(r ApiInvoiceCreditedPostRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.InvoiceCreditedPost")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/invoice.credited"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.invoiceCreditedPostRequest == nil {
+		return nil, reportError("invoiceCreditedPostRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.invoiceCreditedPostRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
 type ApiInvoicePaidPostRequest struct {
 	ctx context.Context
 	ApiService *DefaultAPIService

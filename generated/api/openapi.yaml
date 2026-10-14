@@ -3783,10 +3783,164 @@ paths:
               schema:
                 $ref: "#/components/schemas/listMe_401_response"
           description: Error
-      summary: "Import an e-commerce order (Shopify/WooCommerce connectors) — creates\
-        \ a DRAFT invoice + contact, deduped by source+external_id (scope: orders:write)"
+      summary: "Import an e-commerce order (Shopify/WooCommerce connectors) into the\
+        \ channel sync engine — stored as a channel order (stock reserved, invoice\
+        \ drafted by the engine), deduped by source+external_id; returns channel_order_id\
+        \ (scope: orders:write)"
       tags:
       - orders
+  /sales-channels:
+    get:
+      operationId: listSalesChannels
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List sales channels (eMAG, WooCommerce, Trendyol, …) with sync health;\
+        \ credentials are never returned (scope: orders:read)"
+      tags:
+      - sales-channels
+  /sales-channels/{id}:
+    get:
+      operationId: getSalesChannel
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Get a sales channel with sync health (scope: orders:read)"
+      tags:
+      - sales-channels
+  /channel-orders:
+    get:
+      operationId: listChannelOrders
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: channel_id
+        required: false
+        schema:
+          format: uuid
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          enum:
+          - new
+          - acknowledged
+          - in_progress
+          - shipped
+          - delivered
+          - cancelled
+          - returned
+          - needs_mapping
+          - oversold
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: updated_since
+        required: false
+        schema:
+          format: date-time
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List orders imported from sales channels (scope: orders:read)"
+      tags:
+      - channel-orders
+  /channel-orders/{id}:
+    get:
+      operationId: getChannelOrder
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Get a channel order with its lines (scope: orders:read)"
+      tags:
+      - channel-orders
+  /channel-orders/{id}/retry:
+    post:
+      operationId: retryChannelOrder
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Retry the stock reservation of an oversold or unmapped channel order\
+        \ (scope: orders:write)"
+      tags:
+      - channel-orders
   /bookings:
     get:
       operationId: listBookings
@@ -12361,6 +12515,584 @@ paths:
         \ 10 movements the widget renders"
       tags:
       - rewards
+  /shipping-points:
+    get:
+      operationId: listShippingPoints
+      parameters:
+      - description: "lat,lng — sorted by distance"
+        explode: true
+        in: query
+        name: near
+        required: false
+        schema:
+          pattern: "^-?\\d+(\\.\\d+)?,-?\\d+(\\.\\d+)?$"
+          type: string
+        style: form
+      - description: With near
+        explode: true
+        in: query
+        name: radius_km
+        required: false
+        schema:
+          default: 10
+          maximum: 50
+          type: number
+        style: form
+      - description: Locality (diacritics optional)
+        explode: true
+        in: query
+        name: city
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: 6-digit RO postcode
+        explode: true
+        in: query
+        name: postal_code
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Text over name / address / city
+        explode: true
+        in: query
+        name: q
+        required: false
+        schema:
+          minLength: 2
+          type: string
+        style: form
+      - description: "Comma list of sameday, cargus, fancourier, dpd, gls"
+        explode: true
+        in: query
+        name: courier
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Comma list of locker, shop, office, post"
+        explode: true
+        in: query
+        name: type
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Only points that accept cash on delivery
+        explode: true
+        in: query
+        name: cod
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: Only points that accept card
+        explode: true
+        in: query
+        name: card
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: Only points open around the clock
+        explode: true
+        in: query
+        name: open_24_7
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: Hide points that cannot take this weight
+        explode: true
+        in: query
+        name: weight_kg
+        required: false
+        schema:
+          type: number
+        style: form
+      - description: Max results
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 50
+          maximum: 200
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listShippingPoints_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Search lockers, partner shops and courier offices (global data, refreshed\
+        \ daily). One anchor required: near, city, postal_code or q. (scope: shipping:read)"
+      tags:
+      - shipping-points
+  /shipments:
+    get:
+      operationId: listShipments
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: perPage
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Only this status
+        explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          enum:
+          - draft
+          - awb_generated
+          - picked_up
+          - in_transit
+          - out_for_delivery
+          - delivered
+          - returned
+          - cancelled
+          - failed
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listShipments_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "List shipments (AWBs), newest first (scope: shipping:read)"
+      tags:
+      - shipments
+    post:
+      operationId: createShipment
+      parameters:
+      - description: Required. Retries with the same key replay the first response
+          instead of starting a second job (24 h).
+        explode: false
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          maxLength: 200
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShipmentCreate"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createShipment_201_response"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Create an AWB at a courier — a real cost. Sender is the organisation;\
+        \ the pickup point is re-validated; the label is stored. 409 COURIER_NOT_CONFIGURED\
+        \ / SENDER_MISSING; 422 POINT_*. Requires Idempotency-Key. (scope: shipping:write)"
+      tags:
+      - shipments
+  /shipments/quote:
+    post:
+      operationId: quoteShipment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShipmentQuoteRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/quoteShipment_200_response"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "429":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Price a parcel at every configured courier in parallel and compare\
+        \ (cheapest real tariff first). Creates nothing. Heavy rate tier. (scope:\
+        \ shipping:read)"
+      tags:
+      - shipments
+  /shipments/{id}:
+    get:
+      operationId: getShipment
+      parameters:
+      - description: Shipment id
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createShipment_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Get a shipment (scope: shipping:read)"
+      tags:
+      - shipments
+  /shipments/{id}/label:
+    get:
+      operationId: getShipmentLabel
+      parameters:
+      - description: Shipment id
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - description: Ask the courier for this format
+        explode: true
+        in: query
+        name: format
+        required: false
+        schema:
+          enum:
+          - pdf_a4
+          - pdf_a6
+          - zpl
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/pdf:
+              schema:
+                format: binary
+                type: string
+            application/zpl:
+              schema:
+                format: binary
+                type: string
+          description: The label document
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Download the AWB label (PDF, or ZPL with format=zpl) (scope: shipping:read)"
+      tags:
+      - shipments
+  /shipments/{id}/tracking:
+    get:
+      operationId: getShipmentTracking
+      parameters:
+      - description: Shipment id
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createShipment_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Refresh tracking from the courier and return the shipment with all\
+        \ events (scope: shipping:read)"
+      tags:
+      - shipments
+  /shipments/{id}/cancel:
+    post:
+      operationId: cancelShipment
+      parameters:
+      - description: Shipment id
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createShipment_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Cancel the AWB at the courier and mark the shipment cancelled. 409\
+        \ ALREADY_FINAL / CANCEL_UNSUPPORTED. Honours Idempotency-Key. (scope: shipping:write)"
+      tags:
+      - shipments
 components:
   schemas:
     Meta:
@@ -12719,6 +13451,8 @@ components:
         total: total
         series: series
         subtotal: subtotal
+        credited_amount: credited_amount
+        paid_amount: paid_amount
         currency: currency
         vat_type: TAXABLE
         id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
@@ -12738,6 +13472,10 @@ components:
         number:
           type: integer
         status:
+          description: "DRAFT, SENT, VIEWED, PAID, PARTIALLY_PAID, OVERDUE, CANCELLED,\
+            \ PENDING_REVIEW or CREDITED. CREDITED = fully reversed by issued credit\
+            \ notes (storno): nothing is owed and the invoice is never chased; an\
+            \ issued credit note linked to its source is CREDITED too (applied)."
           type: string
         contact_id:
           type: string
@@ -12770,6 +13508,12 @@ components:
         vat_total:
           type: string
         total:
+          type: string
+        paid_amount:
+          type: string
+        credited_amount:
+          description: Sum of the issued credit notes reversing this invoice. Open
+            balance = total − paid_amount − credited_amount.
           type: string
     InvoiceCreate:
       description: "Exactly one of `contact_id` or `contact_external_id` is required.\
@@ -14440,8 +15184,13 @@ components:
         paid_amount:
           description: "Decimal string, after this payment"
           type: string
+        credited_amount:
+          description: "Decimal string (ADR-0279): sum of |total| of the issued credit\
+            \ notes reversing this invoice; 0.00 when none"
+          type: string
         remaining_amount:
-          description: "Decimal string, 0.00 when settled"
+          description: "Decimal string, total − credited_amount − paid_amount, 0.00\
+            \ when settled"
           type: string
         status:
           enum:
@@ -14483,8 +15232,13 @@ components:
         paid_amount:
           description: "Decimal string, after the reversal"
           type: string
+        credited_amount:
+          description: "Decimal string (ADR-0279): sum of |total| of the issued credit\
+            \ notes reversing this invoice; 0.00 when none"
+          type: string
         remaining_amount:
-          description: "Decimal string, the re-opened balance"
+          description: "Decimal string, the re-opened balance (total − credited_amount\
+            \ − paid_amount)"
           type: string
         status:
           type: string
@@ -14501,6 +15255,69 @@ components:
       - paid_amount
       - remaining_amount
       - reversal
+      - status
+      - total
+    InvoiceCreditedWebhookData:
+      properties:
+        invoice_id:
+          description: The SOURCE invoice the credit note reverses
+          format: uuid
+          type: string
+        number:
+          description: "`<series><number>` of the source, e.g. IMS42"
+          type: string
+        currency:
+          type: string
+        total:
+          description: "Decimal string, gross total of the source"
+          type: string
+        credited_amount:
+          description: "Decimal string, sum of |total| of the issued, non-cancelled\
+            \ credit notes reversing the source, after this change"
+          type: string
+        paid_amount:
+          description: "Decimal string, money received on the source"
+          type: string
+        remaining_amount:
+          description: "Decimal string, total − credited_amount − paid_amount, never\
+            \ negative"
+          type: string
+        refund_due:
+          description: "Decimal string, paid_amount − (total − credited_amount) when\
+            \ the customer paid more than the net; else 0.00"
+          type: string
+        status:
+          description: Source status after the change; CREDITED when fully reversed
+          enum:
+          - SENT
+          - VIEWED
+          - PAID
+          - PARTIALLY_PAID
+          - OVERDUE
+          - CREDITED
+          type: string
+        fully_credited:
+          description: Every unit of the source has been reversed by credit notes
+          type: boolean
+        credit_note_id:
+          description: The credit note whose issue or cancellation triggered this
+            event
+          format: uuid
+          type: string
+        contact_id:
+          format: uuid
+          type: string
+          nullable: true
+      required:
+      - credit_note_id
+      - credited_amount
+      - currency
+      - fully_credited
+      - invoice_id
+      - number
+      - paid_amount
+      - refund_due
+      - remaining_amount
       - status
       - total
     ContactFiscalStatusWebhookData:
@@ -21843,6 +22660,368 @@ components:
       - history
       - program
       - summary
+    ShippingPoint:
+      example:
+        country: country
+        address: address
+        distance_km: 5.962133916683182
+        lng: 6.027456183070403
+        city: city
+        county: county
+        external_id: external_id
+        type: locker
+        supports_card: true
+        schedule:
+        - day: day
+          close: close
+          open: open
+        - day: day
+          close: close
+          open: open
+        courier: sameday
+        name: name
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        postal_code: postal_code
+        supports_cod: true
+        max_weight_kg: 1.4658129805029452
+        lat: 0.8008281904610115
+      properties:
+        id:
+          format: uuid
+          type: string
+        courier:
+          enum:
+          - sameday
+          - cargus
+          - fancourier
+          - dpd
+          - gls
+          type: string
+        external_id:
+          description: The courier's own point id
+          type: string
+        type:
+          enum:
+          - locker
+          - shop
+          - office
+          - post
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        county:
+          nullable: true
+          type: string
+        postal_code:
+          nullable: true
+          type: string
+        country:
+          type: string
+        lat:
+          nullable: true
+          type: number
+        lng:
+          nullable: true
+          type: number
+        schedule:
+          items:
+            $ref: "#/components/schemas/ShippingPoint_schedule_inner"
+          type: array
+        supports_cod:
+          type: boolean
+        supports_card:
+          type: boolean
+        max_weight_kg:
+          nullable: true
+          type: number
+        distance_km:
+          description: "From `near`, when given"
+          nullable: true
+          type: number
+      required:
+      - address
+      - city
+      - country
+      - courier
+      - external_id
+      - id
+      - name
+      - supports_card
+      - supports_cod
+      - type
+    Shipment:
+      example:
+        awb_number: awb_number
+        cost: 5.962133916683182
+        weight_kg: 6.027456183070403
+        has_label: true
+        created_at: 2000-01-23T04:56:07.000+00:00
+        channel_order_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        cod_amount: 1.4658129805029452
+        last_tracked_at: 2000-01-23T04:56:07.000+00:00
+        is_return: true
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        courier: sameday
+        sender: "{}"
+        tracking_events:
+        - at: 2000-01-23T04:56:07.000+00:00
+          description: description
+          location: location
+          status: status
+        - at: 2000-01-23T04:56:07.000+00:00
+          description: description
+          location: location
+          status: status
+        service_code: service_code
+        invoice_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        pickup_point_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        order_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        status: draft
+        parcel_count: 0
+      properties:
+        id:
+          format: uuid
+          type: string
+        courier:
+          enum:
+          - sameday
+          - cargus
+          - fancourier
+          - dpd
+          - gls
+          - manual
+          type: string
+        status:
+          enum:
+          - draft
+          - awb_generated
+          - picked_up
+          - in_transit
+          - out_for_delivery
+          - delivered
+          - returned
+          - cancelled
+          - failed
+          type: string
+        awb_number:
+          nullable: true
+          type: string
+        service_code:
+          nullable: true
+          type: string
+        pickup_point_id:
+          format: uuid
+          nullable: true
+          type: string
+        order_id:
+          format: uuid
+          nullable: true
+          type: string
+        invoice_id:
+          format: uuid
+          nullable: true
+          type: string
+        channel_order_id:
+          format: uuid
+          nullable: true
+          type: string
+        is_return:
+          type: boolean
+        parcel_count:
+          type: integer
+        weight_kg:
+          type: number
+        cod_amount:
+          type: number
+        cost:
+          nullable: true
+          type: number
+        has_label:
+          description: "GET /shipments/{id}/label returns a document"
+          type: boolean
+        sender:
+          description: Sender address as sent to the courier (the organisation)
+          nullable: true
+          type: object
+        tracking_events:
+          items:
+            $ref: "#/components/schemas/Shipment_tracking_events_inner"
+          type: array
+        last_tracked_at:
+          format: date-time
+          nullable: true
+          type: string
+        created_at:
+          format: date-time
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+      required:
+      - cod_amount
+      - courier
+      - created_at
+      - has_label
+      - id
+      - is_return
+      - parcel_count
+      - status
+      - tracking_events
+      - updated_at
+      - weight_kg
+    ShipmentQuoteRequest:
+      additionalProperties: {}
+      example:
+        couriers:
+        - sameday
+        - sameday
+        parcel:
+          weight_kg: 602.7456183070403
+          contents: contents
+          count: 8
+        declared_value: 0.5962133916683182
+        recipient:
+          country: RO
+          phone: phone
+          city: city
+          street: street
+          name: name
+          county: county
+          postal_code: postal_code
+          email: email
+        pickup_point_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        cod_amount: 0.14658129805029452
+      properties:
+        recipient:
+          $ref: "#/components/schemas/ShipmentQuoteRequest_recipient"
+        parcel:
+          $ref: "#/components/schemas/ShipmentQuoteRequest_parcel"
+        cod_amount:
+          default: 0
+          minimum: 0
+        declared_value:
+          minimum: 0
+        pickup_point_id:
+          description: Narrows the comparison to that point's courier
+          format: uuid
+        couriers:
+          items:
+            enum:
+            - sameday
+            - cargus
+            - fancourier
+            - dpd
+            - gls
+      required:
+      - parcel
+      - recipient
+    ShipmentQuoteResult:
+      example:
+        couriers:
+        - courier: sameday
+          status: ok
+        - courier: sameday
+          status: ok
+        quotes:
+        - cost: 0.8008281904610115
+          courier: sameday
+          service_name: service_name
+          cheapest: true
+          estimated: true
+          service_code: service_code
+          currency: currency
+          eta_days: 6
+        - cost: 0.8008281904610115
+          courier: sameday
+          service_name: service_name
+          cheapest: true
+          estimated: true
+          service_code: service_code
+          currency: currency
+          eta_days: 6
+      properties:
+        quotes:
+          items:
+            $ref: "#/components/schemas/ShipmentQuoteResult_quotes_inner"
+          type: array
+        couriers:
+          items:
+            $ref: "#/components/schemas/ShipmentQuoteResult_couriers_inner"
+          type: array
+      required:
+      - couriers
+      - quotes
+    ShipmentCreate:
+      additionalProperties: {}
+      example:
+        reference: reference
+        parcel:
+          weight_kg: 602.7456183070403
+          contents: contents
+          count: 8
+        declared_value: 0.5962133916683182
+        courier: sameday
+        recipient:
+          country: RO
+          phone: phone
+          city: city
+          street: street
+          name: name
+          county: county
+          postal_code: postal_code
+          email: email
+        service_code: service_code
+        invoice_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        pickup_point_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        channel_order_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        cod_amount: 0.14658129805029452
+        order_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        courier:
+          enum:
+          - sameday
+          - cargus
+          - fancourier
+          - dpd
+          - gls
+        service_code:
+          description: From a quote
+          maxLength: 40
+        reference:
+          description: "Your order number, printed on the label"
+          maxLength: 80
+        recipient:
+          $ref: "#/components/schemas/ShipmentCreate_recipient"
+        parcel:
+          $ref: "#/components/schemas/ShipmentCreate_parcel"
+        cod_amount:
+          default: 0
+          minimum: 0
+        declared_value:
+          minimum: 0
+        pickup_point_id:
+          description: "Re-validated: active, same courier, accepts COD, fits the\
+            \ weight"
+          format: uuid
+        order_id:
+          format: uuid
+          type: string
+        invoice_id:
+          format: uuid
+          type: string
+        channel_order_id:
+          format: uuid
+          type: string
+      required:
+      - courier
+      - parcel
+      - recipient
+      - reference
     listMe_401_response_error:
       example:
         code: code
@@ -22056,6 +23235,8 @@ components:
           total: total
           series: series
           subtotal: subtotal
+          credited_amount: credited_amount
+          paid_amount: paid_amount
           currency: currency
           vat_type: TAXABLE
           id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
@@ -22071,6 +23252,8 @@ components:
           total: total
           series: series
           subtotal: subtotal
+          credited_amount: credited_amount
+          paid_amount: paid_amount
           currency: currency
           vat_type: TAXABLE
           id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
@@ -22108,6 +23291,8 @@ components:
           total: total
           series: series
           subtotal: subtotal
+          credited_amount: credited_amount
+          paid_amount: paid_amount
           currency: currency
           vat_type: TAXABLE
           id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
@@ -27433,6 +28618,218 @@ components:
       required:
       - data
       - error
+    listShippingPoints_200_response:
+      example:
+        data:
+        - country: country
+          address: address
+          distance_km: 5.962133916683182
+          lng: 6.027456183070403
+          city: city
+          county: county
+          external_id: external_id
+          type: locker
+          supports_card: true
+          schedule:
+          - day: day
+            close: close
+            open: open
+          - day: day
+            close: close
+            open: open
+          courier: sameday
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          postal_code: postal_code
+          supports_cod: true
+          max_weight_kg: 1.4658129805029452
+          lat: 0.8008281904610115
+        - country: country
+          address: address
+          distance_km: 5.962133916683182
+          lng: 6.027456183070403
+          city: city
+          county: county
+          external_id: external_id
+          type: locker
+          supports_card: true
+          schedule:
+          - day: day
+            close: close
+            open: open
+          - day: day
+            close: close
+            open: open
+          courier: sameday
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          postal_code: postal_code
+          supports_cod: true
+          max_weight_kg: 1.4658129805029452
+          lat: 0.8008281904610115
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/ShippingPoint"
+          type: array
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    listShipments_200_response:
+      example:
+        data:
+        - awb_number: awb_number
+          cost: 5.962133916683182
+          weight_kg: 6.027456183070403
+          has_label: true
+          created_at: 2000-01-23T04:56:07.000+00:00
+          channel_order_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          cod_amount: 1.4658129805029452
+          last_tracked_at: 2000-01-23T04:56:07.000+00:00
+          is_return: true
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          courier: sameday
+          sender: "{}"
+          tracking_events:
+          - at: 2000-01-23T04:56:07.000+00:00
+            description: description
+            location: location
+            status: status
+          - at: 2000-01-23T04:56:07.000+00:00
+            description: description
+            location: location
+            status: status
+          service_code: service_code
+          invoice_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          pickup_point_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          order_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          status: draft
+          parcel_count: 0
+        - awb_number: awb_number
+          cost: 5.962133916683182
+          weight_kg: 6.027456183070403
+          has_label: true
+          created_at: 2000-01-23T04:56:07.000+00:00
+          channel_order_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          cod_amount: 1.4658129805029452
+          last_tracked_at: 2000-01-23T04:56:07.000+00:00
+          is_return: true
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          courier: sameday
+          sender: "{}"
+          tracking_events:
+          - at: 2000-01-23T04:56:07.000+00:00
+            description: description
+            location: location
+            status: status
+          - at: 2000-01-23T04:56:07.000+00:00
+            description: description
+            location: location
+            status: status
+          service_code: service_code
+          invoice_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          pickup_point_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          order_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          status: draft
+          parcel_count: 0
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/Shipment"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    createShipment_201_response:
+      example:
+        data:
+          awb_number: awb_number
+          cost: 5.962133916683182
+          weight_kg: 6.027456183070403
+          has_label: true
+          created_at: 2000-01-23T04:56:07.000+00:00
+          channel_order_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          cod_amount: 1.4658129805029452
+          last_tracked_at: 2000-01-23T04:56:07.000+00:00
+          is_return: true
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          courier: sameday
+          sender: "{}"
+          tracking_events:
+          - at: 2000-01-23T04:56:07.000+00:00
+            description: description
+            location: location
+            status: status
+          - at: 2000-01-23T04:56:07.000+00:00
+            description: description
+            location: location
+            status: status
+          service_code: service_code
+          invoice_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          pickup_point_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          order_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          status: draft
+          parcel_count: 0
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/Shipment"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    quoteShipment_200_response:
+      example:
+        data:
+          couriers:
+          - courier: sameday
+            status: ok
+          - courier: sameday
+            status: ok
+          quotes:
+          - cost: 0.8008281904610115
+            courier: sameday
+            service_name: service_name
+            cheapest: true
+            estimated: true
+            service_code: service_code
+            currency: currency
+            eta_days: 6
+          - cost: 0.8008281904610115
+            courier: sameday
+            service_name: service_name
+            cheapest: true
+            estimated: true
+            service_code: service_code
+            currency: currency
+            eta_days: 6
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/ShipmentQuoteResult"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
     invoice_paid_post_request:
       allOf:
       - $ref: "#/components/schemas/WebhookDelivery"
@@ -27460,6 +28857,15 @@ components:
             - invoice.payment_reversed
           data:
             $ref: "#/components/schemas/InvoicePaymentReversedWebhookData"
+    invoice_credited_post_request:
+      allOf:
+      - $ref: "#/components/schemas/WebhookDelivery"
+      - properties:
+          type:
+            enum:
+            - invoice.credited
+          data:
+            $ref: "#/components/schemas/InvoiceCreditedWebhookData"
     contact_fiscal_status_changed_post_request:
       allOf:
       - $ref: "#/components/schemas/WebhookDelivery"
@@ -28932,6 +30338,196 @@ components:
       - family
       - icon
       - key
+    ShippingPoint_schedule_inner:
+      example:
+        day: day
+        close: close
+        open: open
+      properties:
+        day:
+          type: string
+        open:
+          type: string
+        close:
+          type: string
+    Shipment_tracking_events_inner:
+      example:
+        at: 2000-01-23T04:56:07.000+00:00
+        description: description
+        location: location
+        status: status
+      properties:
+        status:
+          type: string
+        description:
+          type: string
+        at:
+          format: date-time
+          type: string
+        location:
+          type: string
+    ShipmentQuoteRequest_recipient:
+      additionalProperties: false
+      example:
+        country: RO
+        phone: phone
+        city: city
+        street: street
+        name: name
+        county: county
+        postal_code: postal_code
+        email: email
+      properties:
+        name:
+          maxLength: 200
+          type: string
+        phone:
+          maxLength: 40
+          type: string
+        email:
+          format: email
+        street:
+          maxLength: 300
+        city:
+          maxLength: 120
+        county:
+          maxLength: 120
+        postal_code:
+          maxLength: 20
+        country:
+          default: RO
+          maxLength: 2
+          minLength: 2
+      required:
+      - city
+      - name
+      - phone
+    ShipmentQuoteRequest_parcel:
+      additionalProperties: false
+      example:
+        weight_kg: 602.7456183070403
+        contents: contents
+        count: 8
+      properties:
+        count:
+          default: 1
+          maximum: 99
+          minimum: 1
+        weight_kg:
+          maximum: 1000
+        contents:
+          maxLength: 200
+          type: string
+      required:
+      - weight_kg
+    ShipmentQuoteResult_quotes_inner:
+      example:
+        cost: 0.8008281904610115
+        courier: sameday
+        service_name: service_name
+        cheapest: true
+        estimated: true
+        service_code: service_code
+        currency: currency
+        eta_days: 6
+      properties:
+        courier:
+          enum:
+          - sameday
+          - cargus
+          - fancourier
+          - dpd
+          - gls
+          type: string
+        service_code:
+          nullable: true
+          type: string
+        service_name:
+          type: string
+        cost:
+          type: number
+        currency:
+          type: string
+        eta_days:
+          nullable: true
+          type: integer
+        estimated:
+          description: "Our formula, not the courier tariff"
+          type: boolean
+        cheapest:
+          description: Cheapest real (non-estimated) tariff
+          type: boolean
+    ShipmentQuoteResult_couriers_inner:
+      example:
+        courier: sameday
+        status: ok
+      properties:
+        courier:
+          enum:
+          - sameday
+          - cargus
+          - fancourier
+          - dpd
+          - gls
+          type: string
+        status:
+          enum:
+          - ok
+          - not_configured
+          - timeout
+          - failed
+          type: string
+    ShipmentCreate_recipient:
+      additionalProperties: false
+      example:
+        country: RO
+        phone: phone
+        city: city
+        street: street
+        name: name
+        county: county
+        postal_code: postal_code
+        email: email
+      properties:
+        name:
+          maxLength: 200
+        phone:
+          maxLength: 40
+        email:
+          format: email
+        street:
+          maxLength: 300
+        city:
+          maxLength: 120
+        county:
+          maxLength: 120
+        postal_code:
+          maxLength: 20
+        country:
+          default: RO
+          maxLength: 2
+          minLength: 2
+      required:
+      - city
+      - name
+      - phone
+    ShipmentCreate_parcel:
+      additionalProperties: false
+      example:
+        weight_kg: 602.7456183070403
+        contents: contents
+        count: 8
+      properties:
+        count:
+          default: 1
+          maximum: 99
+          minimum: 1
+        weight_kg:
+          maximum: 1000
+        contents:
+          maxLength: 200
+      required:
+      - weight_kg
   securitySchemes:
     bearerAuth:
       description: API key as Bearer token

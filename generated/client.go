@@ -65,6 +65,8 @@ type APIClient struct {
 
 	CatalogAPI *CatalogAPIService
 
+	ChannelOrdersAPI *ChannelOrdersAPIService
+
 	CommsAPI *CommsAPIService
 
 	CompaniesAPI *CompaniesAPIService
@@ -157,7 +159,13 @@ type APIClient struct {
 
 	SaftAPI *SaftAPIService
 
+	SalesChannelsAPI *SalesChannelsAPIService
+
 	SeriesAPI *SeriesAPIService
+
+	ShipmentsAPI *ShipmentsAPIService
+
+	ShippingPointsAPI *ShippingPointsAPIService
 
 	SitesAPI *SitesAPIService
 
@@ -204,6 +212,7 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.BookingsAPI = (*BookingsAPIService)(&c.common)
 	c.CabinetAPI = (*CabinetAPIService)(&c.common)
 	c.CatalogAPI = (*CatalogAPIService)(&c.common)
+	c.ChannelOrdersAPI = (*ChannelOrdersAPIService)(&c.common)
 	c.CommsAPI = (*CommsAPIService)(&c.common)
 	c.CompaniesAPI = (*CompaniesAPIService)(&c.common)
 	c.CompatAPI = (*CompatAPIService)(&c.common)
@@ -250,7 +259,10 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.ResourcingAPI = (*ResourcingAPIService)(&c.common)
 	c.RewardsAPI = (*RewardsAPIService)(&c.common)
 	c.SaftAPI = (*SaftAPIService)(&c.common)
+	c.SalesChannelsAPI = (*SalesChannelsAPIService)(&c.common)
 	c.SeriesAPI = (*SeriesAPIService)(&c.common)
+	c.ShipmentsAPI = (*ShipmentsAPIService)(&c.common)
+	c.ShippingPointsAPI = (*ShippingPointsAPIService)(&c.common)
 	c.SitesAPI = (*SitesAPIService)(&c.common)
 	c.SpaceTransfersAPI = (*SpaceTransfersAPIService)(&c.common)
 	c.SpacesAPI = (*SpacesAPIService)(&c.common)

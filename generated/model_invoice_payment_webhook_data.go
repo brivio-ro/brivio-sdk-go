@@ -30,7 +30,9 @@ type InvoicePaymentWebhookData struct {
 	Total string `json:"total"`
 	// Decimal string, after this payment
 	PaidAmount string `json:"paid_amount"`
-	// Decimal string, 0.00 when settled
+	// Decimal string (ADR-0279): sum of |total| of the issued credit notes reversing this invoice; 0.00 when none
+	CreditedAmount *string `json:"credited_amount,omitempty"`
+	// Decimal string, total − credited_amount − paid_amount, 0.00 when settled
 	RemainingAmount string `json:"remaining_amount"`
 	Status string `json:"status"`
 	Payment InvoicePaymentWebhookDataPayment `json:"payment"`
@@ -186,6 +188,38 @@ func (o *InvoicePaymentWebhookData) SetPaidAmount(v string) {
 	o.PaidAmount = v
 }
 
+// GetCreditedAmount returns the CreditedAmount field value if set, zero value otherwise.
+func (o *InvoicePaymentWebhookData) GetCreditedAmount() string {
+	if o == nil || IsNil(o.CreditedAmount) {
+		var ret string
+		return ret
+	}
+	return *o.CreditedAmount
+}
+
+// GetCreditedAmountOk returns a tuple with the CreditedAmount field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *InvoicePaymentWebhookData) GetCreditedAmountOk() (*string, bool) {
+	if o == nil || IsNil(o.CreditedAmount) {
+		return nil, false
+	}
+	return o.CreditedAmount, true
+}
+
+// HasCreditedAmount returns a boolean if a field has been set.
+func (o *InvoicePaymentWebhookData) HasCreditedAmount() bool {
+	if o != nil && !IsNil(o.CreditedAmount) {
+		return true
+	}
+
+	return false
+}
+
+// SetCreditedAmount gets a reference to the given string and assigns it to the CreditedAmount field.
+func (o *InvoicePaymentWebhookData) SetCreditedAmount(v string) {
+	o.CreditedAmount = &v
+}
+
 // GetRemainingAmount returns the RemainingAmount field value
 func (o *InvoicePaymentWebhookData) GetRemainingAmount() string {
 	if o == nil {
@@ -337,6 +371,9 @@ func (o InvoicePaymentWebhookData) ToMap() (map[string]interface{}, error) {
 	toSerialize["currency"] = o.Currency
 	toSerialize["total"] = o.Total
 	toSerialize["paid_amount"] = o.PaidAmount
+	if !IsNil(o.CreditedAmount) {
+		toSerialize["credited_amount"] = o.CreditedAmount
+	}
 	toSerialize["remaining_amount"] = o.RemainingAmount
 	toSerialize["status"] = o.Status
 	toSerialize["payment"] = o.Payment

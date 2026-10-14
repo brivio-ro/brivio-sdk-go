@@ -24,6 +24,7 @@ type Invoice struct {
 	Direction *string `json:"direction,omitempty"`
 	Series *string `json:"series,omitempty"`
 	Number *int32 `json:"number,omitempty"`
+	// DRAFT, SENT, VIEWED, PAID, PARTIALLY_PAID, OVERDUE, CANCELLED, PENDING_REVIEW or CREDITED. CREDITED = fully reversed by issued credit notes (storno): nothing is owed and the invoice is never chased; an issued credit note linked to its source is CREDITED too (applied).
 	Status *string `json:"status,omitempty"`
 	ContactId *string `json:"contact_id,omitempty"`
 	// Issuing legal entity the number was allocated under.
@@ -36,6 +37,9 @@ type Invoice struct {
 	Subtotal *string `json:"subtotal,omitempty"`
 	VatTotal *string `json:"vat_total,omitempty"`
 	Total *string `json:"total,omitempty"`
+	PaidAmount *string `json:"paid_amount,omitempty"`
+	// Sum of the issued credit notes reversing this invoice. Open balance = total − paid_amount − credited_amount.
+	CreditedAmount *string `json:"credited_amount,omitempty"`
 }
 
 // NewInvoice instantiates a new Invoice object
@@ -535,6 +539,70 @@ func (o *Invoice) SetTotal(v string) {
 	o.Total = &v
 }
 
+// GetPaidAmount returns the PaidAmount field value if set, zero value otherwise.
+func (o *Invoice) GetPaidAmount() string {
+	if o == nil || IsNil(o.PaidAmount) {
+		var ret string
+		return ret
+	}
+	return *o.PaidAmount
+}
+
+// GetPaidAmountOk returns a tuple with the PaidAmount field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Invoice) GetPaidAmountOk() (*string, bool) {
+	if o == nil || IsNil(o.PaidAmount) {
+		return nil, false
+	}
+	return o.PaidAmount, true
+}
+
+// HasPaidAmount returns a boolean if a field has been set.
+func (o *Invoice) HasPaidAmount() bool {
+	if o != nil && !IsNil(o.PaidAmount) {
+		return true
+	}
+
+	return false
+}
+
+// SetPaidAmount gets a reference to the given string and assigns it to the PaidAmount field.
+func (o *Invoice) SetPaidAmount(v string) {
+	o.PaidAmount = &v
+}
+
+// GetCreditedAmount returns the CreditedAmount field value if set, zero value otherwise.
+func (o *Invoice) GetCreditedAmount() string {
+	if o == nil || IsNil(o.CreditedAmount) {
+		var ret string
+		return ret
+	}
+	return *o.CreditedAmount
+}
+
+// GetCreditedAmountOk returns a tuple with the CreditedAmount field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Invoice) GetCreditedAmountOk() (*string, bool) {
+	if o == nil || IsNil(o.CreditedAmount) {
+		return nil, false
+	}
+	return o.CreditedAmount, true
+}
+
+// HasCreditedAmount returns a boolean if a field has been set.
+func (o *Invoice) HasCreditedAmount() bool {
+	if o != nil && !IsNil(o.CreditedAmount) {
+		return true
+	}
+
+	return false
+}
+
+// SetCreditedAmount gets a reference to the given string and assigns it to the CreditedAmount field.
+func (o *Invoice) SetCreditedAmount(v string) {
+	o.CreditedAmount = &v
+}
+
 func (o Invoice) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -589,6 +657,12 @@ func (o Invoice) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.Total) {
 		toSerialize["total"] = o.Total
+	}
+	if !IsNil(o.PaidAmount) {
+		toSerialize["paid_amount"] = o.PaidAmount
+	}
+	if !IsNil(o.CreditedAmount) {
+		toSerialize["credited_amount"] = o.CreditedAmount
 	}
 	return toSerialize, nil
 }

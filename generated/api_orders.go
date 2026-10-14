@@ -39,7 +39,7 @@ func (r ApiCreateOrderImportRequest) Execute() (*http.Response, error) {
 }
 
 /*
-CreateOrderImport Import an e-commerce order (Shopify/WooCommerce connectors) — creates a DRAFT invoice + contact, deduped by source+external_id (scope: orders:write)
+CreateOrderImport Import an e-commerce order (Shopify/WooCommerce connectors) into the channel sync engine — stored as a channel order (stock reserved, invoice drafted by the engine), deduped by source+external_id; returns channel_order_id (scope: orders:write)
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiCreateOrderImportRequest

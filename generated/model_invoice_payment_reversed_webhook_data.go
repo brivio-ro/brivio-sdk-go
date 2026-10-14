@@ -28,7 +28,9 @@ type InvoicePaymentReversedWebhookData struct {
 	Total string `json:"total"`
 	// Decimal string, after the reversal
 	PaidAmount string `json:"paid_amount"`
-	// Decimal string, the re-opened balance
+	// Decimal string (ADR-0279): sum of |total| of the issued credit notes reversing this invoice; 0.00 when none
+	CreditedAmount *string `json:"credited_amount,omitempty"`
+	// Decimal string, the re-opened balance (total − credited_amount − paid_amount)
 	RemainingAmount string `json:"remaining_amount"`
 	Status string `json:"status"`
 	Reversal InvoicePaymentReversedWebhookDataReversal `json:"reversal"`
@@ -182,6 +184,38 @@ func (o *InvoicePaymentReversedWebhookData) SetPaidAmount(v string) {
 	o.PaidAmount = v
 }
 
+// GetCreditedAmount returns the CreditedAmount field value if set, zero value otherwise.
+func (o *InvoicePaymentReversedWebhookData) GetCreditedAmount() string {
+	if o == nil || IsNil(o.CreditedAmount) {
+		var ret string
+		return ret
+	}
+	return *o.CreditedAmount
+}
+
+// GetCreditedAmountOk returns a tuple with the CreditedAmount field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *InvoicePaymentReversedWebhookData) GetCreditedAmountOk() (*string, bool) {
+	if o == nil || IsNil(o.CreditedAmount) {
+		return nil, false
+	}
+	return o.CreditedAmount, true
+}
+
+// HasCreditedAmount returns a boolean if a field has been set.
+func (o *InvoicePaymentReversedWebhookData) HasCreditedAmount() bool {
+	if o != nil && !IsNil(o.CreditedAmount) {
+		return true
+	}
+
+	return false
+}
+
+// SetCreditedAmount gets a reference to the given string and assigns it to the CreditedAmount field.
+func (o *InvoicePaymentReversedWebhookData) SetCreditedAmount(v string) {
+	o.CreditedAmount = &v
+}
+
 // GetRemainingAmount returns the RemainingAmount field value
 func (o *InvoicePaymentReversedWebhookData) GetRemainingAmount() string {
 	if o == nil {
@@ -301,6 +335,9 @@ func (o InvoicePaymentReversedWebhookData) ToMap() (map[string]interface{}, erro
 	toSerialize["currency"] = o.Currency
 	toSerialize["total"] = o.Total
 	toSerialize["paid_amount"] = o.PaidAmount
+	if !IsNil(o.CreditedAmount) {
+		toSerialize["credited_amount"] = o.CreditedAmount
+	}
 	toSerialize["remaining_amount"] = o.RemainingAmount
 	toSerialize["status"] = o.Status
 	toSerialize["reversal"] = o.Reversal
