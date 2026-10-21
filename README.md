@@ -64,10 +64,12 @@ is the common case. Returning an error from the callback stops iteration.
 ```go
 invoice, err := client.Invoices().Create(ctx,
     map[string]any{
-        "contactId": "ct_123",
-        "currency":  "RON",
-        "lines": []map[string]any{
-            {"description": "Consultanță", "quantity": 1, "unitPrice": 1000, "vatRate": 21},
+        "contact_id": "3f2b8c1e-5d4a-4e7b-9c1f-2a6d8e0b4c71",
+        "issue_date": "2026-11-03",
+        "due_date":   "2026-11-17",
+        "currency":   "RON",
+        "items": []map[string]any{
+            {"description": "Consultanță", "quantity": 1, "unit_price": 1000, "vat_rate": 21},
         },
     },
     // Safe to retry: the same key never creates a second invoice.
@@ -76,6 +78,7 @@ invoice, err := client.Invoices().Create(ctx,
 
 client.Invoices().Send(ctx, invoiceID)
 client.Invoices().SubmitEFactura(ctx, invoiceID)
+status, err := client.Invoices().EFacturaStatus(ctx, invoiceID)
 ```
 
 ## Errors

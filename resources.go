@@ -67,7 +67,7 @@ func (r *Invoices) SubmitEFactura(ctx context.Context, id string) (json.RawMessa
 
 // EFacturaStatus reports the ANAF transmission state.
 func (r *Invoices) EFacturaStatus(ctx context.Context, id string) (json.RawMessage, error) {
-	data, _, err := r.client.Do(ctx, http.MethodGet, r.path+"/"+id+"/efactura")
+	data, _, err := r.client.Do(ctx, http.MethodGet, r.path+"/"+id+"/efactura-status")
 	return data, err
 }
 
