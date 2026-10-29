@@ -385,6 +385,8 @@ func (r ApiDeleteInvoiceRequest) Execute() (*http.Response, error) {
 /*
 DeleteInvoice Delete a invoice
 
+Deletes a DRAFT invoice that was never submitted to e-Factura. Any other invoice is a numbered fiscal document: 409 INVOICE_NOT_DELETABLE; reverse it with POST /invoices/{id}/credit-note. (scope: invoices:write)
+
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @param id
  @return ApiDeleteInvoiceRequest
@@ -1262,7 +1264,7 @@ func (r ApiSendInvoiceRequest) Execute() (*http.Response, error) {
 }
 
 /*
-SendInvoice Mark an invoice as sent (DRAFT → SENT; idempotent)
+SendInvoice Issue an invoice (DRAFT → SENT; idempotent): VIES, storno association, stock and ledger posting like the app; 409 CONFLICT on a VIES or storno refusal
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @param id
@@ -1463,6 +1465,8 @@ func (r ApiUpdateInvoiceRequest) Execute() (*CreateInvoice201Response, *http.Res
 
 /*
 UpdateInvoice Update a invoice
+
+Status moves are whitelisted: SENT → VIEWED/OVERDUE, VIEWED/PARTIALLY_PAID → OVERDUE, DRAFT → CANCELLED (only if never sent to e-Factura). Issue with POST /invoices/{id}/send, record payments with POST /invoices/{id}/payments, reverse with POST /invoices/{id}/credit-note. Once issued or known to e-Factura, due_date and other fiscal fields are frozen; notes and project_id stay editable. Refusals: 409 INVOICE_NOT_EDITABLE; 422 INVOICE_CREDITED on a credited invoice. (scope: invoices:write)
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @param id
