@@ -12,6 +12,7 @@ package generated
 
 import (
 	"encoding/json"
+	"time"
 )
 
 // checks if the Invoice type satisfies the MappedNullable interface at compile time
@@ -29,6 +30,9 @@ type Invoice struct {
 	ContactId *string `json:"contact_id,omitempty"`
 	// Issuing legal entity the number was allocated under.
 	CompanyId *string `json:"company_id,omitempty"`
+	ProjectId *string `json:"project_id,omitempty"`
+	IssueDate *string `json:"issue_date,omitempty"`
+	DueDate *string `json:"due_date,omitempty"`
 	Currency *string `json:"currency,omitempty"`
 	// RON per 1 unit of `currency`, persisted per document (BNR T-1, Cod Fiscal art. 290 / ADR-0029). \"1.000000\" for RON.
 	ExchangeRate *string `json:"exchange_rate,omitempty"`
@@ -40,6 +44,12 @@ type Invoice struct {
 	PaidAmount *string `json:"paid_amount,omitempty"`
 	// Sum of the issued credit notes reversing this invoice. Open balance = total − paid_amount − credited_amount.
 	CreditedAmount *string `json:"credited_amount,omitempty"`
+	Notes *string `json:"notes,omitempty"`
+	SentAt *time.Time `json:"sent_at,omitempty"`
+	PaidAt *time.Time `json:"paid_at,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
+	Contact *InvoiceContact `json:"contact,omitempty"`
 }
 
 // NewInvoice instantiates a new Invoice object
@@ -313,6 +323,102 @@ func (o *Invoice) HasCompanyId() bool {
 // SetCompanyId gets a reference to the given string and assigns it to the CompanyId field.
 func (o *Invoice) SetCompanyId(v string) {
 	o.CompanyId = &v
+}
+
+// GetProjectId returns the ProjectId field value if set, zero value otherwise.
+func (o *Invoice) GetProjectId() string {
+	if o == nil || IsNil(o.ProjectId) {
+		var ret string
+		return ret
+	}
+	return *o.ProjectId
+}
+
+// GetProjectIdOk returns a tuple with the ProjectId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Invoice) GetProjectIdOk() (*string, bool) {
+	if o == nil || IsNil(o.ProjectId) {
+		return nil, false
+	}
+	return o.ProjectId, true
+}
+
+// HasProjectId returns a boolean if a field has been set.
+func (o *Invoice) HasProjectId() bool {
+	if o != nil && !IsNil(o.ProjectId) {
+		return true
+	}
+
+	return false
+}
+
+// SetProjectId gets a reference to the given string and assigns it to the ProjectId field.
+func (o *Invoice) SetProjectId(v string) {
+	o.ProjectId = &v
+}
+
+// GetIssueDate returns the IssueDate field value if set, zero value otherwise.
+func (o *Invoice) GetIssueDate() string {
+	if o == nil || IsNil(o.IssueDate) {
+		var ret string
+		return ret
+	}
+	return *o.IssueDate
+}
+
+// GetIssueDateOk returns a tuple with the IssueDate field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Invoice) GetIssueDateOk() (*string, bool) {
+	if o == nil || IsNil(o.IssueDate) {
+		return nil, false
+	}
+	return o.IssueDate, true
+}
+
+// HasIssueDate returns a boolean if a field has been set.
+func (o *Invoice) HasIssueDate() bool {
+	if o != nil && !IsNil(o.IssueDate) {
+		return true
+	}
+
+	return false
+}
+
+// SetIssueDate gets a reference to the given string and assigns it to the IssueDate field.
+func (o *Invoice) SetIssueDate(v string) {
+	o.IssueDate = &v
+}
+
+// GetDueDate returns the DueDate field value if set, zero value otherwise.
+func (o *Invoice) GetDueDate() string {
+	if o == nil || IsNil(o.DueDate) {
+		var ret string
+		return ret
+	}
+	return *o.DueDate
+}
+
+// GetDueDateOk returns a tuple with the DueDate field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Invoice) GetDueDateOk() (*string, bool) {
+	if o == nil || IsNil(o.DueDate) {
+		return nil, false
+	}
+	return o.DueDate, true
+}
+
+// HasDueDate returns a boolean if a field has been set.
+func (o *Invoice) HasDueDate() bool {
+	if o != nil && !IsNil(o.DueDate) {
+		return true
+	}
+
+	return false
+}
+
+// SetDueDate gets a reference to the given string and assigns it to the DueDate field.
+func (o *Invoice) SetDueDate(v string) {
+	o.DueDate = &v
 }
 
 // GetCurrency returns the Currency field value if set, zero value otherwise.
@@ -603,6 +709,198 @@ func (o *Invoice) SetCreditedAmount(v string) {
 	o.CreditedAmount = &v
 }
 
+// GetNotes returns the Notes field value if set, zero value otherwise.
+func (o *Invoice) GetNotes() string {
+	if o == nil || IsNil(o.Notes) {
+		var ret string
+		return ret
+	}
+	return *o.Notes
+}
+
+// GetNotesOk returns a tuple with the Notes field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Invoice) GetNotesOk() (*string, bool) {
+	if o == nil || IsNil(o.Notes) {
+		return nil, false
+	}
+	return o.Notes, true
+}
+
+// HasNotes returns a boolean if a field has been set.
+func (o *Invoice) HasNotes() bool {
+	if o != nil && !IsNil(o.Notes) {
+		return true
+	}
+
+	return false
+}
+
+// SetNotes gets a reference to the given string and assigns it to the Notes field.
+func (o *Invoice) SetNotes(v string) {
+	o.Notes = &v
+}
+
+// GetSentAt returns the SentAt field value if set, zero value otherwise.
+func (o *Invoice) GetSentAt() time.Time {
+	if o == nil || IsNil(o.SentAt) {
+		var ret time.Time
+		return ret
+	}
+	return *o.SentAt
+}
+
+// GetSentAtOk returns a tuple with the SentAt field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Invoice) GetSentAtOk() (*time.Time, bool) {
+	if o == nil || IsNil(o.SentAt) {
+		return nil, false
+	}
+	return o.SentAt, true
+}
+
+// HasSentAt returns a boolean if a field has been set.
+func (o *Invoice) HasSentAt() bool {
+	if o != nil && !IsNil(o.SentAt) {
+		return true
+	}
+
+	return false
+}
+
+// SetSentAt gets a reference to the given time.Time and assigns it to the SentAt field.
+func (o *Invoice) SetSentAt(v time.Time) {
+	o.SentAt = &v
+}
+
+// GetPaidAt returns the PaidAt field value if set, zero value otherwise.
+func (o *Invoice) GetPaidAt() time.Time {
+	if o == nil || IsNil(o.PaidAt) {
+		var ret time.Time
+		return ret
+	}
+	return *o.PaidAt
+}
+
+// GetPaidAtOk returns a tuple with the PaidAt field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Invoice) GetPaidAtOk() (*time.Time, bool) {
+	if o == nil || IsNil(o.PaidAt) {
+		return nil, false
+	}
+	return o.PaidAt, true
+}
+
+// HasPaidAt returns a boolean if a field has been set.
+func (o *Invoice) HasPaidAt() bool {
+	if o != nil && !IsNil(o.PaidAt) {
+		return true
+	}
+
+	return false
+}
+
+// SetPaidAt gets a reference to the given time.Time and assigns it to the PaidAt field.
+func (o *Invoice) SetPaidAt(v time.Time) {
+	o.PaidAt = &v
+}
+
+// GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
+func (o *Invoice) GetCreatedAt() time.Time {
+	if o == nil || IsNil(o.CreatedAt) {
+		var ret time.Time
+		return ret
+	}
+	return *o.CreatedAt
+}
+
+// GetCreatedAtOk returns a tuple with the CreatedAt field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Invoice) GetCreatedAtOk() (*time.Time, bool) {
+	if o == nil || IsNil(o.CreatedAt) {
+		return nil, false
+	}
+	return o.CreatedAt, true
+}
+
+// HasCreatedAt returns a boolean if a field has been set.
+func (o *Invoice) HasCreatedAt() bool {
+	if o != nil && !IsNil(o.CreatedAt) {
+		return true
+	}
+
+	return false
+}
+
+// SetCreatedAt gets a reference to the given time.Time and assigns it to the CreatedAt field.
+func (o *Invoice) SetCreatedAt(v time.Time) {
+	o.CreatedAt = &v
+}
+
+// GetUpdatedAt returns the UpdatedAt field value if set, zero value otherwise.
+func (o *Invoice) GetUpdatedAt() time.Time {
+	if o == nil || IsNil(o.UpdatedAt) {
+		var ret time.Time
+		return ret
+	}
+	return *o.UpdatedAt
+}
+
+// GetUpdatedAtOk returns a tuple with the UpdatedAt field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Invoice) GetUpdatedAtOk() (*time.Time, bool) {
+	if o == nil || IsNil(o.UpdatedAt) {
+		return nil, false
+	}
+	return o.UpdatedAt, true
+}
+
+// HasUpdatedAt returns a boolean if a field has been set.
+func (o *Invoice) HasUpdatedAt() bool {
+	if o != nil && !IsNil(o.UpdatedAt) {
+		return true
+	}
+
+	return false
+}
+
+// SetUpdatedAt gets a reference to the given time.Time and assigns it to the UpdatedAt field.
+func (o *Invoice) SetUpdatedAt(v time.Time) {
+	o.UpdatedAt = &v
+}
+
+// GetContact returns the Contact field value if set, zero value otherwise.
+func (o *Invoice) GetContact() InvoiceContact {
+	if o == nil || IsNil(o.Contact) {
+		var ret InvoiceContact
+		return ret
+	}
+	return *o.Contact
+}
+
+// GetContactOk returns a tuple with the Contact field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Invoice) GetContactOk() (*InvoiceContact, bool) {
+	if o == nil || IsNil(o.Contact) {
+		return nil, false
+	}
+	return o.Contact, true
+}
+
+// HasContact returns a boolean if a field has been set.
+func (o *Invoice) HasContact() bool {
+	if o != nil && !IsNil(o.Contact) {
+		return true
+	}
+
+	return false
+}
+
+// SetContact gets a reference to the given InvoiceContact and assigns it to the Contact field.
+func (o *Invoice) SetContact(v InvoiceContact) {
+	o.Contact = &v
+}
+
 func (o Invoice) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -637,6 +935,15 @@ func (o Invoice) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.CompanyId) {
 		toSerialize["company_id"] = o.CompanyId
 	}
+	if !IsNil(o.ProjectId) {
+		toSerialize["project_id"] = o.ProjectId
+	}
+	if !IsNil(o.IssueDate) {
+		toSerialize["issue_date"] = o.IssueDate
+	}
+	if !IsNil(o.DueDate) {
+		toSerialize["due_date"] = o.DueDate
+	}
 	if !IsNil(o.Currency) {
 		toSerialize["currency"] = o.Currency
 	}
@@ -663,6 +970,24 @@ func (o Invoice) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.CreditedAmount) {
 		toSerialize["credited_amount"] = o.CreditedAmount
+	}
+	if !IsNil(o.Notes) {
+		toSerialize["notes"] = o.Notes
+	}
+	if !IsNil(o.SentAt) {
+		toSerialize["sent_at"] = o.SentAt
+	}
+	if !IsNil(o.PaidAt) {
+		toSerialize["paid_at"] = o.PaidAt
+	}
+	if !IsNil(o.CreatedAt) {
+		toSerialize["created_at"] = o.CreatedAt
+	}
+	if !IsNil(o.UpdatedAt) {
+		toSerialize["updated_at"] = o.UpdatedAt
+	}
+	if !IsNil(o.Contact) {
+		toSerialize["contact"] = o.Contact
 	}
 	return toSerialize, nil
 }

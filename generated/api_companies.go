@@ -26,11 +26,11 @@ type CompaniesAPIService service
 type ApiCreateCompanySearchRequest struct {
 	ctx context.Context
 	ApiService *CompaniesAPIService
-	createCompanySearchRequest *CreateCompanySearchRequest
+	companySearchRequest *CompanySearchRequest
 }
 
-func (r ApiCreateCompanySearchRequest) CreateCompanySearchRequest(createCompanySearchRequest CreateCompanySearchRequest) ApiCreateCompanySearchRequest {
-	r.createCompanySearchRequest = &createCompanySearchRequest
+func (r ApiCreateCompanySearchRequest) CompanySearchRequest(companySearchRequest CompanySearchRequest) ApiCreateCompanySearchRequest {
+	r.companySearchRequest = &companySearchRequest
 	return r
 }
 
@@ -41,7 +41,7 @@ func (r ApiCreateCompanySearchRequest) Execute() (*http.Response, error) {
 /*
 CreateCompanySearch Search the public company registry (full filter model)
 
-Body: { groups: FilterGroup[], sort?, page?, pageSize?, stats? }. AND between groups, OR within a group; groups support exclude:true (NOT). Scope: companies:read.
+Body: { groups: CompanyFilterGroup[], sort?, page?, pageSize?, stats? }. AND between groups, OR within a group; any group accepts exclude:true (NOT). Every filter of the /prospecting web page is expressible here; see CompanyFilterGroup for the seven group kinds. Scope: companies:read.
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiCreateCompanySearchRequest
@@ -71,8 +71,8 @@ func (a *CompaniesAPIService) CreateCompanySearchExecute(r ApiCreateCompanySearc
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
-	if r.createCompanySearchRequest == nil {
-		return nil, reportError("createCompanySearchRequest is required and must be specified")
+	if r.companySearchRequest == nil {
+		return nil, reportError("companySearchRequest is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -93,7 +93,7 @@ func (a *CompaniesAPIService) CreateCompanySearchExecute(r ApiCreateCompanySearc
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.createCompanySearchRequest
+	localVarPostBody = r.companySearchRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return nil, err
@@ -257,6 +257,21 @@ type ApiListCompanySearchRequest struct {
 	caen *string
 	sect *string
 	jud *string
+	loc *string
+	stare *string
+	forma *string
+	pl *string
+	an *string
+	vech *string
+	cap *string
+	nrpl *string
+	email *string
+	tel *string
+	web *string
+	tva *string
+	efact *string
+	arepl *string
+	revend *string
 	fin *string
 	trend *string
 	adm *string
@@ -266,66 +281,157 @@ type ApiListCompanySearchRequest struct {
 	stats *bool
 }
 
-// Free text (name/CUI)
+// Free text over name / CUI / registration number. Prefix &#x60;!&#x60; to exclude.
 func (r ApiListCompanySearchRequest) Q(q string) ApiListCompanySearchRequest {
 	r.q = &q
 	return r
 }
 
-// CAEN codes, comma-separated
+// Full CAEN codes (4-digit, exact match), comma-separated, ORed. Prefix a value with &#x60;!&#x60; to exclude it.
 func (r ApiListCompanySearchRequest) Caen(caen string) ApiListCompanySearchRequest {
 	r.caen = &caen
 	return r
 }
 
-// CAEN divisions, comma-separated
+// CAEN divisions (2-digit), comma-separated, ORed; &#x60;!&#x60; excludes.
 func (r ApiListCompanySearchRequest) Sect(sect string) ApiListCompanySearchRequest {
 	r.sect = &sect
 	return r
 }
 
-// Counties, comma-separated
+// Counties of the registered office, comma-separated, ORed; &#x60;!&#x60; excludes. Romanian county names as stored in the registry, uppercase with diacritics (ALBA, ARGEȘ, BIHOR, BUCUREȘTI, CLUJ, CONSTANȚA, IAȘI, ILFOV, TIMIȘ, …); matching is case-insensitive.
 func (r ApiListCompanySearchRequest) Jud(jud string) ApiListCompanySearchRequest {
 	r.jud = &jud
 	return r
 }
 
-// Financial ranges, e.g. revenue:latest:1000000-
+// Localities (city), comma-separated, ORed, case-insensitive exact match; &#x60;!&#x60; excludes.
+func (r ApiListCompanySearchRequest) Loc(loc string) ApiListCompanySearchRequest {
+	r.loc = &loc
+	return r
+}
+
+// Company-state codes, comma-separated, ORed; &#x60;!&#x60; excludes. Company-status buckets derived from the registry state text: active, suspended, expiredSeat, insolvency, dissolution, liquidation, bankruptcy, struckOff, other, unknown. struckOff &#x3D; radiată, active &#x3D; în funcțiune. Legacy ONRC numeric codes (N_STARE_FIRMA, e.g. 1048) are still accepted and matched exactly against company_state_code.
+func (r ApiListCompanySearchRequest) Stare(stare string) ApiListCompanySearchRequest {
+	r.stare = &stare
+	return r
+}
+
+// Legal forms, comma-separated, ORed; &#x60;!&#x60; excludes. Registry legal-form codes: SRL, SA, PFA, II, IF, AF, SNC, SCS, SCA, RA, SC, CA, GIE (long registry spellings such as &#39;SOCIETATE COMERCIALĂ CU RĂSPUNDERE LIMITATĂ&#39; fold to the short code).
+func (r ApiListCompanySearchRequest) Forma(forma string) ApiListCompanySearchRequest {
+	r.forma = &forma
+	return r
+}
+
+// Has an active work point in these counties, comma-separated, ORed; &#x60;!&#x60; excludes.
+func (r ApiListCompanySearchRequest) Pl(pl string) ApiListCompanySearchRequest {
+	r.pl = &pl
+	return r
+}
+
+// Founding year. Range &#x60;min-max&#x60;, either side optional; prefix &#x60;!&#x60; to exclude.
+func (r ApiListCompanySearchRequest) An(an string) ApiListCompanySearchRequest {
+	r.an = &an
+	return r
+}
+
+// Company age in years. Range &#x60;min-max&#x60;, either side optional; prefix &#x60;!&#x60; to exclude.
+func (r ApiListCompanySearchRequest) Vech(vech string) ApiListCompanySearchRequest {
+	r.vech = &vech
+	return r
+}
+
+// Share capital in RON. Range &#x60;min-max&#x60;, either side optional; prefix &#x60;!&#x60; to exclude.
+func (r ApiListCompanySearchRequest) Cap(cap string) ApiListCompanySearchRequest {
+	r.cap = &cap
+	return r
+}
+
+// Number of work points. Range &#x60;min-max&#x60;, either side optional; prefix &#x60;!&#x60; to exclude.
+func (r ApiListCompanySearchRequest) Nrpl(nrpl string) ApiListCompanySearchRequest {
+	r.nrpl = &nrpl
+	return r
+}
+
+// &#x60;1&#x60; &#x3D; has an e-mail address, &#x60;0&#x60; &#x3D; has no an e-mail address.
+func (r ApiListCompanySearchRequest) Email(email string) ApiListCompanySearchRequest {
+	r.email = &email
+	return r
+}
+
+// &#x60;1&#x60; &#x3D; has a phone number, &#x60;0&#x60; &#x3D; has no a phone number.
+func (r ApiListCompanySearchRequest) Tel(tel string) ApiListCompanySearchRequest {
+	r.tel = &tel
+	return r
+}
+
+// &#x60;1&#x60; &#x3D; has a website, &#x60;0&#x60; &#x3D; has no a website.
+func (r ApiListCompanySearchRequest) Web(web string) ApiListCompanySearchRequest {
+	r.web = &web
+	return r
+}
+
+// &#x60;1&#x60; &#x3D; VAT-registered, &#x60;0&#x60; &#x3D; not VAT-registered.
+func (r ApiListCompanySearchRequest) Tva(tva string) ApiListCompanySearchRequest {
+	r.tva = &tva
+	return r
+}
+
+// &#x60;1&#x60; &#x3D; in the RO e-Factura registry, &#x60;0&#x60; &#x3D; not.
+func (r ApiListCompanySearchRequest) Efact(efact string) ApiListCompanySearchRequest {
+	r.efact = &efact
+	return r
+}
+
+// &#x60;1&#x60; &#x3D; has work points, &#x60;0&#x60; &#x3D; has no work points.
+func (r ApiListCompanySearchRequest) Arepl(arepl string) ApiListCompanySearchRequest {
+	r.arepl = &arepl
+	return r
+}
+
+// &#x60;1&#x60; &#x3D; profile claimed on Brivio, &#x60;0&#x60; &#x3D; unclaimed.
+func (r ApiListCompanySearchRequest) Revend(revend string) ApiListCompanySearchRequest {
+	r.revend = &revend
+	return r
+}
+
+// Financial ranges &#x60;indicator:year:min-max&#x60;, comma-separated, ANDed (each is its own group); year is &#x60;latest&#x60; or YYYY (2009+); prefix &#x60;!&#x60; to exclude. Indicators: revenue, netProfit, employees, equity, totalDebts, fixedAssets, currentAssets.
 func (r ApiListCompanySearchRequest) Fin(fin string) ApiListCompanySearchRequest {
 	r.fin = &fin
 	return r
 }
 
-// Trend filters, e.g. profitableYears:3
+// Multi-year trends, comma-separated, ANDed; &#x60;!&#x60; excludes. Forms: &#x60;revenueGrowthYears:N&#x60; (N 2-5), &#x60;profitableYears:N&#x60; (1-5), &#x60;employeesGrowing:N&#x60; (2-5), &#x60;debtDecreasing:N&#x60; (2-5), &#x60;revenueCagr:WINDOW:MINPCT&#x60; (window 3 or 5), &#x60;debtToEquity:MAX&#x60;.
 func (r ApiListCompanySearchRequest) Trend(trend string) ApiListCompanySearchRequest {
 	r.trend = &trend
 	return r
 }
 
-// Administrator/associate name
+// Administrator / associate name (min 2 chars), optionally &#x60;name:min-max&#x60; to constrain their ownership percent; &#x60;!&#x60; excludes.
 func (r ApiListCompanySearchRequest) Adm(adm string) ApiListCompanySearchRequest {
 	r.adm = &adm
 	return r
 }
 
+// Sort order.
 func (r ApiListCompanySearchRequest) Sort(sort string) ApiListCompanySearchRequest {
 	r.sort = &sort
 	return r
 }
 
-// Page
+// Page, 1-based (1-1000).
 func (r ApiListCompanySearchRequest) P(p int32) ApiListCompanySearchRequest {
 	r.p = &p
 	return r
 }
 
-// Page size (max 200)
+// Page size, 1-200 (default 25).
 func (r ApiListCompanySearchRequest) N(n int32) ApiListCompanySearchRequest {
 	r.n = &n
 	return r
 }
 
-// Include aggregate stats
+// Include aggregate stats for the whole match set (only the literal &#x60;true&#x60; enables it).
 func (r ApiListCompanySearchRequest) Stats(stats bool) ApiListCompanySearchRequest {
 	r.stats = &stats
 	return r
@@ -338,7 +444,7 @@ func (r ApiListCompanySearchRequest) Execute() (*http.Response, error) {
 /*
 ListCompanySearch Search the public company registry (compact URL filters)
 
-Prospectare: filter ~2M Romanian companies. Same query-string codec as the /prospecting web UI (e.g. ?jud=CLUJ&sect=62&fin=employees:latest:10-). Scope: companies:read.
+Prospectare: filter ~2M Romanian companies. Same query-string codec as the /prospecting web UI, so a shared /prospecting link works verbatim (e.g. ?jud=CLUJ&sect=62&fin=employees:latest:10-). Each parameter is one filter group; parameters are ANDed, comma-separated values inside one parameter are ORed. Exclusion: prefix a value with `!` to turn it into a NOT clause (e.g. `jud=!BUCUREȘTI`, `fin=!revenue:latest:-100000`); on list parameters the `!` values form a separate excluded group. Ranges are written `min-max`, either side optional (`10-50`, `10-`, `-50`). Flags take `1` (has) or `0` (has not). Invalid filters degrade to an empty filter set rather than an error. Scope: companies:read.
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiListCompanySearchRequest
@@ -381,6 +487,51 @@ func (a *CompaniesAPIService) ListCompanySearchExecute(r ApiListCompanySearchReq
 	if r.jud != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "jud", r.jud, "form", "")
 	}
+	if r.loc != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "loc", r.loc, "form", "")
+	}
+	if r.stare != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "stare", r.stare, "form", "")
+	}
+	if r.forma != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "forma", r.forma, "form", "")
+	}
+	if r.pl != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "pl", r.pl, "form", "")
+	}
+	if r.an != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "an", r.an, "form", "")
+	}
+	if r.vech != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "vech", r.vech, "form", "")
+	}
+	if r.cap != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "cap", r.cap, "form", "")
+	}
+	if r.nrpl != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "nrpl", r.nrpl, "form", "")
+	}
+	if r.email != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "email", r.email, "form", "")
+	}
+	if r.tel != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "tel", r.tel, "form", "")
+	}
+	if r.web != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "web", r.web, "form", "")
+	}
+	if r.tva != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "tva", r.tva, "form", "")
+	}
+	if r.efact != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "efact", r.efact, "form", "")
+	}
+	if r.arepl != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "arepl", r.arepl, "form", "")
+	}
+	if r.revend != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "revend", r.revend, "form", "")
+	}
 	if r.fin != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "fin", r.fin, "form", "")
 	}
@@ -392,12 +543,21 @@ func (a *CompaniesAPIService) ListCompanySearchExecute(r ApiListCompanySearchReq
 	}
 	if r.sort != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "sort", r.sort, "form", "")
+	} else {
+		var defaultValue string = "relevance"
+		r.sort = &defaultValue
 	}
 	if r.p != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "p", r.p, "form", "")
+	} else {
+		var defaultValue int32 = 1
+		r.p = &defaultValue
 	}
 	if r.n != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "n", r.n, "form", "")
+	} else {
+		var defaultValue int32 = 25
+		r.n = &defaultValue
 	}
 	if r.stats != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "stats", r.stats, "form", "")

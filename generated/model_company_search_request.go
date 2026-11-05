@@ -16,42 +16,59 @@ import (
 	"fmt"
 )
 
-// checks if the CreateCompanySearchRequest type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &CreateCompanySearchRequest{}
+// checks if the CompanySearchRequest type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &CompanySearchRequest{}
 
-// CreateCompanySearchRequest struct for CreateCompanySearchRequest
-type CreateCompanySearchRequest struct {
-	Groups []map[string]interface{} `json:"groups"`
+// CompanySearchRequest struct for CompanySearchRequest
+type CompanySearchRequest struct {
+	// At most 40 groups.
+	Groups []CompanyFilterGroup `json:"groups"`
+	// One of: relevance, name, nameDesc, revenue, revenueAsc, employees, employeesAsc, foundedNewest, foundedOldest (default relevance).
 	Sort *string `json:"sort,omitempty"`
+	// Page, 1-1000 (default 1).
 	Page *int32 `json:"page,omitempty"`
+	// Results per page, 1-200 (default 25).
 	PageSize *int32 `json:"pageSize,omitempty"`
+	// Include aggregate stats (count, revenue and headcount totals/averages) for the whole match set.
 	Stats *bool `json:"stats,omitempty"`
 }
 
-type _CreateCompanySearchRequest CreateCompanySearchRequest
+type _CompanySearchRequest CompanySearchRequest
 
-// NewCreateCompanySearchRequest instantiates a new CreateCompanySearchRequest object
+// NewCompanySearchRequest instantiates a new CompanySearchRequest object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewCreateCompanySearchRequest(groups []map[string]interface{}) *CreateCompanySearchRequest {
-	this := CreateCompanySearchRequest{}
+func NewCompanySearchRequest(groups []CompanyFilterGroup) *CompanySearchRequest {
+	this := CompanySearchRequest{}
 	this.Groups = groups
+	var sort string = "relevance"
+	this.Sort = &sort
+	var page int32 = 1
+	this.Page = &page
+	var pageSize int32 = 25
+	this.PageSize = &pageSize
 	return &this
 }
 
-// NewCreateCompanySearchRequestWithDefaults instantiates a new CreateCompanySearchRequest object
+// NewCompanySearchRequestWithDefaults instantiates a new CompanySearchRequest object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewCreateCompanySearchRequestWithDefaults() *CreateCompanySearchRequest {
-	this := CreateCompanySearchRequest{}
+func NewCompanySearchRequestWithDefaults() *CompanySearchRequest {
+	this := CompanySearchRequest{}
+	var sort string = "relevance"
+	this.Sort = &sort
+	var page int32 = 1
+	this.Page = &page
+	var pageSize int32 = 25
+	this.PageSize = &pageSize
 	return &this
 }
 
 // GetGroups returns the Groups field value
-func (o *CreateCompanySearchRequest) GetGroups() []map[string]interface{} {
+func (o *CompanySearchRequest) GetGroups() []CompanyFilterGroup {
 	if o == nil {
-		var ret []map[string]interface{}
+		var ret []CompanyFilterGroup
 		return ret
 	}
 
@@ -60,7 +77,7 @@ func (o *CreateCompanySearchRequest) GetGroups() []map[string]interface{} {
 
 // GetGroupsOk returns a tuple with the Groups field value
 // and a boolean to check if the value has been set.
-func (o *CreateCompanySearchRequest) GetGroupsOk() ([]map[string]interface{}, bool) {
+func (o *CompanySearchRequest) GetGroupsOk() ([]CompanyFilterGroup, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -68,12 +85,12 @@ func (o *CreateCompanySearchRequest) GetGroupsOk() ([]map[string]interface{}, bo
 }
 
 // SetGroups sets field value
-func (o *CreateCompanySearchRequest) SetGroups(v []map[string]interface{}) {
+func (o *CompanySearchRequest) SetGroups(v []CompanyFilterGroup) {
 	o.Groups = v
 }
 
 // GetSort returns the Sort field value if set, zero value otherwise.
-func (o *CreateCompanySearchRequest) GetSort() string {
+func (o *CompanySearchRequest) GetSort() string {
 	if o == nil || IsNil(o.Sort) {
 		var ret string
 		return ret
@@ -83,7 +100,7 @@ func (o *CreateCompanySearchRequest) GetSort() string {
 
 // GetSortOk returns a tuple with the Sort field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *CreateCompanySearchRequest) GetSortOk() (*string, bool) {
+func (o *CompanySearchRequest) GetSortOk() (*string, bool) {
 	if o == nil || IsNil(o.Sort) {
 		return nil, false
 	}
@@ -91,7 +108,7 @@ func (o *CreateCompanySearchRequest) GetSortOk() (*string, bool) {
 }
 
 // HasSort returns a boolean if a field has been set.
-func (o *CreateCompanySearchRequest) HasSort() bool {
+func (o *CompanySearchRequest) HasSort() bool {
 	if o != nil && !IsNil(o.Sort) {
 		return true
 	}
@@ -100,12 +117,12 @@ func (o *CreateCompanySearchRequest) HasSort() bool {
 }
 
 // SetSort gets a reference to the given string and assigns it to the Sort field.
-func (o *CreateCompanySearchRequest) SetSort(v string) {
+func (o *CompanySearchRequest) SetSort(v string) {
 	o.Sort = &v
 }
 
 // GetPage returns the Page field value if set, zero value otherwise.
-func (o *CreateCompanySearchRequest) GetPage() int32 {
+func (o *CompanySearchRequest) GetPage() int32 {
 	if o == nil || IsNil(o.Page) {
 		var ret int32
 		return ret
@@ -115,7 +132,7 @@ func (o *CreateCompanySearchRequest) GetPage() int32 {
 
 // GetPageOk returns a tuple with the Page field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *CreateCompanySearchRequest) GetPageOk() (*int32, bool) {
+func (o *CompanySearchRequest) GetPageOk() (*int32, bool) {
 	if o == nil || IsNil(o.Page) {
 		return nil, false
 	}
@@ -123,7 +140,7 @@ func (o *CreateCompanySearchRequest) GetPageOk() (*int32, bool) {
 }
 
 // HasPage returns a boolean if a field has been set.
-func (o *CreateCompanySearchRequest) HasPage() bool {
+func (o *CompanySearchRequest) HasPage() bool {
 	if o != nil && !IsNil(o.Page) {
 		return true
 	}
@@ -132,12 +149,12 @@ func (o *CreateCompanySearchRequest) HasPage() bool {
 }
 
 // SetPage gets a reference to the given int32 and assigns it to the Page field.
-func (o *CreateCompanySearchRequest) SetPage(v int32) {
+func (o *CompanySearchRequest) SetPage(v int32) {
 	o.Page = &v
 }
 
 // GetPageSize returns the PageSize field value if set, zero value otherwise.
-func (o *CreateCompanySearchRequest) GetPageSize() int32 {
+func (o *CompanySearchRequest) GetPageSize() int32 {
 	if o == nil || IsNil(o.PageSize) {
 		var ret int32
 		return ret
@@ -147,7 +164,7 @@ func (o *CreateCompanySearchRequest) GetPageSize() int32 {
 
 // GetPageSizeOk returns a tuple with the PageSize field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *CreateCompanySearchRequest) GetPageSizeOk() (*int32, bool) {
+func (o *CompanySearchRequest) GetPageSizeOk() (*int32, bool) {
 	if o == nil || IsNil(o.PageSize) {
 		return nil, false
 	}
@@ -155,7 +172,7 @@ func (o *CreateCompanySearchRequest) GetPageSizeOk() (*int32, bool) {
 }
 
 // HasPageSize returns a boolean if a field has been set.
-func (o *CreateCompanySearchRequest) HasPageSize() bool {
+func (o *CompanySearchRequest) HasPageSize() bool {
 	if o != nil && !IsNil(o.PageSize) {
 		return true
 	}
@@ -164,12 +181,12 @@ func (o *CreateCompanySearchRequest) HasPageSize() bool {
 }
 
 // SetPageSize gets a reference to the given int32 and assigns it to the PageSize field.
-func (o *CreateCompanySearchRequest) SetPageSize(v int32) {
+func (o *CompanySearchRequest) SetPageSize(v int32) {
 	o.PageSize = &v
 }
 
 // GetStats returns the Stats field value if set, zero value otherwise.
-func (o *CreateCompanySearchRequest) GetStats() bool {
+func (o *CompanySearchRequest) GetStats() bool {
 	if o == nil || IsNil(o.Stats) {
 		var ret bool
 		return ret
@@ -179,7 +196,7 @@ func (o *CreateCompanySearchRequest) GetStats() bool {
 
 // GetStatsOk returns a tuple with the Stats field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *CreateCompanySearchRequest) GetStatsOk() (*bool, bool) {
+func (o *CompanySearchRequest) GetStatsOk() (*bool, bool) {
 	if o == nil || IsNil(o.Stats) {
 		return nil, false
 	}
@@ -187,7 +204,7 @@ func (o *CreateCompanySearchRequest) GetStatsOk() (*bool, bool) {
 }
 
 // HasStats returns a boolean if a field has been set.
-func (o *CreateCompanySearchRequest) HasStats() bool {
+func (o *CompanySearchRequest) HasStats() bool {
 	if o != nil && !IsNil(o.Stats) {
 		return true
 	}
@@ -196,11 +213,11 @@ func (o *CreateCompanySearchRequest) HasStats() bool {
 }
 
 // SetStats gets a reference to the given bool and assigns it to the Stats field.
-func (o *CreateCompanySearchRequest) SetStats(v bool) {
+func (o *CompanySearchRequest) SetStats(v bool) {
 	o.Stats = &v
 }
 
-func (o CreateCompanySearchRequest) MarshalJSON() ([]byte, error) {
+func (o CompanySearchRequest) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -208,7 +225,7 @@ func (o CreateCompanySearchRequest) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o CreateCompanySearchRequest) ToMap() (map[string]interface{}, error) {
+func (o CompanySearchRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["groups"] = o.Groups
 	if !IsNil(o.Sort) {
@@ -226,7 +243,7 @@ func (o CreateCompanySearchRequest) ToMap() (map[string]interface{}, error) {
 	return toSerialize, nil
 }
 
-func (o *CreateCompanySearchRequest) UnmarshalJSON(data []byte) (err error) {
+func (o *CompanySearchRequest) UnmarshalJSON(data []byte) (err error) {
 	// This validates that all required properties are included in the JSON object
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
@@ -248,53 +265,53 @@ func (o *CreateCompanySearchRequest) UnmarshalJSON(data []byte) (err error) {
 		}
 	}
 
-	varCreateCompanySearchRequest := _CreateCompanySearchRequest{}
+	varCompanySearchRequest := _CompanySearchRequest{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varCreateCompanySearchRequest)
+	err = decoder.Decode(&varCompanySearchRequest)
 
 	if err != nil {
 		return err
 	}
 
-	*o = CreateCompanySearchRequest(varCreateCompanySearchRequest)
+	*o = CompanySearchRequest(varCompanySearchRequest)
 
 	return err
 }
 
-type NullableCreateCompanySearchRequest struct {
-	value *CreateCompanySearchRequest
+type NullableCompanySearchRequest struct {
+	value *CompanySearchRequest
 	isSet bool
 }
 
-func (v NullableCreateCompanySearchRequest) Get() *CreateCompanySearchRequest {
+func (v NullableCompanySearchRequest) Get() *CompanySearchRequest {
 	return v.value
 }
 
-func (v *NullableCreateCompanySearchRequest) Set(val *CreateCompanySearchRequest) {
+func (v *NullableCompanySearchRequest) Set(val *CompanySearchRequest) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableCreateCompanySearchRequest) IsSet() bool {
+func (v NullableCompanySearchRequest) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableCreateCompanySearchRequest) Unset() {
+func (v *NullableCompanySearchRequest) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableCreateCompanySearchRequest(val *CreateCompanySearchRequest) *NullableCreateCompanySearchRequest {
-	return &NullableCreateCompanySearchRequest{value: val, isSet: true}
+func NewNullableCompanySearchRequest(val *CompanySearchRequest) *NullableCompanySearchRequest {
+	return &NullableCompanySearchRequest{value: val, isSet: true}
 }
 
-func (v NullableCreateCompanySearchRequest) MarshalJSON() ([]byte, error) {
+func (v NullableCompanySearchRequest) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableCreateCompanySearchRequest) UnmarshalJSON(src []byte) error {
+func (v *NullableCompanySearchRequest) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

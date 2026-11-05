@@ -44,6 +44,9 @@ api_inventory.go
 api_invoices.go
 api_legal.go
 api_locations.go
+api_mail_aliases.go
+api_mail_domains.go
+api_mailboxes.go
 api_marketing.go
 api_me.go
 api_modules.go
@@ -69,6 +72,7 @@ api_shipping_points.go
 api_sites.go
 api_space_transfers.go
 api_spaces.go
+api_stores.go
 api_subscriptions.go
 api_taxes.go
 api_time_entries.go
@@ -105,6 +109,22 @@ model_bank_rule_input.go
 model_bundle_component.go
 model_bundle_settings.go
 model_cancel_payment_link_200_response.go
+model_company_administrator_filter.go
+model_company_filter_group.go
+model_company_financial_filter.go
+model_company_financial_filter_year.go
+model_company_flag_filter.go
+model_company_numeric_range.go
+model_company_range_filter.go
+model_company_search_request.go
+model_company_terms_filter.go
+model_company_text_filter.go
+model_company_trend_debt_decreasing.go
+model_company_trend_debt_to_equity.go
+model_company_trend_employees_growing.go
+model_company_trend_profitable_years.go
+model_company_trend_revenue_cagr.go
+model_company_trend_revenue_growth_years.go
 model_complete_contract_obligation_200_response.go
 model_complete_contract_obligation_200_response_data.go
 model_configure_campaign_ab_test_200_response.go
@@ -149,7 +169,6 @@ model_create_article_201_response.go
 model_create_assistant_run_200_response.go
 model_create_assistant_thread_201_response.go
 model_create_banking_statement_import_request.go
-model_create_company_search_request.go
 model_create_contact_201_response.go
 model_create_contract_201_response.go
 model_create_contract_obligation_201_response.go
@@ -162,6 +181,7 @@ model_create_delivery_route_201_response.go
 model_create_dns_zone_201_response.go
 model_create_dock_appointment_201_response.go
 model_create_document_201_response.go
+model_create_domain_order_201_response.go
 model_create_email_domain_201_response.go
 model_create_email_send_202_response.go
 model_create_expense_201_response.go
@@ -175,6 +195,8 @@ model_create_import_declaration_201_response.go
 model_create_import_declaration_201_response_data.go
 model_create_invoice_201_response.go
 model_create_location_201_response.go
+model_create_mail_alias_201_response.go
+model_create_mailbox_201_response.go
 model_create_marketing_subscriber_200_response.go
 model_create_order_import_request.go
 model_create_order_import_request_customer.go
@@ -205,6 +227,7 @@ model_custom_hostname_dns_instructions_txt.go
 model_custom_hostname_verify_result.go
 model_delete_cost_budget_200_response.go
 model_delete_custom_hostname_200_response.go
+model_delete_mailbox_200_response.go
 model_delete_prospecting_saved_search_200_response.go
 model_delete_prospecting_saved_search_200_response_data.go
 model_delivery_route.go
@@ -265,6 +288,13 @@ model_dock_appointment_update.go
 model_document.go
 model_document_create.go
 model_domain.go
+model_domain_order.go
+model_domain_order_completed_post_request.go
+model_domain_order_create.go
+model_domain_order_failed_post_request.go
+model_domain_order_webhook_data.go
+model_domain_search_result.go
+model_domain_transfer_price.go
 model_download_export_200_response.go
 model_email.go
 model_email_address.go
@@ -318,6 +348,7 @@ model_get_delivery_route_cost_analytics_200_response.go
 model_get_delivery_route_cost_comparison_200_response.go
 model_get_display_me_200_response.go
 model_get_display_snapshot_200_response.go
+model_get_domain_transfer_price_200_response.go
 model_get_gate_visit_200_response.go
 model_get_import_declaration_200_response.go
 model_get_payment_200_response.go
@@ -330,6 +361,8 @@ model_get_saft_generation_download_200_response.go
 model_get_saft_import_200_response.go
 model_get_space_200_response.go
 model_get_space_transfer_200_response.go
+model_get_store_app_data_safety_200_response.go
+model_get_store_app_profile_200_response.go
 model_get_time_entry_200_response.go
 model_get_vehicle_200_response.go
 model_import_declaration.go
@@ -343,6 +376,7 @@ model_import_job_create.go
 model_import_job_error.go
 model_import_preview.go
 model_invoice.go
+model_invoice_contact.go
 model_invoice_create.go
 model_invoice_create_items_inner.go
 model_invoice_credited_post_request.go
@@ -376,6 +410,7 @@ model_list_delivery_routes_200_response.go
 model_list_dns_zones_200_response.go
 model_list_dock_appointments_200_response.go
 model_list_documents_200_response.go
+model_list_domain_orders_200_response.go
 model_list_domains_200_response.go
 model_list_email_domains_200_response.go
 model_list_emails_200_response.go
@@ -391,6 +426,9 @@ model_list_import_errors_200_response.go
 model_list_imports_200_response.go
 model_list_invoices_200_response.go
 model_list_locations_200_response.go
+model_list_mail_aliases_200_response.go
+model_list_mail_domains_200_response.go
+model_list_mailboxes_200_response.go
 model_list_marketing_campaign_variants_200_response.go
 model_list_me_401_response.go
 model_list_me_401_response_error.go
@@ -417,6 +455,14 @@ model_list_vehicle_trip_sheets_200_response.go
 model_list_vehicles_200_response.go
 model_location.go
 model_location_create.go
+model_mail_alias.go
+model_mail_alias_create.go
+model_mail_alias_created.go
+model_mail_domain.go
+model_mail_resource_deleted.go
+model_mailbox.go
+model_mailbox_create.go
+model_mailbox_created.go
 model_marketing_ab_test_configure.go
 model_marketing_ab_test_configure_variants_inner.go
 model_marketing_campaign_ab_test_.go
@@ -501,6 +547,7 @@ model_saft_import_preview_trial_balance.go
 model_saft_import_preview_trial_balance_rows_inner.go
 model_saft_submission.go
 model_saft_submission_sections_inner.go
+model_search_domains_200_response.go
 model_shipment.go
 model_shipment_create.go
 model_shipment_create_parcel.go
@@ -522,6 +569,11 @@ model_space_member.go
 model_space_member_ref.go
 model_space_transfer.go
 model_space_update.go
+model_store_app_data_safety.go
+model_store_app_data_safety_apple.go
+model_store_app_data_safety_items_inner.go
+model_store_app_profile.go
+model_store_app_profile_generator.go
 model_subscription_activated_post_request.go
 model_subscription_canceled_post_request.go
 model_subscription_updated_post_request.go

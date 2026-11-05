@@ -19,11 +19,11 @@ import (
 // checks if the InvoiceCreate type satisfies the MappedNullable interface at compile time
 var _ MappedNullable = &InvoiceCreate{}
 
-// InvoiceCreate Exactly one of `contact_id` or `contact_external_id` is required. Issued documents are numbered by the same gapless per-(company, series, year) allocator the app uses (ADR-0208); the `series` defaults to `BRV`. Non-RON documents carry the BNR T-1 reference rate for `issue_date` unless a positive `exchange_rate` is supplied — when the rate cannot be obtained the request fails with 422 `EXCHANGE_RATE_UNAVAILABLE`, never a silent rate of 1.
+// InvoiceCreate Exactly one of `contact_id` or `contact_external_id` is required. Issued documents are numbered by the same gapless per-(company, series, year) allocator the app uses (ADR-0208); the `series` defaults to the organisation's series for that document type (an invoice series is never used for a proforma, quote or aviz). Non-RON documents carry the BNR T-1 reference rate for `issue_date` unless a positive `exchange_rate` is supplied — when the rate cannot be obtained the request fails with 422 `EXCHANGE_RATE_UNAVAILABLE`, never a silent rate of 1.
 type InvoiceCreate struct {
 	Type *string `json:"type,omitempty"`
 	Direction *string `json:"direction,omitempty"`
-	// Numbering series; defaults to `BRV` for issued documents.
+	// Numbering series; defaults to the organisation's series for the document type. Issuing in a series that already numbers another kind of document is refused with 409 `SERIES_TYPE_MISMATCH`.
 	Series *string `json:"series,omitempty"`
 	ContactId *string `json:"contact_id,omitempty"`
 	// Your own identifier for the contact, resolved through the external reference map (source `api`, entity `contact`). Used only when `contact_id` is absent; unknown → 404 `CONTACT_NOT_FOUND`.

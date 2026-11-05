@@ -244,11 +244,20 @@ paths:
   /companies/search:
     get:
       description: "Prospectare: filter ~2M Romanian companies. Same query-string\
-        \ codec as the /prospecting web UI (e.g. ?jud=CLUJ&sect=62&fin=employees:latest:10-).\
-        \ Scope: companies:read."
+        \ codec as the /prospecting web UI, so a shared /prospecting link works verbatim\
+        \ (e.g. ?jud=CLUJ&sect=62&fin=employees:latest:10-). Each parameter is one\
+        \ filter group; parameters are ANDed, comma-separated values inside one parameter\
+        \ are ORed. Exclusion: prefix a value with `!` to turn it into a NOT clause\
+        \ (e.g. `jud=!BUCUREȘTI`, `fin=!revenue:latest:-100000`); on list parameters\
+        \ the `!` values form a separate excluded group. Ranges are written `min-max`,\
+        \ either side optional (`10-50`, `10-`, `-50`). Flags take `1` (has) or `0`\
+        \ (has not). Invalid filters degrade to an empty filter set rather than an\
+        \ error. Scope: companies:read."
       operationId: listCompanySearch
       parameters:
-      - description: Free text (name/CUI)
+      - description: Free text over name / CUI / registration number. Prefix `!` to
+          exclude.
+        example: construct
         explode: true
         in: query
         name: q
@@ -256,7 +265,9 @@ paths:
         schema:
           type: string
         style: form
-      - description: "CAEN codes, comma-separated"
+      - description: "Full CAEN codes (4-digit, exact match), comma-separated, ORed.\
+          \ Prefix a value with `!` to exclude it."
+        example: "6201,6202"
         explode: true
         in: query
         name: caen
@@ -264,7 +275,8 @@ paths:
         schema:
           type: string
         style: form
-      - description: "CAEN divisions, comma-separated"
+      - description: "CAEN divisions (2-digit), comma-separated, ORed; `!` excludes."
+        example: "62,63"
         explode: true
         in: query
         name: sect
@@ -272,7 +284,11 @@ paths:
         schema:
           type: string
         style: form
-      - description: "Counties, comma-separated"
+      - description: "Counties of the registered office, comma-separated, ORed; `!`\
+          \ excludes. Romanian county names as stored in the registry, uppercase with\
+          \ diacritics (ALBA, ARGEȘ, BIHOR, BUCUREȘTI, CLUJ, CONSTANȚA, IAȘI, ILFOV,\
+          \ TIMIȘ, …); matching is case-insensitive."
+        example: "CLUJ,BIHOR"
         explode: true
         in: query
         name: jud
@@ -280,7 +296,181 @@ paths:
         schema:
           type: string
         style: form
-      - description: "Financial ranges, e.g. revenue:latest:1000000-"
+      - description: "Localities (city), comma-separated, ORed, case-insensitive exact\
+          \ match; `!` excludes."
+        example: CLUJ-NAPOCA
+        explode: true
+        in: query
+        name: loc
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Company-state codes, comma-separated, ORed; `!` excludes. Company-status\
+          \ buckets derived from the registry state text: active, suspended, expiredSeat,\
+          \ insolvency, dissolution, liquidation, bankruptcy, struckOff, other, unknown.\
+          \ struckOff = radiată, active = în funcțiune. Legacy ONRC numeric codes\
+          \ (N_STARE_FIRMA, e.g. 1048) are still accepted and matched exactly against\
+          \ company_state_code."
+        example: active
+        explode: true
+        in: query
+        name: stare
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Legal forms, comma-separated, ORed; `!` excludes. Registry legal-form\
+          \ codes: SRL, SA, PFA, II, IF, AF, SNC, SCS, SCA, RA, SC, CA, GIE (long\
+          \ registry spellings such as 'SOCIETATE COMERCIALĂ CU RĂSPUNDERE LIMITATĂ\
+          ' fold to the short code)."
+        example: "SRL,SA"
+        explode: true
+        in: query
+        name: forma
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Has an active work point in these counties, comma-separated,\
+          \ ORed; `!` excludes."
+        example: TIMIȘ
+        explode: true
+        in: query
+        name: pl
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Founding year. Range `min-max`, either side optional; prefix\
+          \ `!` to exclude."
+        example: 2015-2024
+        explode: true
+        in: query
+        name: an
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Company age in years. Range `min-max`, either side optional;\
+          \ prefix `!` to exclude."
+        example: 5-
+        explode: true
+        in: query
+        name: vech
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Share capital in RON. Range `min-max`, either side optional;\
+          \ prefix `!` to exclude."
+        example: 200-
+        explode: true
+        in: query
+        name: cap
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Number of work points. Range `min-max`, either side optional;\
+          \ prefix `!` to exclude."
+        example: 1-
+        explode: true
+        in: query
+        name: nrpl
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "`1` = has an e-mail address, `0` = has no an e-mail address."
+        example: "1"
+        explode: true
+        in: query
+        name: email
+        required: false
+        schema:
+          enum:
+          - "0"
+          - "1"
+          type: string
+        style: form
+      - description: "`1` = has a phone number, `0` = has no a phone number."
+        example: "1"
+        explode: true
+        in: query
+        name: tel
+        required: false
+        schema:
+          enum:
+          - "0"
+          - "1"
+          type: string
+        style: form
+      - description: "`1` = has a website, `0` = has no a website."
+        example: "1"
+        explode: true
+        in: query
+        name: web
+        required: false
+        schema:
+          enum:
+          - "0"
+          - "1"
+          type: string
+        style: form
+      - description: "`1` = VAT-registered, `0` = not VAT-registered."
+        example: "1"
+        explode: true
+        in: query
+        name: tva
+        required: false
+        schema:
+          enum:
+          - "0"
+          - "1"
+          type: string
+        style: form
+      - description: "`1` = in the RO e-Factura registry, `0` = not."
+        example: "1"
+        explode: true
+        in: query
+        name: efact
+        required: false
+        schema:
+          enum:
+          - "0"
+          - "1"
+          type: string
+        style: form
+      - description: "`1` = has work points, `0` = has no work points."
+        example: "1"
+        explode: true
+        in: query
+        name: arepl
+        required: false
+        schema:
+          enum:
+          - "0"
+          - "1"
+          type: string
+        style: form
+      - description: "`1` = profile claimed on Brivio, `0` = unclaimed."
+        example: "0"
+        explode: true
+        in: query
+        name: revend
+        required: false
+        schema:
+          enum:
+          - "0"
+          - "1"
+          type: string
+        style: form
+      - description: "Financial ranges `indicator:year:min-max`, comma-separated,\
+          \ ANDed (each is its own group); year is `latest` or YYYY (2009+); prefix\
+          \ `!` to exclude. Indicators: revenue, netProfit, employees, equity, totalDebts,\
+          \ fixedAssets, currentAssets."
+        example: "revenue:latest:1000000-,employees:2024:10-50"
         explode: true
         in: query
         name: fin
@@ -288,7 +478,11 @@ paths:
         schema:
           type: string
         style: form
-      - description: "Trend filters, e.g. profitableYears:3"
+      - description: "Multi-year trends, comma-separated, ANDed; `!` excludes. Forms:\
+          \ `revenueGrowthYears:N` (N 2-5), `profitableYears:N` (1-5), `employeesGrowing:N`\
+          \ (2-5), `debtDecreasing:N` (2-5), `revenueCagr:WINDOW:MINPCT` (window 3\
+          \ or 5), `debtToEquity:MAX`."
+        example: "profitableYears:3,revenueCagr:3:10"
         explode: true
         in: query
         name: trend
@@ -296,7 +490,9 @@ paths:
         schema:
           type: string
         style: form
-      - description: Administrator/associate name
+      - description: "Administrator / associate name (min 2 chars), optionally `name:min-max`\
+          \ to constrain their ownership percent; `!` excludes."
+        example: popescu:50-
         explode: true
         in: query
         name: adm
@@ -304,11 +500,14 @@ paths:
         schema:
           type: string
         style: form
-      - explode: true
+      - description: Sort order.
+        example: revenue
+        explode: true
         in: query
         name: sort
         required: false
         schema:
+          default: relevance
           enum:
           - relevance
           - name
@@ -321,23 +520,26 @@ paths:
           - foundedOldest
           type: string
         style: form
-      - description: Page
+      - description: "Page, 1-based (1-1000)."
         explode: true
         in: query
         name: p
         required: false
         schema:
+          default: 1
           type: integer
         style: form
-      - description: Page size (max 200)
+      - description: "Page size, 1-200 (default 25)."
         explode: true
         in: query
         name: "n"
         required: false
         schema:
+          default: 25
           type: integer
         style: form
-      - description: Include aggregate stats
+      - description: Include aggregate stats for the whole match set (only the literal
+          `true` enables it).
         explode: true
         in: query
         name: stats
@@ -358,15 +560,16 @@ paths:
       tags:
       - companies
     post:
-      description: "Body: { groups: FilterGroup[], sort?, page?, pageSize?, stats?\
-        \ }. AND between groups, OR within a group; groups support exclude:true (NOT).\
-        \ Scope: companies:read."
+      description: "Body: { groups: CompanyFilterGroup[], sort?, page?, pageSize?,\
+        \ stats? }. AND between groups, OR within a group; any group accepts exclude:true\
+        \ (NOT). Every filter of the /prospecting web page is expressible here; see\
+        \ CompanyFilterGroup for the seven group kinds. Scope: companies:read."
       operationId: createCompanySearch
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/createCompanySearch_request"
+              $ref: "#/components/schemas/CompanySearchRequest"
         required: true
       responses:
         "200":
@@ -14428,6 +14631,760 @@ paths:
         \ happens only in the app Approval Feed. (scope: assistant:write)"
       tags:
       - assistant
+  /mail-domains:
+    get:
+      operationId: listMailDomains
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMailDomains_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "The organization's hosted mail domains, read-only; adding and verifying\
+        \ a domain happen in the app (scope: mailboxes:read)"
+      tags:
+      - mail-domains
+  /mailboxes:
+    get:
+      operationId: listMailboxes
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMailboxes_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "The organization's hosted mailboxes; personal and HR employee mailboxes\
+        \ are not included (scope: mailboxes:read)"
+      tags:
+      - mailboxes
+    post:
+      operationId: createMailbox
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MailboxCreate"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createMailbox_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "502":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Provision a hosted mailbox on an active hosted domain of the organization.\
+        \ The password is generated and sealed server-side and never returned. A taken\
+        \ address is 409, a reserved local part 422, no mail server configured 503,\
+        \ a mail-server refusal 502. Honours Idempotency-Key. (scope: mailboxes:write)"
+      tags:
+      - mailboxes
+  /mailboxes/{id}:
+    delete:
+      operationId: deleteMailbox
+      parameters:
+      - description: Mailbox id
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/deleteMailbox_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "502":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Delete the mailbox on the mail server first, then its record (its\
+        \ aliases go with it); a mail-server refusal is 502 and keeps it. Honours\
+        \ Idempotency-Key. (scope: mailboxes:write)"
+      tags:
+      - mailboxes
+  /mail-aliases:
+    get:
+      operationId: listMailAliases
+      parameters:
+      - description: Only the aliases of this mailbox
+        explode: true
+        in: query
+        name: mailbox_id
+        required: false
+        schema:
+          format: uuid
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMailAliases_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Aliases of the organization's hosted mailboxes (scope: mailboxes:read)"
+      tags:
+      - mail-aliases
+    post:
+      operationId: createMailAlias
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MailAliasCreate"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createMailAlias_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "502":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Add an alias delivering into an organization mailbox, on the mailbox's\
+        \ domain. Created on the mail server first, then recorded. A taken address\
+        \ (alias or mailbox) is 409, a reserved local part 422, a mail-server refusal\
+        \ 502. Honours Idempotency-Key. (scope: mailboxes:write)"
+      tags:
+      - mail-aliases
+  /mail-aliases/{id}:
+    delete:
+      operationId: deleteMailAlias
+      parameters:
+      - description: Mail alias id
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/deleteMailbox_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "502":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Remove the alias on the mail server first, then its record; a mail-server\
+        \ refusal is 502 and keeps it. Honours Idempotency-Key. (scope: mailboxes:write)"
+      tags:
+      - mail-aliases
+  /domains/search:
+    get:
+      operationId: searchDomains
+      parameters:
+      - description: "The label, without TLD"
+        explode: true
+        in: query
+        name: query
+        required: true
+        schema:
+          maxLength: 63
+          minLength: 1
+          pattern: "^[A-Za-z0-9-]+$"
+          type: string
+        style: form
+      - description: "Comma-separated TLDs, at most 20, e.g. ro,com"
+        explode: true
+        in: query
+        name: tlds
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/searchDomains_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "502":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Availability and retail price of <query>.<tld> for each TLD (default\
+        \ ro, com, eu, net, io). 503 when no registrar is configured (scope: domains:read)"
+      tags:
+      - domains
+  /domains/transfer-price:
+    get:
+      operationId: getDomainTransferPrice
+      parameters:
+      - explode: true
+        in: query
+        name: domain
+        required: true
+        schema:
+          maxLength: 253
+          minLength: 4
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getDomainTransferPrice_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Retail price of transferring a domain to Brivio (its TLD). 503 when\
+        \ no registrar is configured (scope: domains:read)"
+      tags:
+      - domains
+  /domains/orders:
+    get:
+      operationId: listDomainOrders
+      parameters:
+      - explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          enum:
+          - pending
+          - confirmed
+          - rejected
+          - expired
+          - completed
+          - failed
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listDomainOrders_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "The organization's domain orders, newest first (at most 100) (scope:\
+        \ domains:read)"
+      tags:
+      - domains
+    post:
+      operationId: createDomainOrder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DomainOrderCreate"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createDomainOrder_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "502":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Order a domain registration or transfer. This is NOT a purchase: the\
+        \ order stays pending until an org admin confirms it in Brivio with a second\
+        \ factor (confirm_url) and expires after 72 h. Returns the quoted price, never\
+        \ the auth code. A taken domain or a second pending order for it is 409, a\
+        \ platform host 422, no registrar 503. Honours Idempotency-Key. (scope: domains:write)"
+      tags:
+      - domains
+  /domains/orders/{id}:
+    get:
+      operationId: getDomainOrder
+      parameters:
+      - description: Domain order id
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/createDomainOrder_201_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "One domain order with its effective status (scope: domains:read)"
+      tags:
+      - domains
+  /stores/{id}/app-profile:
+    get:
+      operationId: getStoreAppProfile
+      parameters:
+      - description: Store id
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getStoreAppProfile_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "The store's Android app profile and build status; 404 when the store\
+        \ has no app (scope: sites:read)"
+      tags:
+      - stores
+  /stores/{id}/app-profile/data-safety:
+    get:
+      operationId: getStoreAppDataSafety
+      parameters:
+      - description: Store id
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getStoreAppDataSafety_200_response"
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "What the store's app collects, for Play's Data safety form and Apple's\
+        \ privacy labels (scope: sites:read)"
+      tags:
+      - stores
 components:
   schemas:
     Meta:
@@ -14458,6 +15415,407 @@ components:
       required:
       - data
       - error
+    CompanyNumericRange:
+      additionalProperties: false
+      description: Inclusive range; at least one side should be set. min must be <=
+        max.
+      properties:
+        min:
+          type: number
+        max:
+          type: number
+    CompanyTextFilter:
+      additionalProperties: false
+      description: Free text over company name / CUI / registration number (trigram).
+      example:
+        field: text
+        query: construct
+      properties:
+        field:
+          enum:
+          - text
+          type: string
+        query:
+          maxLength: 200
+          minLength: 1
+          type: string
+        exclude:
+          description: Negate this group (NOT).
+          type: boolean
+      required:
+      - field
+      - query
+    CompanyTermsFilter:
+      additionalProperties: false
+      description: "Categorical filter, values ORed. caen = full 4-digit CAEN codes,\
+        \ exact match (e.g. 6201); caenSection = 2-digit CAEN division (e.g. 62 =\
+        \ IT); county / workPointCounty (has an active work point in): Romanian county\
+        \ names as stored in the registry, uppercase with diacritics (ALBA, ARGEȘ\
+        , BIHOR, BUCUREȘTI, CLUJ, CONSTANȚA, IAȘI, ILFOV, TIMIȘ, …); matching is case-insensitive.\
+        \ city = locality name, case-insensitive exact match; status: Company-status\
+        \ buckets derived from the registry state text: active, suspended, expiredSeat,\
+        \ insolvency, dissolution, liquidation, bankruptcy, struckOff, other, unknown.\
+        \ struckOff = radiată, active = în funcțiune. Legacy ONRC numeric codes (N_STARE_FIRMA,\
+        \ e.g. 1048) are still accepted and matched exactly against company_state_code.\
+        \ legalForm: Registry legal-form codes: SRL, SA, PFA, II, IF, AF, SNC, SCS,\
+        \ SCA, RA, SC, CA, GIE (long registry spellings such as 'SOCIETATE COMERCIALĂ\
+        \ CU RĂSPUNDERE LIMITATĂ' fold to the short code)."
+      example:
+        field: county
+        values:
+        - CLUJ
+        - BIHOR
+      properties:
+        field:
+          enum:
+          - caen
+          - caenSection
+          - county
+          - city
+          - status
+          - legalForm
+          - workPointCounty
+          type: string
+        values:
+          items:
+            maxLength: 120
+            minLength: 1
+            type: string
+          maxItems: 200
+          minItems: 1
+          type: array
+        exclude:
+          description: Negate this group (NOT).
+          type: boolean
+      required:
+      - field
+      - values
+    CompanyRangeFilter:
+      additionalProperties: false
+      description: "Numeric range over a company column: foundedYear (founding/registration\
+        \ year), ageYears (years since founding), shareCapital (RON), workPointsCount\
+        \ (number of work points)."
+      example:
+        field: ageYears
+        range:
+          min: 5
+      properties:
+        field:
+          enum:
+          - foundedYear
+          - ageYears
+          - shareCapital
+          - workPointsCount
+          type: string
+        range:
+          $ref: "#/components/schemas/CompanyNumericRange"
+        exclude:
+          description: Negate this group (NOT).
+          type: boolean
+      required:
+      - field
+      - range
+    CompanyFlagFilter:
+      additionalProperties: false
+      description: "Boolean property: hasEmail, hasPhone, hasWebsite, hasVat (VAT-registered),\
+        \ hasEFactura (in the RO e-Factura registry), hasWorkPoints, isClaimed (profile\
+        \ claimed on Brivio). value:false selects companies WITHOUT it."
+      example:
+        field: hasEFactura
+        value: true
+      properties:
+        field:
+          enum:
+          - hasEmail
+          - hasPhone
+          - hasWebsite
+          - hasVat
+          - hasEFactura
+          - hasWorkPoints
+          - isClaimed
+          type: string
+        value:
+          type: boolean
+        exclude:
+          description: Negate this group (NOT).
+          type: boolean
+      required:
+      - field
+      - value
+    CompanyAdministratorFilter:
+      additionalProperties: false
+      description: Companies where a person whose name contains `query` is an administrator
+        / associate; optionally constrain their ownership share (percent).
+      example:
+        field: administratorName
+        query: popescu
+        ownershipPct:
+          min: 50
+      properties:
+        field:
+          enum:
+          - administratorName
+          type: string
+        query:
+          maxLength: 200
+          minLength: 2
+          type: string
+        ownershipPct:
+          $ref: "#/components/schemas/CompanyNumericRange"
+        exclude:
+          description: Negate this group (NOT).
+          type: boolean
+      required:
+      - field
+      - query
+    CompanyFinancialFilter:
+      additionalProperties: false
+      description: "Range over a filed financial indicator (RON, employees = headcount)\
+        \ for a year, or `latest` = most recent year filed per company."
+      example:
+        field: financial
+        indicator: revenue
+        year: latest
+        range:
+          min: 1000000
+      properties:
+        field:
+          enum:
+          - financial
+          type: string
+        indicator:
+          enum:
+          - revenue
+          - netProfit
+          - employees
+          - equity
+          - totalDebts
+          - fixedAssets
+          - currentAssets
+          type: string
+        year:
+          $ref: "#/components/schemas/CompanyFinancialFilter_year"
+        range:
+          $ref: "#/components/schemas/CompanyNumericRange"
+        exclude:
+          description: Negate this group (NOT).
+          type: boolean
+      required:
+      - field
+      - indicator
+      - range
+    CompanyTrendRevenueGrowthYears:
+      additionalProperties: false
+      description: Revenue strictly increased across the company's last `years` filed
+        years.
+      properties:
+        field:
+          enum:
+          - trend
+          type: string
+        trend:
+          enum:
+          - revenueGrowthYears
+          type: string
+        years:
+          maximum: 5
+          minimum: 2
+          type: integer
+        exclude:
+          description: Negate this group (NOT).
+          type: boolean
+      required:
+      - field
+      - trend
+      - years
+    CompanyTrendProfitableYears:
+      additionalProperties: false
+      description: Net profit > 0 in each of the company's last `years` filed years.
+      properties:
+        field:
+          enum:
+          - trend
+          type: string
+        trend:
+          enum:
+          - profitableYears
+          type: string
+        years:
+          maximum: 5
+          minimum: 1
+          type: integer
+        exclude:
+          description: Negate this group (NOT).
+          type: boolean
+      required:
+      - field
+      - trend
+      - years
+    CompanyTrendEmployeesGrowing:
+      additionalProperties: false
+      description: Headcount strictly increased across the last `years` filed years.
+      properties:
+        field:
+          enum:
+          - trend
+          type: string
+        trend:
+          enum:
+          - employeesGrowing
+          type: string
+        years:
+          maximum: 5
+          minimum: 2
+          type: integer
+        exclude:
+          description: Negate this group (NOT).
+          type: boolean
+      required:
+      - field
+      - trend
+      - years
+    CompanyTrendDebtDecreasing:
+      additionalProperties: false
+      description: Total debts strictly decreased across the last `years` filed years.
+      properties:
+        field:
+          enum:
+          - trend
+          type: string
+        trend:
+          enum:
+          - debtDecreasing
+          type: string
+        years:
+          maximum: 5
+          minimum: 2
+          type: integer
+        exclude:
+          description: Negate this group (NOT).
+          type: boolean
+      required:
+      - field
+      - trend
+      - years
+    CompanyTrendRevenueCagr:
+      additionalProperties: false
+      description: Revenue CAGR over a 3- or 5-year window is at least minPct.
+      properties:
+        field:
+          enum:
+          - trend
+          type: string
+        trend:
+          enum:
+          - revenueCagr
+          type: string
+        window:
+          enum:
+          - 3
+          - 5
+          type: integer
+        minPct:
+          description: "Minimum compound annual growth, percent."
+          maximum: 1000
+          minimum: -100
+          type: number
+        exclude:
+          description: Negate this group (NOT).
+          type: boolean
+      required:
+      - field
+      - minPct
+      - trend
+      - window
+    CompanyTrendDebtToEquity:
+      additionalProperties: false
+      description: Debt-to-equity ratio at the latest year is at most max.
+      properties:
+        field:
+          enum:
+          - trend
+          type: string
+        trend:
+          enum:
+          - debtToEquity
+          type: string
+        max:
+          description: Maximum debt/equity ratio at the latest year.
+          maximum: 1000
+          minimum: 0
+          type: number
+        exclude:
+          description: Negate this group (NOT).
+          type: boolean
+      required:
+      - field
+      - max
+      - trend
+    CompanyFilterGroup:
+      description: "One filter group. AND between groups, OR within a group's values;\
+        \ exclude:true negates the group."
+      oneOf:
+      - $ref: "#/components/schemas/CompanyTextFilter"
+      - $ref: "#/components/schemas/CompanyTermsFilter"
+      - $ref: "#/components/schemas/CompanyRangeFilter"
+      - $ref: "#/components/schemas/CompanyFlagFilter"
+      - $ref: "#/components/schemas/CompanyAdministratorFilter"
+      - $ref: "#/components/schemas/CompanyFinancialFilter"
+      - $ref: "#/components/schemas/CompanyTrendRevenueGrowthYears"
+      - $ref: "#/components/schemas/CompanyTrendProfitableYears"
+      - $ref: "#/components/schemas/CompanyTrendEmployeesGrowing"
+      - $ref: "#/components/schemas/CompanyTrendDebtDecreasing"
+      - $ref: "#/components/schemas/CompanyTrendRevenueCagr"
+      - $ref: "#/components/schemas/CompanyTrendDebtToEquity"
+    CompanySearchRequest:
+      example:
+        groups:
+        - field: caenSection
+          values:
+          - "62"
+        - field: county
+          values:
+          - CLUJ
+        - field: status
+          values:
+          - active
+        - field: financial
+          indicator: employees
+          year: latest
+          range:
+            min: 10
+        - field: legalForm
+          values:
+          - PFA
+          - II
+          exclude: true
+        sort: revenue
+        pageSize: 25
+      properties:
+        groups:
+          description: At most 40 groups.
+          items:
+            $ref: "#/components/schemas/CompanyFilterGroup"
+          type: array
+        sort:
+          default: relevance
+          description: "One of: relevance, name, nameDesc, revenue, revenueAsc, employees,\
+            \ employeesAsc, foundedNewest, foundedOldest (default relevance)."
+          type: string
+        page:
+          default: 1
+          description: "Page, 1-1000 (default 1)."
+          type: integer
+        pageSize:
+          default: 25
+          description: "Results per page, 1-200 (default 25)."
+          type: integer
+        stats:
+          description: "Include aggregate stats (count, revenue and headcount totals/averages)\
+            \ for the whole match set."
+          type: boolean
+      required:
+      - groups
     BankRuleInput:
       description: "A bank reconciliation rule. At least one condition (matchCounterpartyName,\
         \ matchCounterpartyIban, matchDescription/Regex, amountMin/Max, direction\
@@ -14776,22 +16134,34 @@ components:
       - name
     Invoice:
       example:
-        company_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        exchange_rate: exchange_rate
+        notes: notes
         vat_exemption_reason: vat_exemption_reason
+        created_at: 2000-01-23T04:56:07.000+00:00
         type: type
         contact_id: contact_id
         vat_total: vat_total
         number: 0
         total: total
+        issue_date: 2000-01-23
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        project_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        contact:
+          name: name
+          id: id
+          email: email
+        currency: currency
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        direction: direction
+        company_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        exchange_rate: exchange_rate
+        due_date: 2000-01-23
+        sent_at: 2000-01-23T04:56:07.000+00:00
+        paid_at: 2000-01-23T04:56:07.000+00:00
         series: series
         subtotal: subtotal
         credited_amount: credited_amount
         paid_amount: paid_amount
-        currency: currency
         vat_type: TAXABLE
-        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        direction: direction
         status: status
       properties:
         id:
@@ -14819,6 +16189,16 @@ components:
           format: uuid
           type: string
           nullable: true
+        project_id:
+          format: uuid
+          type: string
+          nullable: true
+        issue_date:
+          format: date
+          type: string
+        due_date:
+          format: date
+          type: string
         currency:
           type: string
         exchange_rate:
@@ -14850,14 +16230,34 @@ components:
           description: Sum of the issued credit notes reversing this invoice. Open
             balance = total − paid_amount − credited_amount.
           type: string
+        notes:
+          type: string
+          nullable: true
+        sent_at:
+          format: date-time
+          type: string
+          nullable: true
+        paid_at:
+          format: date-time
+          type: string
+          nullable: true
+        created_at:
+          format: date-time
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+        contact:
+          $ref: "#/components/schemas/Invoice_contact"
     InvoiceCreate:
       description: "Exactly one of `contact_id` or `contact_external_id` is required.\
         \ Issued documents are numbered by the same gapless per-(company, series,\
-        \ year) allocator the app uses (ADR-0208); the `series` defaults to `BRV`.\
-        \ Non-RON documents carry the BNR T-1 reference rate for `issue_date` unless\
-        \ a positive `exchange_rate` is supplied — when the rate cannot be obtained\
-        \ the request fails with 422 `EXCHANGE_RATE_UNAVAILABLE`, never a silent rate\
-        \ of 1."
+        \ year) allocator the app uses (ADR-0208); the `series` defaults to the organisation's\
+        \ series for that document type (an invoice series is never used for a proforma,\
+        \ quote or aviz). Non-RON documents carry the BNR T-1 reference rate for `issue_date`\
+        \ unless a positive `exchange_rate` is supplied — when the rate cannot be\
+        \ obtained the request fails with 422 `EXCHANGE_RATE_UNAVAILABLE`, never a\
+        \ silent rate of 1."
       example:
         contact_external_id: contact_external_id
         notes: notes
@@ -14902,7 +16302,9 @@ components:
           - RECEIVED
           type: string
         series:
-          description: Numbering series; defaults to `BRV` for issued documents.
+          description: Numbering series; defaults to the organisation's series for
+            the document type. Issuing in a series that already numbers another kind
+            of document is refused with 409 `SERIES_TYPE_MISMATCH`.
           type: string
         contact_id:
           format: uuid
@@ -25719,6 +27121,581 @@ components:
           type: boolean
       required:
       - message
+    MailDomain:
+      example:
+        verified_at: 2000-01-23T04:56:07.000+00:00
+        domain: domain
+        created_at: 2000-01-23T04:56:07.000+00:00
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        status: pending
+      properties:
+        id:
+          format: uuid
+          type: string
+        domain:
+          description: "Lowercased domain, e.g. firma.ro."
+          type: string
+        status:
+          description: Mailboxes can be created only on an active domain.
+          enum:
+          - pending
+          - provisioning
+          - active
+          - error
+          - suspended
+          type: string
+        verified_at:
+          format: date-time
+          nullable: true
+          type: string
+        created_at:
+          format: date-time
+          nullable: true
+          type: string
+      required:
+      - domain
+      - id
+      - status
+    Mailbox:
+      example:
+        domain_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        address: address
+        used_mb: 6
+        delete_after: 2000-01-23T04:56:07.000+00:00
+        quota_mb: 0
+        access_policy: brivio_only
+        created_at: 2000-01-23T04:56:07.000+00:00
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        display_name: display_name
+        status: pending
+      properties:
+        id:
+          format: uuid
+          type: string
+        address:
+          format: email
+          type: string
+        display_name:
+          nullable: true
+          type: string
+        domain_id:
+          format: uuid
+          nullable: true
+          type: string
+        status:
+          enum:
+          - pending
+          - syncing
+          - active
+          - auth_error
+          - error
+          - paused
+          type: string
+        quota_mb:
+          nullable: true
+          type: integer
+        used_mb:
+          nullable: true
+          type: integer
+        access_policy:
+          enum:
+          - brivio_only
+          - open
+          type: string
+        delete_after:
+          description: Set when deletion was scheduled in the app (restorable until
+            then).
+          format: date-time
+          nullable: true
+          type: string
+        created_at:
+          format: date-time
+          nullable: true
+          type: string
+      required:
+      - access_policy
+      - address
+      - id
+      - status
+    MailboxCreate:
+      additionalProperties: false
+      example:
+        domain_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        local_part: local_part
+        quota_mb: 4335
+        display_name: display_name
+      properties:
+        domain_id:
+          description: An active hosted mail domain of the organization (GET /mail-domains).
+          format: uuid
+          type: string
+        local_part:
+          description: "The part before @. Role addresses (postmaster, abuse, admin,\
+            \ support …) are reserved (422)."
+          maxLength: 64
+          minLength: 1
+          pattern: "^[A-Za-z0-9]([A-Za-z0-9._-]*[A-Za-z0-9])?$"
+          type: string
+        display_name:
+          maxLength: 255
+          type: string
+        quota_mb:
+          description: Default 5120.
+          maximum: 51200
+          minimum: 256
+          type: integer
+      required:
+      - domain_id
+      - local_part
+    MailboxCreated:
+      description: "No password: it is generated and sealed server-side and never\
+        \ returned."
+      example:
+        address: address
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        status: pending
+      properties:
+        id:
+          format: uuid
+          type: string
+        address:
+          format: email
+          type: string
+        status:
+          enum:
+          - pending
+          type: string
+      required:
+      - address
+      - id
+      - status
+    MailAlias:
+      example:
+        address: address
+        mailbox_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        created_at: 2000-01-23T04:56:07.000+00:00
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        mailbox_address: mailbox_address
+      properties:
+        id:
+          format: uuid
+          type: string
+        address:
+          format: email
+          type: string
+        mailbox_id:
+          format: uuid
+          type: string
+        mailbox_address:
+          format: email
+          type: string
+        created_at:
+          format: date-time
+          nullable: true
+          type: string
+      required:
+      - address
+      - id
+      - mailbox_address
+      - mailbox_id
+    MailAliasCreate:
+      additionalProperties: false
+      example:
+        alias_local_part: alias_local_part
+        mailbox_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        mailbox_id:
+          description: The organization mailbox the alias delivers into; the alias
+            is on its domain.
+          format: uuid
+          type: string
+        alias_local_part:
+          description: Role addresses are reserved (422).
+          maxLength: 64
+          minLength: 1
+          pattern: "^[A-Za-z0-9]([A-Za-z0-9._-]*[A-Za-z0-9])?$"
+          type: string
+      required:
+      - alias_local_part
+      - mailbox_id
+    MailAliasCreated:
+      example:
+        address: address
+        mailbox_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        id:
+          format: uuid
+          type: string
+        address:
+          format: email
+          type: string
+        mailbox_id:
+          format: uuid
+          type: string
+      required:
+      - address
+      - id
+      - mailbox_id
+    MailResourceDeleted:
+      example:
+        deleted: true
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        id:
+          format: uuid
+          type: string
+        deleted:
+          type: boolean
+      required:
+      - deleted
+      - id
+    DomainSearchResult:
+      example:
+        premium: true
+        domain: domain
+        available: true
+        price_cents: 0
+        currency: currency
+      properties:
+        domain:
+          type: string
+        available:
+          type: boolean
+        premium:
+          type: boolean
+        price_cents:
+          description: "Retail price for the first year, in cents of `currency` (wholesale\
+            \ + markup). Null when the registrar gave no price."
+          nullable: true
+          type: integer
+        currency:
+          nullable: true
+          type: string
+      required:
+      - available
+      - currency
+      - domain
+      - price_cents
+    DomainTransferPrice:
+      example:
+        domain: domain
+        price_cents: 0
+        currency: currency
+        tld: tld
+      properties:
+        domain:
+          type: string
+        tld:
+          type: string
+        price_cents:
+          description: Retail transfer price in cents of `currency`; null when the
+            TLD has no cached transfer price (the registrar confirms it).
+          nullable: true
+          type: integer
+        currency:
+          nullable: true
+          type: string
+      required:
+      - currency
+      - domain
+      - price_cents
+      - tld
+    DomainOrderCreate:
+      additionalProperties: false
+      example:
+        period: 1
+        kind: register
+        domain: domain
+        auth_code: auth_code
+      properties:
+        kind:
+          enum:
+          - register
+          - transfer
+          type: string
+        domain:
+          description: "Fully qualified, e.g. firma.ro. Brivio platform hosts are\
+            \ refused (422)."
+          maxLength: 253
+          minLength: 4
+          type: string
+        period:
+          description: "Years, register only (default 1). A transfer is always 1."
+          maximum: 10
+          minimum: 1
+          type: integer
+        auth_code:
+          description: "Transfer only, required: the EPP code from the current registrar.\
+            \ Sealed at rest, never returned."
+          maxLength: 512
+          minLength: 1
+          type: string
+      required:
+      - domain
+      - kind
+    DomainOrder:
+      description: A domain registration or transfer REQUEST. Nothing is bought until
+        an org admin confirms it in Brivio with a step-up. Never carries the auth
+        code.
+      example:
+        period: 0
+        decided_at: 2000-01-23T04:56:07.000+00:00
+        kind: register
+        requested_via: api
+        created_at: 2000-01-23T04:56:07.000+00:00
+        expires_at: 2000-01-23T04:56:07.000+00:00
+        quoted_price_cents: 6
+        domain: domain
+        result_domain_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        currency: currency
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        last_error: last_error
+        confirm_url: https://openapi-generator.tech
+        object: domain_order
+        status: pending
+      properties:
+        id:
+          format: uuid
+          type: string
+        object:
+          enum:
+          - domain_order
+          type: string
+        kind:
+          enum:
+          - register
+          - transfer
+          type: string
+        domain:
+          type: string
+        period:
+          type: integer
+        status:
+          description: "Effective status: a pending order past expires_at reads expired."
+          enum:
+          - pending
+          - confirmed
+          - rejected
+          - expired
+          - completed
+          - failed
+          type: string
+        quoted_price_cents:
+          description: "Retail price quoted when the order was made, in cents of `currency`."
+          nullable: true
+          type: integer
+        currency:
+          nullable: true
+          type: string
+        requested_via:
+          enum:
+          - api
+          - app
+          type: string
+        expires_at:
+          format: date-time
+          type: string
+        decided_at:
+          format: date-time
+          nullable: true
+          type: string
+        result_domain_id:
+          description: The registered domain (GET /domains) once completed.
+          format: uuid
+          nullable: true
+          type: string
+        last_error:
+          description: Set when status is failed.
+          nullable: true
+          type: string
+        created_at:
+          format: date-time
+          type: string
+        confirm_url:
+          description: The Brivio page where an org admin confirms or rejects the
+            order.
+          format: uri
+          type: string
+      required:
+      - confirm_url
+      - created_at
+      - domain
+      - expires_at
+      - id
+      - kind
+      - object
+      - period
+      - status
+    DomainOrderWebhookData:
+      properties:
+        id:
+          description: The domain order id
+          format: uuid
+          type: string
+        object:
+          enum:
+          - domain_order
+          type: string
+        kind:
+          enum:
+          - register
+          - transfer
+          type: string
+        domain:
+          type: string
+        status:
+          enum:
+          - completed
+          - failed
+          type: string
+        domain_id:
+          format: uuid
+          nullable: true
+          type: string
+        error:
+          description: "failed only: a short error code from the registrar step."
+          nullable: true
+          type: string
+      required:
+      - domain
+      - id
+      - kind
+      - object
+      - status
+    StoreAppProfile:
+      example:
+        store_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        icon_url: https://openapi-generator.tech
+        entry_url: https://openapi-generator.tech
+        app_name: app_name
+        capabilities:
+        - capabilities
+        - capabilities
+        generator:
+          appName: appName
+          packageId: packageId
+          primaryColor: primaryColor
+          entryUrl: https://openapi-generator.tech
+          iconUrl: https://openapi-generator.tech
+          storeId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          shortName: shortName
+        short_name: short_name
+        package_id: package_id
+        primary_color: primary_color
+        platform: android
+        status: draft
+      properties:
+        store_id:
+          format: uuid
+          type: string
+        platform:
+          enum:
+          - android
+          type: string
+        app_name:
+          type: string
+        short_name:
+          type: string
+        package_id:
+          description: "Android application id, e.g. ro.brivio.store.example"
+          type: string
+        primary_color:
+          description: "Hex colour, e.g. #1f6feb"
+          type: string
+        icon_url:
+          format: uri
+          nullable: true
+          type: string
+        entry_url:
+          description: The storefront URL the app opens
+          format: uri
+          type: string
+        capabilities:
+          items:
+            type: string
+          type: array
+        status:
+          enum:
+          - draft
+          - ready
+          - building
+          - built
+          - failed
+          type: string
+        generator:
+          $ref: "#/components/schemas/StoreAppProfile_generator"
+      required:
+      - app_name
+      - capabilities
+      - entry_url
+      - generator
+      - icon_url
+      - package_id
+      - platform
+      - primary_color
+      - short_name
+      - status
+      - store_id
+    StoreAppDataSafety:
+      example:
+        apple:
+          linked_to_user:
+          - linked_to_user
+          - linked_to_user
+          not_linked_to_user:
+          - not_linked_to_user
+          - not_linked_to_user
+          tracking: true
+        collects_data: true
+        encrypted_in_transit: true
+        deletion_request_supported: true
+        version: 0
+        items:
+        - shared: true
+          purposes:
+          - purposes
+          - purposes
+          collected: true
+          optional: true
+          because:
+          - because
+          - because
+          type: type
+        - shared: true
+          purposes:
+          - purposes
+          - purposes
+          collected: true
+          optional: true
+          because:
+          - because
+          - because
+          type: type
+      properties:
+        version:
+          enum:
+          - 1
+          type: integer
+        collects_data:
+          type: boolean
+        encrypted_in_transit:
+          type: boolean
+        deletion_request_supported:
+          type: boolean
+        items:
+          items:
+            $ref: "#/components/schemas/StoreAppDataSafety_items_inner"
+          type: array
+        apple:
+          $ref: "#/components/schemas/StoreAppDataSafety_apple"
+      required:
+      - apple
+      - collects_data
+      - deletion_request_supported
+      - encrypted_in_transit
+      - items
+      - version
     listMe_401_response_error:
       example:
         code: code
@@ -25816,22 +27793,6 @@ components:
       required:
       - data
       - error
-    createCompanySearch_request:
-      properties:
-        groups:
-          items:
-            type: object
-          type: array
-        sort:
-          type: string
-        page:
-          type: integer
-        pageSize:
-          type: integer
-        stats:
-          type: boolean
-      required:
-      - groups
     listArticles_200_response:
       example:
         data:
@@ -25922,39 +27883,63 @@ components:
     listInvoices_200_response:
       example:
         data:
-        - company_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          exchange_rate: exchange_rate
+        - notes: notes
           vat_exemption_reason: vat_exemption_reason
+          created_at: 2000-01-23T04:56:07.000+00:00
           type: type
           contact_id: contact_id
           vat_total: vat_total
           number: 0
           total: total
+          issue_date: 2000-01-23
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          project_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          contact:
+            name: name
+            id: id
+            email: email
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          direction: direction
+          company_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          exchange_rate: exchange_rate
+          due_date: 2000-01-23
+          sent_at: 2000-01-23T04:56:07.000+00:00
+          paid_at: 2000-01-23T04:56:07.000+00:00
           series: series
           subtotal: subtotal
           credited_amount: credited_amount
           paid_amount: paid_amount
-          currency: currency
           vat_type: TAXABLE
-          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          direction: direction
           status: status
-        - company_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          exchange_rate: exchange_rate
+        - notes: notes
           vat_exemption_reason: vat_exemption_reason
+          created_at: 2000-01-23T04:56:07.000+00:00
           type: type
           contact_id: contact_id
           vat_total: vat_total
           number: 0
           total: total
+          issue_date: 2000-01-23
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          project_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          contact:
+            name: name
+            id: id
+            email: email
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          direction: direction
+          company_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          exchange_rate: exchange_rate
+          due_date: 2000-01-23
+          sent_at: 2000-01-23T04:56:07.000+00:00
+          paid_at: 2000-01-23T04:56:07.000+00:00
           series: series
           subtotal: subtotal
           credited_amount: credited_amount
           paid_amount: paid_amount
-          currency: currency
           vat_type: TAXABLE
-          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          direction: direction
           status: status
         meta:
           nextCursor: nextCursor
@@ -25978,22 +27963,34 @@ components:
     createInvoice_201_response:
       example:
         data:
-          company_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          exchange_rate: exchange_rate
+          notes: notes
           vat_exemption_reason: vat_exemption_reason
+          created_at: 2000-01-23T04:56:07.000+00:00
           type: type
           contact_id: contact_id
           vat_total: vat_total
           number: 0
           total: total
+          issue_date: 2000-01-23
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          project_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          contact:
+            name: name
+            id: id
+            email: email
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          direction: direction
+          company_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          exchange_rate: exchange_rate
+          due_date: 2000-01-23
+          sent_at: 2000-01-23T04:56:07.000+00:00
+          paid_at: 2000-01-23T04:56:07.000+00:00
           series: series
           subtotal: subtotal
           credited_amount: credited_amount
           paid_amount: paid_amount
-          currency: currency
           vat_type: TAXABLE
-          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          direction: direction
           status: status
         error: ""
       properties:
@@ -32261,6 +34258,360 @@ components:
       required:
       - data
       - error
+    listMailDomains_200_response:
+      example:
+        data:
+        - verified_at: 2000-01-23T04:56:07.000+00:00
+          domain: domain
+          created_at: 2000-01-23T04:56:07.000+00:00
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          status: pending
+        - verified_at: 2000-01-23T04:56:07.000+00:00
+          domain: domain
+          created_at: 2000-01-23T04:56:07.000+00:00
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          status: pending
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/MailDomain"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    listMailboxes_200_response:
+      example:
+        data:
+        - domain_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          address: address
+          used_mb: 6
+          delete_after: 2000-01-23T04:56:07.000+00:00
+          quota_mb: 0
+          access_policy: brivio_only
+          created_at: 2000-01-23T04:56:07.000+00:00
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          display_name: display_name
+          status: pending
+        - domain_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          address: address
+          used_mb: 6
+          delete_after: 2000-01-23T04:56:07.000+00:00
+          quota_mb: 0
+          access_policy: brivio_only
+          created_at: 2000-01-23T04:56:07.000+00:00
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          display_name: display_name
+          status: pending
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/Mailbox"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    createMailbox_201_response:
+      example:
+        data:
+          address: address
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          status: pending
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/MailboxCreated"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    deleteMailbox_200_response:
+      example:
+        data:
+          deleted: true
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/MailResourceDeleted"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    listMailAliases_200_response:
+      example:
+        data:
+        - address: address
+          mailbox_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          created_at: 2000-01-23T04:56:07.000+00:00
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          mailbox_address: mailbox_address
+        - address: address
+          mailbox_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          created_at: 2000-01-23T04:56:07.000+00:00
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          mailbox_address: mailbox_address
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/MailAlias"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    createMailAlias_201_response:
+      example:
+        data:
+          address: address
+          mailbox_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/MailAliasCreated"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    searchDomains_200_response:
+      example:
+        data:
+        - premium: true
+          domain: domain
+          available: true
+          price_cents: 0
+          currency: currency
+        - premium: true
+          domain: domain
+          available: true
+          price_cents: 0
+          currency: currency
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/DomainSearchResult"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    getDomainTransferPrice_200_response:
+      example:
+        data:
+          domain: domain
+          price_cents: 0
+          currency: currency
+          tld: tld
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/DomainTransferPrice"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    listDomainOrders_200_response:
+      example:
+        data:
+        - period: 0
+          decided_at: 2000-01-23T04:56:07.000+00:00
+          kind: register
+          requested_via: api
+          created_at: 2000-01-23T04:56:07.000+00:00
+          expires_at: 2000-01-23T04:56:07.000+00:00
+          quoted_price_cents: 6
+          domain: domain
+          result_domain_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          last_error: last_error
+          confirm_url: https://openapi-generator.tech
+          object: domain_order
+          status: pending
+        - period: 0
+          decided_at: 2000-01-23T04:56:07.000+00:00
+          kind: register
+          requested_via: api
+          created_at: 2000-01-23T04:56:07.000+00:00
+          expires_at: 2000-01-23T04:56:07.000+00:00
+          quoted_price_cents: 6
+          domain: domain
+          result_domain_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          last_error: last_error
+          confirm_url: https://openapi-generator.tech
+          object: domain_order
+          status: pending
+        meta:
+          nextCursor: nextCursor
+          total: 1
+          perPage: 6
+          totalPages: 5
+          page: 0
+        error: ""
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/DomainOrder"
+          type: array
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    createDomainOrder_201_response:
+      example:
+        data:
+          period: 0
+          decided_at: 2000-01-23T04:56:07.000+00:00
+          kind: register
+          requested_via: api
+          created_at: 2000-01-23T04:56:07.000+00:00
+          expires_at: 2000-01-23T04:56:07.000+00:00
+          quoted_price_cents: 6
+          domain: domain
+          result_domain_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          last_error: last_error
+          confirm_url: https://openapi-generator.tech
+          object: domain_order
+          status: pending
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/DomainOrder"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    getStoreAppProfile_200_response:
+      example:
+        data:
+          store_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          icon_url: https://openapi-generator.tech
+          entry_url: https://openapi-generator.tech
+          app_name: app_name
+          capabilities:
+          - capabilities
+          - capabilities
+          generator:
+            appName: appName
+            packageId: packageId
+            primaryColor: primaryColor
+            entryUrl: https://openapi-generator.tech
+            iconUrl: https://openapi-generator.tech
+            storeId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            shortName: shortName
+          short_name: short_name
+          package_id: package_id
+          primary_color: primary_color
+          platform: android
+          status: draft
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/StoreAppProfile"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
+    getStoreAppDataSafety_200_response:
+      example:
+        data:
+          apple:
+            linked_to_user:
+            - linked_to_user
+            - linked_to_user
+            not_linked_to_user:
+            - not_linked_to_user
+            - not_linked_to_user
+            tracking: true
+          collects_data: true
+          encrypted_in_transit: true
+          deletion_request_supported: true
+          version: 0
+          items:
+          - shared: true
+            purposes:
+            - purposes
+            - purposes
+            collected: true
+            optional: true
+            because:
+            - because
+            - because
+            type: type
+          - shared: true
+            purposes:
+            - purposes
+            - purposes
+            collected: true
+            optional: true
+            because:
+            - because
+            - because
+            type: type
+        error: ""
+      properties:
+        data:
+          $ref: "#/components/schemas/StoreAppDataSafety"
+        error:
+          nullable: true
+      required:
+      - data
+      - error
     invoice_paid_post_request:
       allOf:
       - $ref: "#/components/schemas/WebhookDelivery"
@@ -32369,6 +34720,24 @@ components:
             - court_case.hearing_added
           data:
             $ref: "#/components/schemas/CourtHearingAddedWebhookData"
+    domain_order_completed_post_request:
+      allOf:
+      - $ref: "#/components/schemas/WebhookDelivery"
+      - properties:
+          type:
+            enum:
+            - domain_order.completed
+          data:
+            $ref: "#/components/schemas/DomainOrderWebhookData"
+    domain_order_failed_post_request:
+      allOf:
+      - $ref: "#/components/schemas/WebhookDelivery"
+      - properties:
+          type:
+            enum:
+            - domain_order.failed
+          data:
+            $ref: "#/components/schemas/DomainOrderWebhookData"
     email_received_post_request:
       allOf:
       - $ref: "#/components/schemas/WebhookDelivery"
@@ -32405,6 +34774,31 @@ components:
             - subscription.canceled
           data:
             $ref: "#/components/schemas/SubscriptionWebhookData"
+    CompanyFinancialFilter_year:
+      default: latest
+      oneOf:
+      - enum:
+        - latest
+        type: string
+      - maximum: 2100
+        minimum: 2009
+        type: integer
+    Invoice_contact:
+      description: "The client, embedded on list responses (GET /v1/invoices). Absent\
+        \ on single-invoice responses."
+      example:
+        name: name
+        id: id
+        email: email
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          nullable: true
+      nullable: true
     InvoiceCreate_items_inner:
       example:
         article_id: article_id
@@ -34229,6 +36623,105 @@ components:
       - input_tokens
       - output_tokens
       - total_tokens
+    StoreAppProfile_generator:
+      description: The same fields in the camelCase shape BRIVIO_STORE_PROFILE expects.
+      example:
+        appName: appName
+        packageId: packageId
+        primaryColor: primaryColor
+        entryUrl: https://openapi-generator.tech
+        iconUrl: https://openapi-generator.tech
+        storeId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        shortName: shortName
+      properties:
+        storeId:
+          format: uuid
+          type: string
+        appName:
+          type: string
+        shortName:
+          type: string
+        packageId:
+          type: string
+        primaryColor:
+          type: string
+        iconUrl:
+          format: uri
+          nullable: true
+          type: string
+        entryUrl:
+          format: uri
+          type: string
+      required:
+      - appName
+      - entryUrl
+      - iconUrl
+      - packageId
+      - primaryColor
+      - shortName
+      - storeId
+    StoreAppDataSafety_items_inner:
+      example:
+        shared: true
+        purposes:
+        - purposes
+        - purposes
+        collected: true
+        optional: true
+        because:
+        - because
+        - because
+        type: type
+      properties:
+        type:
+          description: Play Data safety data type
+          type: string
+        collected:
+          type: boolean
+        shared:
+          type: boolean
+        optional:
+          type: boolean
+        purposes:
+          items:
+            type: string
+          type: array
+        because:
+          description: The store capabilities that cause the collection
+          items:
+            type: string
+          type: array
+      required:
+      - because
+      - collected
+      - optional
+      - purposes
+      - shared
+      - type
+    StoreAppDataSafety_apple:
+      example:
+        linked_to_user:
+        - linked_to_user
+        - linked_to_user
+        not_linked_to_user:
+        - not_linked_to_user
+        - not_linked_to_user
+        tracking: true
+      properties:
+        linked_to_user:
+          items:
+            type: string
+          type: array
+        not_linked_to_user:
+          items:
+            type: string
+          type: array
+        tracking:
+          type: boolean
+      required:
+      - linked_to_user
+      - not_linked_to_user
+      - tracking
   securitySchemes:
     bearerAuth:
       description: API key as Bearer token

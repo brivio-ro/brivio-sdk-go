@@ -507,6 +507,200 @@ func (a *DefaultAPIService) DeliveryRouteDispatchedPostExecute(r ApiDeliveryRout
 	return localVarHTTPResponse, nil
 }
 
+type ApiDomainOrderCompletedPostRequest struct {
+	ctx context.Context
+	ApiService *DefaultAPIService
+	domainOrderCompletedPostRequest *DomainOrderCompletedPostRequest
+}
+
+func (r ApiDomainOrderCompletedPostRequest) DomainOrderCompletedPostRequest(domainOrderCompletedPostRequest DomainOrderCompletedPostRequest) ApiDomainOrderCompletedPostRequest {
+	r.domainOrderCompletedPostRequest = &domainOrderCompletedPostRequest
+	return r
+}
+
+func (r ApiDomainOrderCompletedPostRequest) Execute() (*http.Response, error) {
+	return r.ApiService.DomainOrderCompletedPostExecute(r)
+}
+
+/*
+DomainOrderCompletedPost A domain order requested through the API (POST /domains/orders) was confirmed by an org admin in Brivio and the registration or transfer was placed at the registrar; domain_id is the registered domain. Ids, domain, kind and status only. Idempotent: id evt_domain_order_<id>_completed.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiDomainOrderCompletedPostRequest
+*/
+func (a *DefaultAPIService) DomainOrderCompletedPost(ctx context.Context) ApiDomainOrderCompletedPostRequest {
+	return ApiDomainOrderCompletedPostRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+func (a *DefaultAPIService) DomainOrderCompletedPostExecute(r ApiDomainOrderCompletedPostRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.DomainOrderCompletedPost")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/domain_order.completed"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.domainOrderCompletedPostRequest == nil {
+		return nil, reportError("domainOrderCompletedPostRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.domainOrderCompletedPostRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
+type ApiDomainOrderFailedPostRequest struct {
+	ctx context.Context
+	ApiService *DefaultAPIService
+	domainOrderFailedPostRequest *DomainOrderFailedPostRequest
+}
+
+func (r ApiDomainOrderFailedPostRequest) DomainOrderFailedPostRequest(domainOrderFailedPostRequest DomainOrderFailedPostRequest) ApiDomainOrderFailedPostRequest {
+	r.domainOrderFailedPostRequest = &domainOrderFailedPostRequest
+	return r
+}
+
+func (r ApiDomainOrderFailedPostRequest) Execute() (*http.Response, error) {
+	return r.ApiService.DomainOrderFailedPostExecute(r)
+}
+
+/*
+DomainOrderFailedPost A domain order was confirmed by an org admin but the registrar step failed (error carries a short code, e.g. subscription_required, domain_taken, transfer_failed). Nothing was registered. Idempotent: id evt_domain_order_<id>_failed.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiDomainOrderFailedPostRequest
+*/
+func (a *DefaultAPIService) DomainOrderFailedPost(ctx context.Context) ApiDomainOrderFailedPostRequest {
+	return ApiDomainOrderFailedPostRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+func (a *DefaultAPIService) DomainOrderFailedPostExecute(r ApiDomainOrderFailedPostRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.DomainOrderFailedPost")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/domain_order.failed"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.domainOrderFailedPostRequest == nil {
+		return nil, reportError("domainOrderFailedPostRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.domainOrderFailedPostRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
 type ApiEmailReceivedPostRequest struct {
 	ctx context.Context
 	ApiService *DefaultAPIService

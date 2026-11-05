@@ -129,6 +129,12 @@ type APIClient struct {
 
 	LocationsAPI *LocationsAPIService
 
+	MailAliasesAPI *MailAliasesAPIService
+
+	MailDomainsAPI *MailDomainsAPIService
+
+	MailboxesAPI *MailboxesAPIService
+
 	MarketingAPI *MarketingAPIService
 
 	MeAPI *MeAPIService
@@ -178,6 +184,8 @@ type APIClient struct {
 	SpaceTransfersAPI *SpaceTransfersAPIService
 
 	SpacesAPI *SpacesAPIService
+
+	StoresAPI *StoresAPIService
 
 	SubscriptionsAPI *SubscriptionsAPIService
 
@@ -250,6 +258,9 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.InvoicesAPI = (*InvoicesAPIService)(&c.common)
 	c.LegalAPI = (*LegalAPIService)(&c.common)
 	c.LocationsAPI = (*LocationsAPIService)(&c.common)
+	c.MailAliasesAPI = (*MailAliasesAPIService)(&c.common)
+	c.MailDomainsAPI = (*MailDomainsAPIService)(&c.common)
+	c.MailboxesAPI = (*MailboxesAPIService)(&c.common)
 	c.MarketingAPI = (*MarketingAPIService)(&c.common)
 	c.MeAPI = (*MeAPIService)(&c.common)
 	c.ModulesAPI = (*ModulesAPIService)(&c.common)
@@ -275,6 +286,7 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.SitesAPI = (*SitesAPIService)(&c.common)
 	c.SpaceTransfersAPI = (*SpaceTransfersAPIService)(&c.common)
 	c.SpacesAPI = (*SpacesAPIService)(&c.common)
+	c.StoresAPI = (*StoresAPIService)(&c.common)
 	c.SubscriptionsAPI = (*SubscriptionsAPIService)(&c.common)
 	c.TaxesAPI = (*TaxesAPIService)(&c.common)
 	c.TimeEntriesAPI = (*TimeEntriesAPIService)(&c.common)
