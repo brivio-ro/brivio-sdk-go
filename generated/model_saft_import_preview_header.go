@@ -19,11 +19,19 @@ var _ MappedNullable = &SaftImportPreviewHeader{}
 
 // SaftImportPreviewHeader struct for SaftImportPreviewHeader
 type SaftImportPreviewHeader struct {
+	// Bare CUI (no RO / 00 prefix).
 	TaxRegistrationNumber *string `json:"taxRegistrationNumber,omitempty"`
 	CompanyName *string `json:"companyName,omitempty"`
 	StartDate *string `json:"startDate,omitempty"`
 	EndDate *string `json:"endDate,omitempty"`
 	Currency *string `json:"currency,omitempty"`
+	// Producing program: `SoftwareCompanyName` `SoftwareID` `SoftwareVersion` joined, e.g. the source accounting app.
+	Software *string `json:"software,omitempty"`
+	SoftwareCompanyName *string `json:"softwareCompanyName,omitempty"`
+	SoftwareId *string `json:"softwareId,omitempty"`
+	SoftwareVersion *string `json:"softwareVersion,omitempty"`
+	// D406 `HeaderComment` (L = monthly, T = quarterly, A = annual, C = on demand, NL/NT = non-resident).
+	HeaderComment *string `json:"headerComment,omitempty"`
 }
 
 // NewSaftImportPreviewHeader instantiates a new SaftImportPreviewHeader object
@@ -203,6 +211,166 @@ func (o *SaftImportPreviewHeader) SetCurrency(v string) {
 	o.Currency = &v
 }
 
+// GetSoftware returns the Software field value if set, zero value otherwise.
+func (o *SaftImportPreviewHeader) GetSoftware() string {
+	if o == nil || IsNil(o.Software) {
+		var ret string
+		return ret
+	}
+	return *o.Software
+}
+
+// GetSoftwareOk returns a tuple with the Software field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SaftImportPreviewHeader) GetSoftwareOk() (*string, bool) {
+	if o == nil || IsNil(o.Software) {
+		return nil, false
+	}
+	return o.Software, true
+}
+
+// HasSoftware returns a boolean if a field has been set.
+func (o *SaftImportPreviewHeader) HasSoftware() bool {
+	if o != nil && !IsNil(o.Software) {
+		return true
+	}
+
+	return false
+}
+
+// SetSoftware gets a reference to the given string and assigns it to the Software field.
+func (o *SaftImportPreviewHeader) SetSoftware(v string) {
+	o.Software = &v
+}
+
+// GetSoftwareCompanyName returns the SoftwareCompanyName field value if set, zero value otherwise.
+func (o *SaftImportPreviewHeader) GetSoftwareCompanyName() string {
+	if o == nil || IsNil(o.SoftwareCompanyName) {
+		var ret string
+		return ret
+	}
+	return *o.SoftwareCompanyName
+}
+
+// GetSoftwareCompanyNameOk returns a tuple with the SoftwareCompanyName field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SaftImportPreviewHeader) GetSoftwareCompanyNameOk() (*string, bool) {
+	if o == nil || IsNil(o.SoftwareCompanyName) {
+		return nil, false
+	}
+	return o.SoftwareCompanyName, true
+}
+
+// HasSoftwareCompanyName returns a boolean if a field has been set.
+func (o *SaftImportPreviewHeader) HasSoftwareCompanyName() bool {
+	if o != nil && !IsNil(o.SoftwareCompanyName) {
+		return true
+	}
+
+	return false
+}
+
+// SetSoftwareCompanyName gets a reference to the given string and assigns it to the SoftwareCompanyName field.
+func (o *SaftImportPreviewHeader) SetSoftwareCompanyName(v string) {
+	o.SoftwareCompanyName = &v
+}
+
+// GetSoftwareId returns the SoftwareId field value if set, zero value otherwise.
+func (o *SaftImportPreviewHeader) GetSoftwareId() string {
+	if o == nil || IsNil(o.SoftwareId) {
+		var ret string
+		return ret
+	}
+	return *o.SoftwareId
+}
+
+// GetSoftwareIdOk returns a tuple with the SoftwareId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SaftImportPreviewHeader) GetSoftwareIdOk() (*string, bool) {
+	if o == nil || IsNil(o.SoftwareId) {
+		return nil, false
+	}
+	return o.SoftwareId, true
+}
+
+// HasSoftwareId returns a boolean if a field has been set.
+func (o *SaftImportPreviewHeader) HasSoftwareId() bool {
+	if o != nil && !IsNil(o.SoftwareId) {
+		return true
+	}
+
+	return false
+}
+
+// SetSoftwareId gets a reference to the given string and assigns it to the SoftwareId field.
+func (o *SaftImportPreviewHeader) SetSoftwareId(v string) {
+	o.SoftwareId = &v
+}
+
+// GetSoftwareVersion returns the SoftwareVersion field value if set, zero value otherwise.
+func (o *SaftImportPreviewHeader) GetSoftwareVersion() string {
+	if o == nil || IsNil(o.SoftwareVersion) {
+		var ret string
+		return ret
+	}
+	return *o.SoftwareVersion
+}
+
+// GetSoftwareVersionOk returns a tuple with the SoftwareVersion field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SaftImportPreviewHeader) GetSoftwareVersionOk() (*string, bool) {
+	if o == nil || IsNil(o.SoftwareVersion) {
+		return nil, false
+	}
+	return o.SoftwareVersion, true
+}
+
+// HasSoftwareVersion returns a boolean if a field has been set.
+func (o *SaftImportPreviewHeader) HasSoftwareVersion() bool {
+	if o != nil && !IsNil(o.SoftwareVersion) {
+		return true
+	}
+
+	return false
+}
+
+// SetSoftwareVersion gets a reference to the given string and assigns it to the SoftwareVersion field.
+func (o *SaftImportPreviewHeader) SetSoftwareVersion(v string) {
+	o.SoftwareVersion = &v
+}
+
+// GetHeaderComment returns the HeaderComment field value if set, zero value otherwise.
+func (o *SaftImportPreviewHeader) GetHeaderComment() string {
+	if o == nil || IsNil(o.HeaderComment) {
+		var ret string
+		return ret
+	}
+	return *o.HeaderComment
+}
+
+// GetHeaderCommentOk returns a tuple with the HeaderComment field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SaftImportPreviewHeader) GetHeaderCommentOk() (*string, bool) {
+	if o == nil || IsNil(o.HeaderComment) {
+		return nil, false
+	}
+	return o.HeaderComment, true
+}
+
+// HasHeaderComment returns a boolean if a field has been set.
+func (o *SaftImportPreviewHeader) HasHeaderComment() bool {
+	if o != nil && !IsNil(o.HeaderComment) {
+		return true
+	}
+
+	return false
+}
+
+// SetHeaderComment gets a reference to the given string and assigns it to the HeaderComment field.
+func (o *SaftImportPreviewHeader) SetHeaderComment(v string) {
+	o.HeaderComment = &v
+}
+
 func (o SaftImportPreviewHeader) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -227,6 +395,21 @@ func (o SaftImportPreviewHeader) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.Currency) {
 		toSerialize["currency"] = o.Currency
+	}
+	if !IsNil(o.Software) {
+		toSerialize["software"] = o.Software
+	}
+	if !IsNil(o.SoftwareCompanyName) {
+		toSerialize["softwareCompanyName"] = o.SoftwareCompanyName
+	}
+	if !IsNil(o.SoftwareId) {
+		toSerialize["softwareId"] = o.SoftwareId
+	}
+	if !IsNil(o.SoftwareVersion) {
+		toSerialize["softwareVersion"] = o.SoftwareVersion
+	}
+	if !IsNil(o.HeaderComment) {
+		toSerialize["headerComment"] = o.HeaderComment
 	}
 	return toSerialize, nil
 }

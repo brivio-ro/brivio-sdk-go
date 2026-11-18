@@ -27,6 +27,14 @@ type InvoiceCreateItemsInner struct {
 	Unit *string `json:"unit,omitempty"`
 	UnitPrice float32 `json:"unit_price"`
 	VatRate *float32 `json:"vat_rate,omitempty"`
+	// Dwelling sold under the transitional 9 % VAT regime (Legea 141/2025 art. III, extended by Legea 161/2026). Required for a 9 % line.
+	HousingTransitional *bool `json:"housing_transitional,omitempty"`
+	// VATEX exemption reason (BT-121) of a 0 % line on a TAXABLE issued invoice (art. 292/294/295 Cod fiscal). Required for such a line; refused on any other rate.
+	VatExemptionCode *string `json:"vat_exemption_code,omitempty"`
+	// Combined Nomenclature (NC/CN) tariff code of the goods, sent as BT-158 item classification.
+	NcCode *string `json:"nc_code,omitempty"`
+	// CPV code of the supply (e.g. \"72000000-5\"), sent as BT-158 item classification.
+	CpvCode *string `json:"cpv_code,omitempty"`
 }
 
 type _InvoiceCreateItemsInner InvoiceCreateItemsInner
@@ -42,6 +50,8 @@ func NewInvoiceCreateItemsInner(description string, quantity float32, unitPrice 
 	var unit string = "buc"
 	this.Unit = &unit
 	this.UnitPrice = unitPrice
+	var housingTransitional bool = false
+	this.HousingTransitional = &housingTransitional
 	return &this
 }
 
@@ -52,6 +62,8 @@ func NewInvoiceCreateItemsInnerWithDefaults() *InvoiceCreateItemsInner {
 	this := InvoiceCreateItemsInner{}
 	var unit string = "buc"
 	this.Unit = &unit
+	var housingTransitional bool = false
+	this.HousingTransitional = &housingTransitional
 	return &this
 }
 
@@ -223,6 +235,134 @@ func (o *InvoiceCreateItemsInner) SetVatRate(v float32) {
 	o.VatRate = &v
 }
 
+// GetHousingTransitional returns the HousingTransitional field value if set, zero value otherwise.
+func (o *InvoiceCreateItemsInner) GetHousingTransitional() bool {
+	if o == nil || IsNil(o.HousingTransitional) {
+		var ret bool
+		return ret
+	}
+	return *o.HousingTransitional
+}
+
+// GetHousingTransitionalOk returns a tuple with the HousingTransitional field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *InvoiceCreateItemsInner) GetHousingTransitionalOk() (*bool, bool) {
+	if o == nil || IsNil(o.HousingTransitional) {
+		return nil, false
+	}
+	return o.HousingTransitional, true
+}
+
+// HasHousingTransitional returns a boolean if a field has been set.
+func (o *InvoiceCreateItemsInner) HasHousingTransitional() bool {
+	if o != nil && !IsNil(o.HousingTransitional) {
+		return true
+	}
+
+	return false
+}
+
+// SetHousingTransitional gets a reference to the given bool and assigns it to the HousingTransitional field.
+func (o *InvoiceCreateItemsInner) SetHousingTransitional(v bool) {
+	o.HousingTransitional = &v
+}
+
+// GetVatExemptionCode returns the VatExemptionCode field value if set, zero value otherwise.
+func (o *InvoiceCreateItemsInner) GetVatExemptionCode() string {
+	if o == nil || IsNil(o.VatExemptionCode) {
+		var ret string
+		return ret
+	}
+	return *o.VatExemptionCode
+}
+
+// GetVatExemptionCodeOk returns a tuple with the VatExemptionCode field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *InvoiceCreateItemsInner) GetVatExemptionCodeOk() (*string, bool) {
+	if o == nil || IsNil(o.VatExemptionCode) {
+		return nil, false
+	}
+	return o.VatExemptionCode, true
+}
+
+// HasVatExemptionCode returns a boolean if a field has been set.
+func (o *InvoiceCreateItemsInner) HasVatExemptionCode() bool {
+	if o != nil && !IsNil(o.VatExemptionCode) {
+		return true
+	}
+
+	return false
+}
+
+// SetVatExemptionCode gets a reference to the given string and assigns it to the VatExemptionCode field.
+func (o *InvoiceCreateItemsInner) SetVatExemptionCode(v string) {
+	o.VatExemptionCode = &v
+}
+
+// GetNcCode returns the NcCode field value if set, zero value otherwise.
+func (o *InvoiceCreateItemsInner) GetNcCode() string {
+	if o == nil || IsNil(o.NcCode) {
+		var ret string
+		return ret
+	}
+	return *o.NcCode
+}
+
+// GetNcCodeOk returns a tuple with the NcCode field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *InvoiceCreateItemsInner) GetNcCodeOk() (*string, bool) {
+	if o == nil || IsNil(o.NcCode) {
+		return nil, false
+	}
+	return o.NcCode, true
+}
+
+// HasNcCode returns a boolean if a field has been set.
+func (o *InvoiceCreateItemsInner) HasNcCode() bool {
+	if o != nil && !IsNil(o.NcCode) {
+		return true
+	}
+
+	return false
+}
+
+// SetNcCode gets a reference to the given string and assigns it to the NcCode field.
+func (o *InvoiceCreateItemsInner) SetNcCode(v string) {
+	o.NcCode = &v
+}
+
+// GetCpvCode returns the CpvCode field value if set, zero value otherwise.
+func (o *InvoiceCreateItemsInner) GetCpvCode() string {
+	if o == nil || IsNil(o.CpvCode) {
+		var ret string
+		return ret
+	}
+	return *o.CpvCode
+}
+
+// GetCpvCodeOk returns a tuple with the CpvCode field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *InvoiceCreateItemsInner) GetCpvCodeOk() (*string, bool) {
+	if o == nil || IsNil(o.CpvCode) {
+		return nil, false
+	}
+	return o.CpvCode, true
+}
+
+// HasCpvCode returns a boolean if a field has been set.
+func (o *InvoiceCreateItemsInner) HasCpvCode() bool {
+	if o != nil && !IsNil(o.CpvCode) {
+		return true
+	}
+
+	return false
+}
+
+// SetCpvCode gets a reference to the given string and assigns it to the CpvCode field.
+func (o *InvoiceCreateItemsInner) SetCpvCode(v string) {
+	o.CpvCode = &v
+}
+
 func (o InvoiceCreateItemsInner) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -244,6 +384,18 @@ func (o InvoiceCreateItemsInner) ToMap() (map[string]interface{}, error) {
 	toSerialize["unit_price"] = o.UnitPrice
 	if !IsNil(o.VatRate) {
 		toSerialize["vat_rate"] = o.VatRate
+	}
+	if !IsNil(o.HousingTransitional) {
+		toSerialize["housing_transitional"] = o.HousingTransitional
+	}
+	if !IsNil(o.VatExemptionCode) {
+		toSerialize["vat_exemption_code"] = o.VatExemptionCode
+	}
+	if !IsNil(o.NcCode) {
+		toSerialize["nc_code"] = o.NcCode
+	}
+	if !IsNil(o.CpvCode) {
+		toSerialize["cpv_code"] = o.CpvCode
 	}
 	return toSerialize, nil
 }

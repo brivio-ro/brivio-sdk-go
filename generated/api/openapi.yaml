@@ -12,6 +12,13 @@ security:
 paths:
   /me:
     get:
+      description: "Returns `organization` { id, name, slug, type, country, tax_residence,\
+        \ tax_regime }, the `environment` of the credential and its `scopes`. `country`\
+        \ is the country of the registered office (ISO 3166-1 alpha-2). `tax_residence`\
+        \ is the country whose tax rules apply; it equals `country` unless the organisation\
+        \ declared a different tax residence (a company incorporated in GB and tax\
+        \ resident in Romania has country \"GB\" and tax_residence \"RO\"). It is\
+        \ never null."
       operationId: listMe
       responses:
         "200":
@@ -23,6 +30,158 @@ paths:
                 $ref: "#/components/schemas/listMe_401_response"
           description: Error
       summary: Identify the authenticated organization
+      tags:
+      - me
+  /me/profile:
+    get:
+      description: "Name, email, avatar, UI locale, whether the email is verified\
+        \ and whether 2FA is on. Honoured only for OAuth tokens of Brivio's own apps;\
+        \ API keys and integrator apps get 403. ADR-0331, MN-0132."
+      operationId: listMeProfile
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "The signed-in person's own profile (first-party: brivio-mobile, scope\
+        \ account:read)"
+      tags:
+      - me
+    patch:
+      description: "Body: { name?, avatar? (https URL or null), locale? (\"ro\" |\
+        \ \"en\" | null) }. An `email` field is refused with 422: the address changes\
+        \ only in the web app, with a confirmation from the new mailbox."
+      operationId: updateMeProfile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/updateMeProfile_request"
+        required: true
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Update the signed-in person's name, avatar or locale (first-party,\
+        \ scope account:write)"
+      tags:
+      - me
+  /me/devices:
+    get:
+      description: "Browser, OS, device type, approximate city/country, label and\
+        \ last activity, most recent first (max 100). First-party only (brivio-mobile).\
+        \ MN-0132."
+      operationId: listMeDevices
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "The signed-in person's active browsers/devices (first-party, scope\
+        \ account:read)"
+      tags:
+      - me
+  /me/notification-preferences:
+    get:
+      description: "Object { email, push, inApp }, each { invoicePaid, contractSigned,\
+        \ documentShared } booleans. Defaults when never set. First-party only (brivio-mobile).\
+        \ MN-0132."
+      operationId: listMeNotificationPreferences
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Your notification switches per channel and event (first-party, scope\
+        \ account:read)"
+      tags:
+      - me
+    put:
+      description: "Whole object, strict: every channel and every event key is required;\
+        \ unknown keys are refused with 422."
+      operationId: updateMeNotificationPreference
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Replace your notification switches (first-party, scope account:write)"
+      tags:
+      - me
+  /me/devices/{id}:
+    delete:
+      description: Revokes the device; that browser is signed out on its next request.
+        Another user's device id is a 404.
+      operationId: deleteMeDevice
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Sign one of your devices out (first-party, scope account:write)"
+      tags:
+      - me
+    patch:
+      operationId: updateMeDevice
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/updateMeDevice_request"
+        required: true
+      responses:
+        "200":
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listMe_401_response"
+          description: Error
+      summary: "Rename one of your devices (first-party, scope account:write)"
       tags:
       - me
   /contacts:
@@ -1188,9 +1347,9 @@ paths:
         \ → OVERDUE, DRAFT → CANCELLED (only if never sent to e-Factura). Issue with\
         \ POST /invoices/{id}/send, record payments with POST /invoices/{id}/payments,\
         \ reverse with POST /invoices/{id}/credit-note. Once issued or known to e-Factura,\
-        \ due_date and other fiscal fields are frozen; notes and project_id stay editable.\
-        \ Refusals: 409 INVOICE_NOT_EDITABLE; 422 INVOICE_CREDITED on a credited invoice.\
-        \ (scope: invoices:write)"
+        \ due_date, buyer_reference, order_reference and other fiscal fields are frozen;\
+        \ notes and project_id stay editable. Refusals: 409 INVOICE_NOT_EDITABLE;\
+        \ 422 INVOICE_CREDITED on a credited invoice. (scope: invoices:write)"
       operationId: updateInvoice
       parameters:
       - explode: false
@@ -1200,6 +1359,12 @@ paths:
         schema:
           type: string
         style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvoiceUpdate"
+        required: false
       responses:
         "200":
           content:
@@ -16135,6 +16300,7 @@ components:
     Invoice:
       example:
         notes: notes
+        order_reference: order_reference
         vat_exemption_reason: vat_exemption_reason
         created_at: 2000-01-23T04:56:07.000+00:00
         type: type
@@ -16155,6 +16321,7 @@ components:
         company_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         exchange_rate: exchange_rate
         due_date: 2000-01-23
+        buyer_reference: buyer_reference
         sent_at: 2000-01-23T04:56:07.000+00:00
         paid_at: 2000-01-23T04:56:07.000+00:00
         series: series
@@ -16226,6 +16393,14 @@ components:
           type: string
         paid_amount:
           type: string
+        buyer_reference:
+          description: BT-10 buyer reference (e-Factura cbc:BuyerReference).
+          type: string
+          nullable: true
+        order_reference:
+          description: BT-13 purchase order reference (e-Factura cac:OrderReference).
+          type: string
+          nullable: true
         credited_amount:
           description: Sum of the issued credit notes reversing this invoice. Open
             balance = total − paid_amount − credited_amount.
@@ -16263,10 +16438,12 @@ components:
         notes: notes
         company_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         exchange_rate: 0.8008281904610115
+        order_reference: order_reference
         due_date: 2000-01-23
         vat_exemption_reason: vat_exemption_reason
         type: INVOICE
         contact_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        buyer_reference: buyer_reference
         issue_date: 2000-01-23
         project_id: project_id
         series: series
@@ -16274,15 +16451,23 @@ components:
         vat_type: TAXABLE
         items:
         - article_id: article_id
+          cpv_code: cpv_code
+          nc_code: nc_code
           unit: buc
           quantity: 6.027456183070403
+          housing_transitional: false
           description: description
+          vat_exemption_code: VATEX-EU-132
           unit_price: 1.4658129805029452
           vat_rate: 5.962133916683182
         - article_id: article_id
+          cpv_code: cpv_code
+          nc_code: nc_code
           unit: buc
           quantity: 6.027456183070403
+          housing_transitional: false
           description: description
+          vat_exemption_code: VATEX-EU-132
           unit_price: 1.4658129805029452
           vat_rate: 5.962133916683182
         direction: ISSUED
@@ -16356,6 +16541,18 @@ components:
           type: string
         notes:
           type: string
+        buyer_reference:
+          description: "BT-10 buyer reference, sent as cbc:BuyerReference. Public\
+            \ institutions usually require it. Trimmed; blank = none."
+          maxLength: 200
+          type: string
+          nullable: true
+        order_reference:
+          description: "BT-13 purchase order number, sent as cac:OrderReference (RO_CIUS\
+            \ BR-RO-L0303: at most 200 characters). Trimmed; blank = none."
+          maxLength: 200
+          type: string
+          nullable: true
         items:
           items:
             $ref: "#/components/schemas/InvoiceCreate_items_inner"
@@ -16364,6 +16561,45 @@ components:
       - due_date
       - issue_date
       - items
+    InvoiceUpdate:
+      description: "Only the keys sent are changed. Once the invoice is issued or\
+        \ known to e-Factura, due_date, buyer_reference and order_reference are frozen\
+        \ (409 INVOICE_NOT_EDITABLE)."
+      example:
+        notes: notes
+        project_id: project_id
+        order_reference: order_reference
+        due_date: 2000-01-23
+        buyer_reference: buyer_reference
+        status: DRAFT
+      properties:
+        status:
+          enum:
+          - DRAFT
+          - SENT
+          - VIEWED
+          - PAID
+          - PARTIALLY_PAID
+          - OVERDUE
+          - CANCELLED
+          type: string
+        project_id:
+          type: string
+        due_date:
+          format: date
+          type: string
+        notes:
+          type: string
+        buyer_reference:
+          description: BT-10 buyer reference. Blank or null clears it.
+          maxLength: 200
+          type: string
+          nullable: true
+        order_reference:
+          description: BT-13 purchase order number. Blank or null clears it.
+          maxLength: 200
+          type: string
+          nullable: true
     InvoicePaymentCreate:
       example:
         reference: reference
@@ -22449,11 +22685,16 @@ components:
         - warnings
         - warnings
         header:
+          softwareCompanyName: softwareCompanyName
+          softwareId: softwareId
+          software: software
           endDate: endDate
           companyName: companyName
           taxRegistrationNumber: taxRegistrationNumber
           currency: currency
           startDate: startDate
+          softwareVersion: softwareVersion
+          headerComment: headerComment
         control_total_mismatches:
         - control_total_mismatches
         - control_total_mismatches
@@ -22515,11 +22756,16 @@ components:
           - warnings
           - warnings
           header:
+            softwareCompanyName: softwareCompanyName
+            softwareId: softwareId
+            software: software
             endDate: endDate
             companyName: companyName
             taxRegistrationNumber: taxRegistrationNumber
             currency: currency
             startDate: startDate
+            softwareVersion: softwareVersion
+            headerComment: headerComment
           control_total_mismatches:
           - control_total_mismatches
           - control_total_mismatches
@@ -22581,7 +22827,8 @@ components:
           $ref: "#/components/schemas/SaftImportPreview"
         result:
           description: "Per-section outcome once applied: contacts, products, accounts,\
-            \ stock, opening_balances ({posted, entry_id, errors}), migration_date."
+            \ stock, assets (fixed-asset register, no journal entry), opening_balances\
+            \ ({posted, entry_id, errors}), migration_date."
           nullable: true
           type: object
         imported_count:
@@ -22667,11 +22914,16 @@ components:
           - warnings
           - warnings
           header:
+            softwareCompanyName: softwareCompanyName
+            softwareId: softwareId
+            software: software
             endDate: endDate
             companyName: companyName
             taxRegistrationNumber: taxRegistrationNumber
             currency: currency
             startDate: startDate
+            softwareVersion: softwareVersion
+            headerComment: headerComment
           control_total_mismatches:
           - control_total_mismatches
           - control_total_mismatches
@@ -22709,6 +22961,7 @@ components:
         account_mapping:
           key: account_mapping
         sections:
+          assets: true
           accounts: true
           stock: true
           opening_balances: true
@@ -27735,6 +27988,28 @@ components:
       required:
       - data
       - error
+    updateMeProfile_request:
+      additionalProperties: {}
+      properties:
+        name:
+          maxLength: 255
+          minLength: 2
+        avatar:
+          format: uri
+          maxLength: 500
+        locale:
+          enum:
+          - ro
+          - en
+          - null
+    updateMeDevice_request:
+      additionalProperties: {}
+      properties:
+        label:
+          maxLength: 100
+          minLength: 1
+      required:
+      - label
     listContacts_200_response:
       example:
         data:
@@ -27884,6 +28159,7 @@ components:
       example:
         data:
         - notes: notes
+          order_reference: order_reference
           vat_exemption_reason: vat_exemption_reason
           created_at: 2000-01-23T04:56:07.000+00:00
           type: type
@@ -27904,6 +28180,7 @@ components:
           company_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           exchange_rate: exchange_rate
           due_date: 2000-01-23
+          buyer_reference: buyer_reference
           sent_at: 2000-01-23T04:56:07.000+00:00
           paid_at: 2000-01-23T04:56:07.000+00:00
           series: series
@@ -27913,6 +28190,7 @@ components:
           vat_type: TAXABLE
           status: status
         - notes: notes
+          order_reference: order_reference
           vat_exemption_reason: vat_exemption_reason
           created_at: 2000-01-23T04:56:07.000+00:00
           type: type
@@ -27933,6 +28211,7 @@ components:
           company_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           exchange_rate: exchange_rate
           due_date: 2000-01-23
+          buyer_reference: buyer_reference
           sent_at: 2000-01-23T04:56:07.000+00:00
           paid_at: 2000-01-23T04:56:07.000+00:00
           series: series
@@ -27964,6 +28243,7 @@ components:
       example:
         data:
           notes: notes
+          order_reference: order_reference
           vat_exemption_reason: vat_exemption_reason
           created_at: 2000-01-23T04:56:07.000+00:00
           type: type
@@ -27984,6 +28264,7 @@ components:
           company_id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           exchange_rate: exchange_rate
           due_date: 2000-01-23
+          buyer_reference: buyer_reference
           sent_at: 2000-01-23T04:56:07.000+00:00
           paid_at: 2000-01-23T04:56:07.000+00:00
           series: series
@@ -31222,11 +31503,16 @@ components:
             - warnings
             - warnings
             header:
+              softwareCompanyName: softwareCompanyName
+              softwareId: softwareId
+              software: software
               endDate: endDate
               companyName: companyName
               taxRegistrationNumber: taxRegistrationNumber
               currency: currency
               startDate: startDate
+              softwareVersion: softwareVersion
+              headerComment: headerComment
             control_total_mismatches:
             - control_total_mismatches
             - control_total_mismatches
@@ -31280,11 +31566,16 @@ components:
             - warnings
             - warnings
             header:
+              softwareCompanyName: softwareCompanyName
+              softwareId: softwareId
+              software: software
               endDate: endDate
               companyName: companyName
               taxRegistrationNumber: taxRegistrationNumber
               currency: currency
               startDate: startDate
+              softwareVersion: softwareVersion
+              headerComment: headerComment
             control_total_mismatches:
             - control_total_mismatches
             - control_total_mismatches
@@ -31360,11 +31651,16 @@ components:
             - warnings
             - warnings
             header:
+              softwareCompanyName: softwareCompanyName
+              softwareId: softwareId
+              software: software
               endDate: endDate
               companyName: companyName
               taxRegistrationNumber: taxRegistrationNumber
               currency: currency
               startDate: startDate
+              softwareVersion: softwareVersion
+              headerComment: headerComment
             control_total_mismatches:
             - control_total_mismatches
             - control_total_mismatches
@@ -31436,11 +31732,16 @@ components:
             - warnings
             - warnings
             header:
+              softwareCompanyName: softwareCompanyName
+              softwareId: softwareId
+              software: software
               endDate: endDate
               companyName: companyName
               taxRegistrationNumber: taxRegistrationNumber
               currency: currency
               startDate: startDate
+              softwareVersion: softwareVersion
+              headerComment: headerComment
             control_total_mismatches:
             - control_total_mismatches
             - control_total_mismatches
@@ -34775,7 +35076,6 @@ components:
           data:
             $ref: "#/components/schemas/SubscriptionWebhookData"
     CompanyFinancialFilter_year:
-      default: latest
       oneOf:
       - enum:
         - latest
@@ -34802,9 +35102,13 @@ components:
     InvoiceCreate_items_inner:
       example:
         article_id: article_id
+        cpv_code: cpv_code
+        nc_code: nc_code
         unit: buc
         quantity: 6.027456183070403
+        housing_transitional: false
         description: description
+        vat_exemption_code: VATEX-EU-132
         unit_price: 1.4658129805029452
         vat_rate: 5.962133916683182
       properties:
@@ -34821,6 +35125,37 @@ components:
           type: number
         vat_rate:
           type: number
+        housing_transitional:
+          default: false
+          description: "Dwelling sold under the transitional 9 % VAT regime (Legea\
+            \ 141/2025 art. III, extended by Legea 161/2026). Required for a 9 % line."
+          type: boolean
+        vat_exemption_code:
+          description: VATEX exemption reason (BT-121) of a 0 % line on a TAXABLE
+            issued invoice (art. 292/294/295 Cod fiscal). Required for such a line;
+            refused on any other rate.
+          enum:
+          - VATEX-EU-132
+          - VATEX-EU-132-1B
+          - VATEX-EU-132-1I
+          - VATEX-EU-135-1A
+          - VATEX-EU-135-1B
+          - VATEX-EU-135-1L
+          - VATEX-EU-135-1J
+          - VATEX-EU-146
+          - VATEX-EU-151
+          - VATEX-EU-148
+          type: string
+        nc_code:
+          description: "Combined Nomenclature (NC/CN) tariff code of the goods, sent\
+            \ as BT-158 item classification."
+          maxLength: 20
+          type: string
+        cpv_code:
+          description: "CPV code of the supply (e.g. \"72000000-5\"), sent as BT-158\
+            \ item classification."
+          maxLength: 20
+          type: string
       required:
       - description
       - quantity
@@ -35378,13 +35713,19 @@ components:
       - quantity
     SaftImportPreview_header:
       example:
+        softwareCompanyName: softwareCompanyName
+        softwareId: softwareId
+        software: software
         endDate: endDate
         companyName: companyName
         taxRegistrationNumber: taxRegistrationNumber
         currency: currency
         startDate: startDate
+        softwareVersion: softwareVersion
+        headerComment: headerComment
       properties:
         taxRegistrationNumber:
+          description: Bare CUI (no RO / 00 prefix).
           type: string
         companyName:
           type: string
@@ -35393,6 +35734,20 @@ components:
         endDate:
           type: string
         currency:
+          type: string
+        software:
+          description: "Producing program: `SoftwareCompanyName` `SoftwareID` `SoftwareVersion`\
+            \ joined, e.g. the source accounting app."
+          type: string
+        softwareCompanyName:
+          type: string
+        softwareId:
+          type: string
+        softwareVersion:
+          type: string
+        headerComment:
+          description: "D406 `HeaderComment` (L = monthly, T = quarterly, A = annual,\
+            \ C = on demand, NL/NT = non-resident)."
           type: string
     SaftImportPreview_counts:
       example:
@@ -35504,6 +35859,7 @@ components:
       additionalProperties: false
       description: Every section defaults to true.
       example:
+        assets: true
         accounts: true
         stock: true
         opening_balances: true
@@ -35518,6 +35874,9 @@ components:
           type: boolean
         stock:
           type: boolean
+        assets:
+          description: MasterFiles/Assets → fixed-asset register; never posts (the
+            opening balance carries the values).
         opening_balances:
           type: boolean
     GateVisit_compliance_alerts_inner:

@@ -1457,6 +1457,12 @@ type ApiUpdateInvoiceRequest struct {
 	ctx context.Context
 	ApiService *InvoicesAPIService
 	id string
+	invoiceUpdate *InvoiceUpdate
+}
+
+func (r ApiUpdateInvoiceRequest) InvoiceUpdate(invoiceUpdate InvoiceUpdate) ApiUpdateInvoiceRequest {
+	r.invoiceUpdate = &invoiceUpdate
+	return r
 }
 
 func (r ApiUpdateInvoiceRequest) Execute() (*CreateInvoice201Response, *http.Response, error) {
@@ -1466,7 +1472,7 @@ func (r ApiUpdateInvoiceRequest) Execute() (*CreateInvoice201Response, *http.Res
 /*
 UpdateInvoice Update a invoice
 
-Status moves are whitelisted: SENT → VIEWED/OVERDUE, VIEWED/PARTIALLY_PAID → OVERDUE, DRAFT → CANCELLED (only if never sent to e-Factura). Issue with POST /invoices/{id}/send, record payments with POST /invoices/{id}/payments, reverse with POST /invoices/{id}/credit-note. Once issued or known to e-Factura, due_date and other fiscal fields are frozen; notes and project_id stay editable. Refusals: 409 INVOICE_NOT_EDITABLE; 422 INVOICE_CREDITED on a credited invoice. (scope: invoices:write)
+Status moves are whitelisted: SENT → VIEWED/OVERDUE, VIEWED/PARTIALLY_PAID → OVERDUE, DRAFT → CANCELLED (only if never sent to e-Factura). Issue with POST /invoices/{id}/send, record payments with POST /invoices/{id}/payments, reverse with POST /invoices/{id}/credit-note. Once issued or known to e-Factura, due_date, buyer_reference, order_reference and other fiscal fields are frozen; notes and project_id stay editable. Refusals: 409 INVOICE_NOT_EDITABLE; 422 INVOICE_CREDITED on a credited invoice. (scope: invoices:write)
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @param id
@@ -1503,7 +1509,7 @@ func (a *InvoicesAPIService) UpdateInvoiceExecute(r ApiUpdateInvoiceRequest) (*C
 	localVarFormParams := url.Values{}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
+	localVarHTTPContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
@@ -1519,6 +1525,8 @@ func (a *InvoicesAPIService) UpdateInvoiceExecute(r ApiUpdateInvoiceRequest) (*C
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
+	// body params
+	localVarPostBody = r.invoiceUpdate
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err

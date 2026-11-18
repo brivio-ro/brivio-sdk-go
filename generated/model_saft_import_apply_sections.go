@@ -23,6 +23,8 @@ type SaftImportApplySections struct {
 	Products *bool `json:"products,omitempty"`
 	Accounts *bool `json:"accounts,omitempty"`
 	Stock *bool `json:"stock,omitempty"`
+	// MasterFiles/Assets → fixed-asset register; never posts (the opening balance carries the values).
+	Assets *bool `json:"assets,omitempty"`
 	OpeningBalances *bool `json:"opening_balances,omitempty"`
 }
 
@@ -171,6 +173,38 @@ func (o *SaftImportApplySections) SetStock(v bool) {
 	o.Stock = &v
 }
 
+// GetAssets returns the Assets field value if set, zero value otherwise.
+func (o *SaftImportApplySections) GetAssets() bool {
+	if o == nil || IsNil(o.Assets) {
+		var ret bool
+		return ret
+	}
+	return *o.Assets
+}
+
+// GetAssetsOk returns a tuple with the Assets field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SaftImportApplySections) GetAssetsOk() (*bool, bool) {
+	if o == nil || IsNil(o.Assets) {
+		return nil, false
+	}
+	return o.Assets, true
+}
+
+// HasAssets returns a boolean if a field has been set.
+func (o *SaftImportApplySections) HasAssets() bool {
+	if o != nil && !IsNil(o.Assets) {
+		return true
+	}
+
+	return false
+}
+
+// SetAssets gets a reference to the given bool and assigns it to the Assets field.
+func (o *SaftImportApplySections) SetAssets(v bool) {
+	o.Assets = &v
+}
+
 // GetOpeningBalances returns the OpeningBalances field value if set, zero value otherwise.
 func (o *SaftImportApplySections) GetOpeningBalances() bool {
 	if o == nil || IsNil(o.OpeningBalances) {
@@ -224,6 +258,9 @@ func (o SaftImportApplySections) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.Stock) {
 		toSerialize["stock"] = o.Stock
+	}
+	if !IsNil(o.Assets) {
+		toSerialize["assets"] = o.Assets
 	}
 	if !IsNil(o.OpeningBalances) {
 		toSerialize["opening_balances"] = o.OpeningBalances

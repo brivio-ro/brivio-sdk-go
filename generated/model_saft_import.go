@@ -32,7 +32,7 @@ type SaftImport struct {
 	HasFile bool `json:"has_file"`
 	StorageExpiresAt NullableTime `json:"storage_expires_at,omitempty"`
 	Preview NullableSaftImportPreview `json:"preview,omitempty"`
-	// Per-section outcome once applied: contacts, products, accounts, stock, opening_balances ({posted, entry_id, errors}), migration_date.
+	// Per-section outcome once applied: contacts, products, accounts, stock, assets (fixed-asset register, no journal entry), opening_balances ({posted, entry_id, errors}), migration_date.
 	Result map[string]interface{} `json:"result,omitempty"`
 	ImportedCount *int32 `json:"imported_count,omitempty"`
 	UpdatedCount *int32 `json:"updated_count,omitempty"`

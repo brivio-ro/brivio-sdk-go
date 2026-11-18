@@ -41,6 +41,10 @@ type InvoiceCreate struct {
 	// Legal mention printed and emitted for non-TAXABLE regimes.
 	VatExemptionReason *string `json:"vat_exemption_reason,omitempty"`
 	Notes *string `json:"notes,omitempty"`
+	// BT-10 buyer reference, sent as cbc:BuyerReference. Public institutions usually require it. Trimmed; blank = none.
+	BuyerReference *string `json:"buyer_reference,omitempty"`
+	// BT-13 purchase order number, sent as cac:OrderReference (RO_CIUS BR-RO-L0303: at most 200 characters). Trimmed; blank = none.
+	OrderReference *string `json:"order_reference,omitempty"`
 	Items []InvoiceCreateItemsInner `json:"items"`
 }
 
@@ -506,6 +510,70 @@ func (o *InvoiceCreate) SetNotes(v string) {
 	o.Notes = &v
 }
 
+// GetBuyerReference returns the BuyerReference field value if set, zero value otherwise.
+func (o *InvoiceCreate) GetBuyerReference() string {
+	if o == nil || IsNil(o.BuyerReference) {
+		var ret string
+		return ret
+	}
+	return *o.BuyerReference
+}
+
+// GetBuyerReferenceOk returns a tuple with the BuyerReference field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *InvoiceCreate) GetBuyerReferenceOk() (*string, bool) {
+	if o == nil || IsNil(o.BuyerReference) {
+		return nil, false
+	}
+	return o.BuyerReference, true
+}
+
+// HasBuyerReference returns a boolean if a field has been set.
+func (o *InvoiceCreate) HasBuyerReference() bool {
+	if o != nil && !IsNil(o.BuyerReference) {
+		return true
+	}
+
+	return false
+}
+
+// SetBuyerReference gets a reference to the given string and assigns it to the BuyerReference field.
+func (o *InvoiceCreate) SetBuyerReference(v string) {
+	o.BuyerReference = &v
+}
+
+// GetOrderReference returns the OrderReference field value if set, zero value otherwise.
+func (o *InvoiceCreate) GetOrderReference() string {
+	if o == nil || IsNil(o.OrderReference) {
+		var ret string
+		return ret
+	}
+	return *o.OrderReference
+}
+
+// GetOrderReferenceOk returns a tuple with the OrderReference field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *InvoiceCreate) GetOrderReferenceOk() (*string, bool) {
+	if o == nil || IsNil(o.OrderReference) {
+		return nil, false
+	}
+	return o.OrderReference, true
+}
+
+// HasOrderReference returns a boolean if a field has been set.
+func (o *InvoiceCreate) HasOrderReference() bool {
+	if o != nil && !IsNil(o.OrderReference) {
+		return true
+	}
+
+	return false
+}
+
+// SetOrderReference gets a reference to the given string and assigns it to the OrderReference field.
+func (o *InvoiceCreate) SetOrderReference(v string) {
+	o.OrderReference = &v
+}
+
 // GetItems returns the Items field value
 func (o *InvoiceCreate) GetItems() []InvoiceCreateItemsInner {
 	if o == nil {
@@ -577,6 +645,12 @@ func (o InvoiceCreate) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.Notes) {
 		toSerialize["notes"] = o.Notes
+	}
+	if !IsNil(o.BuyerReference) {
+		toSerialize["buyer_reference"] = o.BuyerReference
+	}
+	if !IsNil(o.OrderReference) {
+		toSerialize["order_reference"] = o.OrderReference
 	}
 	toSerialize["items"] = o.Items
 	return toSerialize, nil

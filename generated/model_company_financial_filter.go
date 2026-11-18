@@ -39,8 +39,6 @@ func NewCompanyFinancialFilter(field string, indicator string, range_ CompanyNum
 	this := CompanyFinancialFilter{}
 	this.Field = field
 	this.Indicator = indicator
-	var year CompanyFinancialFilterYear = latest
-	this.Year = &year
 	this.Range = range_
 	return &this
 }
@@ -50,8 +48,6 @@ func NewCompanyFinancialFilter(field string, indicator string, range_ CompanyNum
 // but it doesn't guarantee that properties required by API are set
 func NewCompanyFinancialFilterWithDefaults() *CompanyFinancialFilter {
 	this := CompanyFinancialFilter{}
-	var year CompanyFinancialFilterYear = latest
-	this.Year = &year
 	return &this
 }
 
